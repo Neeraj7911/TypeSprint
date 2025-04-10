@@ -1,0 +1,18 @@
+{
+  "ssc_cgl": {
+    "full_mistakes": ["omission", "wrong_word", "spelling_error", "repetition"],
+    "half_mistakes": [
+      "spacing_error",
+      "capitalization_error",
+      "punctuation_error"
+    ]
+  },
+  "ntpc": {
+    "full_mistakes": ["omission", "wrong_word", "spelling_error", "repetition"],
+    "half_mistakes": [
+      "spacing_error",
+      "capitalization_error",
+      "punctuation_error"
+    ]
+  }
+}
