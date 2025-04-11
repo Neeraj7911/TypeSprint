@@ -67,7 +67,7 @@ function Header() {
             {logoText.split("").map((letter, index) => (
               <motion.span
                 key={index}
-                className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"
+                className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600" // Restored original gradient
                 whileHover={{
                   scale: [1, 1.2, 0.9, 1.1, 1],
                   transition: {
@@ -96,7 +96,7 @@ function Header() {
               </NavLink>
               <div className="relative group">
                 <motion.button
-                  className="bg-white bg-opacity-20 dark:text-white text-gray-900 px-4 py-2 rounded-full flex items-center hover:bg-opacity-30 transition-all duration-300"
+                  className="bg-white bg-opacity-20 text-gray-900 dark:text-white px-4 py-2 rounded-full flex items-center hover:bg-opacity-30 transition-all duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

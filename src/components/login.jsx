@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react"; // Added useEffect
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { auth, provider, db } from "../firebase.jsx"; // Ensure this path is correct
+import { auth, provider, db } from "../firebase.jsx";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -10,7 +10,48 @@ import {
 } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { FaGoogle } from "react-icons/fa";
-import CustomCursor from "../components/CustomCursor"; // Adjust path as needed
+import CustomCursor from "../components/CustomCursor";
+
+// List of valid email domains
+const VALID_EMAIL_DOMAINS = [
+  "gmail.com",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "yahoo.com",
+  "icloud.com",
+  "me.com",
+  "mac.com",
+  "msn.com",
+  "aol.com",
+  "proton.me",
+  "protonmail.com",
+  "zoho.com",
+  "gmx.com",
+  "mail.com",
+  "fastmail.com",
+  "yandex.com",
+  "rediffmail.com",
+];
+
+// List of known temporary email domains (expanded for better coverage)
+const TEMP_EMAIL_DOMAINS = [
+  "tempmail.com",
+  "10minutemail.com",
+  "guerrillamail.com",
+  "mailinator.com",
+  "disposabl.email",
+  "throwawaymail.com",
+  "temp-mail.org",
+  "yopmail.com",
+  "sharklasers.com",
+  "getnada.com",
+  "trashmail.com",
+  "mintemail.com",
+  "tempmailo.com",
+  "burnermail.io",
+  "maildrop.cc",
+];
 
 const Login = ({ darkMode }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -28,6 +69,34 @@ const Login = ({ darkMode }) => {
     });
     return () => unsubscribe(); // Cleanup subscription
   }, [navigate]);
+
+  // Validate email domain
+  const validateEmailDomain = (email) => {
+    // Basic email format check
+    if (!email.includes("@")) {
+      return { isValid: false, error: "Please enter a valid email address." };
+    }
+
+    const domain = email.toLowerCase().split("@")[1];
+    if (!domain) {
+      return { isValid: false, error: "Please enter a valid email address." };
+    }
+
+    // Check for temporary email domains
+    if (TEMP_EMAIL_DOMAINS.includes(domain)) {
+      return { isValid: false, error: "Do not use temporary email services." };
+    }
+
+    // Check if domain is in valid list
+    if (!VALID_EMAIL_DOMAINS.includes(domain)) {
+      return {
+        isValid: false,
+        error: "Please do not use Temp Mails :/",
+      };
+    }
+
+    return { isValid: true, error: "" };
+  };
 
   const saveTestResults = async (userId) => {
     try {
@@ -56,6 +125,15 @@ const Login = ({ darkMode }) => {
     e.preventDefault();
     setAuthError("");
     setIsLoading(true);
+
+    // Validate email domain before proceeding
+    const { isValid, error } = validateEmailDomain(authData.email);
+    if (!isValid) {
+      setAuthError(error);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       let userCredential;
       if (isSignUp) {
@@ -75,14 +153,18 @@ const Login = ({ darkMode }) => {
     } catch (error) {
       console.error("Auth error:", error);
       setAuthError(
-        error.code === "auth/user-not-found" ||
-          error.code === "auth/wrong-password"
-          ? "Invalid email or password. Please try again."
+        error.code === "auth/user-not-found"
+          ? "No account found with this email. Please sign up."
+          : error.code === "auth/wrong-password"
+          ? "Incorrect password. Please try again."
+          : error.code === "auth/email-already-in-use"
+          ? "This email is already registered. Please log in."
+          : error.code === "auth/invalid-email"
+          ? "Invalid email format. Please check your email."
           : "Authentication failed. Please try again."
       );
     } finally {
       setIsLoading(false);
-      // Removed navigate("/") here to avoid overriding saveTestResults redirect
     }
   };
 
@@ -91,16 +173,23 @@ const Login = ({ darkMode }) => {
     setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken; // Not used but kept for reference
       const user = result.user;
+
+      // Validate Google email domain
+      const { isValid, error } = validateEmailDomain(user.email);
+      if (!isValid) {
+        await auth.signOut(); // Sign out if invalid domain
+        setAuthError(error);
+        setIsLoading(false);
+        return;
+      }
+
       await saveTestResults(user.uid);
     } catch (error) {
       console.error("Google auth error:", error);
       setAuthError("Failed to sign in with Google. Please try again.");
     } finally {
       setIsLoading(false);
-      // Removed navigate("/") here to avoid overriding saveTestResults redirect
     }
   };
 
