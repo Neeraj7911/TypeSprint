@@ -31,6 +31,7 @@ import {
   FaTwitter,
   FaWhatsapp,
   FaStar,
+  FaLock,
 } from "react-icons/fa";
 
 ChartJS.register(
@@ -77,6 +78,7 @@ const Dashboard = () => {
       const results = resultsSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
+        wpm: doc.data().netWpm || doc.data().wpm || 0,
       }));
       setTestResults(
         results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
@@ -92,7 +94,7 @@ const Dashboard = () => {
       const leaderboardSnapshot = await getDocs(collection(db, "leaderboard"));
       const leaderboard = leaderboardSnapshot.docs
         .map((doc) => ({ email: doc.id, ...doc.data() }))
-        .sort((a, b) => b.wpm - a.wpm);
+        .sort((a, b) => (b.netWpm || b.wpm) - (a.netWpm || a.wpm));
       setLeaderboardData(leaderboard);
     } catch (err) {
       console.error("Error fetching user data:", err);
@@ -101,7 +103,6 @@ const Dashboard = () => {
     }
   };
 
-  // WPM Progress Circle
   const WPMProgressCircle = ({ wpm, targetWPM }) => {
     const radius = 50;
     const circumference = 2 * Math.PI * radius;
@@ -139,7 +140,6 @@ const Dashboard = () => {
     );
   };
 
-  // Progress Chart
   const progressChartData = {
     labels: testResults
       .slice(0, 10)
@@ -162,7 +162,7 @@ const Dashboard = () => {
         data: testResults
           .slice(0, 10)
           .reverse()
-          .map((r) => r.accuracy),
+          .map((r) => r.accuracy || 0),
         borderColor: "magenta",
         backgroundColor: "rgba(255, 0, 128, 0.3)",
         fill: true,
@@ -180,7 +180,6 @@ const Dashboard = () => {
     },
   };
 
-  // Heatmap Data (WPM by Hour)
   const heatmapData = {
     labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
     datasets: [
@@ -213,7 +212,6 @@ const Dashboard = () => {
     },
   };
 
-  // Download Certificate
   const downloadCertificate = (cert) => {
     const pdfDoc = new jsPDF();
     const pageWidth = pdfDoc.internal.pageSize.getWidth();
@@ -266,7 +264,6 @@ const Dashboard = () => {
     pdfDoc.save(`Typing_Certificate_${cert.id}.pdf`);
   };
 
-  // Social Media Sharing
   const shareCertificate = (platform) => {
     if (!latestCertificate) return;
     const text = `I just earned a TypeSprint Certificate! WPM: ${
@@ -341,88 +338,205 @@ const Dashboard = () => {
 
   if (!user) return null;
 
-  // Define variables after data is fetched but before rendering
-  const bestWPM = Math.max(...testResults.map((r) => r.wpm), 0);
+  const bestWPM = testResults.length
+    ? Math.max(...testResults.map((r) => r.wpm || 0))
+    : 0;
   const leaderboardEntry = leaderboardData.find(
     (entry) => entry.email === user.uid
   );
   const leaderboardPosition =
     leaderboardData.findIndex((entry) => entry.email === user.uid) + 1 || "N/A";
   const bestExam = testResults.reduce(
-    (prev, curr) => (prev.wpm > curr.wpm ? prev : curr),
+    (prev, curr) => ((prev.wpm || 0) > (curr.wpm || 0) ? prev : curr),
     { wpm: 0, examName: "None" }
   );
   const consistency =
-    testResults.length > 1
+    testResults.length >= 2
       ? Math.round(
-          (Math.min(...testResults.map((r) => r.wpm)) /
-            Math.max(...testResults.map((r) => r.wpm))) *
+          (Math.min(...testResults.map((r) => r.wpm || 0)) /
+            Math.max(...testResults.map((r) => r.wpm || 0))) *
             100
-        )
-      : 100;
+        ) || 0
+      : "N/A";
   const avgErrors = testResults.length
     ? (
-        testResults.reduce((sum, r) => sum + r.errors, 0) / testResults.length
+        testResults.reduce((sum, r) => sum + (r.errors || 0), 0) /
+        testResults.length
       ).toFixed(1)
     : 0;
 
-  // Define all possible achievements
   const allAchievements = [
     {
       name: "Speed Demon",
       icon: "🏎️",
-      desc: "Achieved 50+ WPM",
+      desc: "50+ WPM",
       condition: bestWPM >= 50,
     },
     {
       name: "Accuracy Master",
       icon: "🎯",
       desc: "90%+ Accuracy",
-      condition: testResults.some((r) => r.accuracy >= 90),
+      condition: testResults.some((r) => (r.accuracy || 0) >= 90),
     },
     {
       name: "Test Veteran",
       icon: "🏅",
-      desc: "Completed 10+ Tests",
+      desc: "10+ Tests",
       condition: testResults.length >= 10,
     },
     {
       name: "Typing Pro",
       icon: "💻",
-      desc: "Achieved 75+ WPM",
+      desc: "75+ WPM",
       condition: bestWPM >= 75,
     },
     {
       name: "Perfectionist",
       icon: "✅",
-      desc: "100% Accuracy on a Test",
-      condition: testResults.some((r) => r.accuracy === 100),
+      desc: "100% Accuracy",
+      condition: testResults.some((r) => (r.accuracy || 0) === 100),
     },
     {
       name: "Marathon Typist",
       icon: "🏃‍♂️",
-      desc: "Completed 25+ Tests",
+      desc: "25+ Tests",
       condition: testResults.length >= 25,
+    },
+    {
+      name: "Lightning Fingers",
+      icon: "⚡",
+      desc: "100+ WPM",
+      condition: bestWPM >= 100,
+    },
+    {
+      name: "Error Slayer",
+      icon: "🗡️",
+      desc: "0 Errors",
+      condition: testResults.some((r) => (r.errors || 0) === 0),
+    },
+    {
+      name: "Night Owl",
+      icon: "🦇",
+      desc: "Typed at Midnight",
+      condition: testResults.some((r) => {
+        const hour = new Date(r.timestamp).getHours();
+        return hour === 0 || hour === 1;
+      }),
+    },
+    {
+      name: "Early Bird",
+      icon: "🐦",
+      desc: "Typed in Morning",
+      condition: testResults.some((r) => {
+        const hour = new Date(r.timestamp).getHours();
+        return hour >= 5 && hour <= 7;
+      }),
+    },
+    {
+      name: "Consistent Star",
+      icon: "⭐",
+      desc: "90%+ Consistency",
+      condition: consistency !== "N/A" && consistency >= 90,
+    },
+    {
+      name: "Exam Conqueror",
+      icon: "🏰",
+      desc: "5+ Exams",
+      condition: new Set(testResults.map((r) => r.examName)).size >= 5,
+    },
+    {
+      name: "Quick Learner",
+      icon: "📚",
+      desc: "WPM +20 in 2 Tests",
+      condition: testResults.some(
+        (r, i) => i > 0 && (r.wpm || 0) - (testResults[i - 1].wpm || 0) >= 20
+      ),
+    },
+    {
+      name: "Error Minimalist",
+      icon: "🧹",
+      desc: "Avg Errors < 2",
+      condition: avgErrors > 0 && avgErrors < 2,
+    },
+    {
+      name: "Sprint Champion",
+      icon: "🏆",
+      desc: "60+ WPM, 95%+ Acc",
+      condition: testResults.some(
+        (r) => (r.wpm || 0) >= 60 && (r.accuracy || 0) >= 95
+      ),
+    },
+    {
+      name: "Daily Grinder",
+      icon: "🔧",
+      desc: "5 Days in Row",
+      condition: (() => {
+        const dates = testResults
+          .map((r) => new Date(r.timestamp).toDateString())
+          .sort();
+        let streak = 1;
+        for (let i = 1; i < dates.length; i++) {
+          const prevDate = new Date(dates[i - 1]);
+          const currDate = new Date(dates[i]);
+          const diffDays = (currDate - prevDate) / (1000 * 60 * 60 * 24);
+          if (diffDays === 1) streak++;
+          else if (diffDays > 1) streak = 1;
+          if (streak >= 5) return true;
+        }
+        return false;
+      })(),
+    },
+    {
+      name: "Typing Titan",
+      icon: "🦁",
+      desc: "50+ Tests",
+      condition: testResults.length >= 50,
+    },
+    {
+      name: "Precision Sniper",
+      icon: "🔍",
+      desc: "5+ Tests 95%+ Acc",
+      condition: testResults.filter((r) => (r.accuracy || 0) >= 95).length >= 5,
+    },
+    {
+      name: "Speed Surge",
+      icon: "🚀",
+      desc: "WPM +10 in 1 Day",
+      condition: (() => {
+        const byDay = testResults.reduce((acc, r) => {
+          const day = new Date(r.timestamp).toDateString();
+          acc[day] = acc[day] || [];
+          acc[day].push(r.wpm || 0);
+          return acc;
+        }, {});
+        return Object.values(byDay).some(
+          (day) => Math.max(...day) - Math.min(...day) >= 10
+        );
+      })(),
+    },
+    {
+      name: "Master Typist",
+      icon: "👑",
+      desc: "80+ WPM, 0 Errors",
+      condition: testResults.some(
+        (r) => (r.wpm || 0) >= 80 && (r.errors || 0) === 0
+      ),
     },
   ];
 
-  // Filter achieved and remaining achievements
   const achievedAchievements = allAchievements.filter(
     (achievement) => achievement.condition
   );
   const remainingAchievements = allAchievements.filter(
     (achievement) => !achievement.condition
   );
-  const remainingCount = remainingAchievements.length;
-
-  const badges = achievedAchievements;
 
   const tips = [];
   if (bestWPM < 40)
     tips.push("Practice daily with short bursts to boost your WPM!");
   if (avgErrors > 5)
     tips.push("Slow down a bit to reduce errors and improve accuracy.");
-  if (consistency < 80)
+  if (consistency !== "N/A" && consistency < 80)
     tips.push("Try consistent practice times to stabilize your performance.");
 
   return (
@@ -476,7 +590,7 @@ const Dashboard = () => {
             <h2 className="text-3xl font-bold text-cyan-400 mb-6">
               Performance Insights
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl shadow-xl">
                 <p className="text-xl font-semibold text-cyan-400">Best WPM</p>
                 <WPMProgressCircle wpm={bestWPM} targetWPM={100} />
@@ -485,10 +599,10 @@ const Dashboard = () => {
                 <p className="text-xl font-semibold text-cyan-400">
                   Consistency
                 </p>
-                <p className="text-3xl font-bold text-white">{consistency}%</p>
-                <p className="text-sm text-gray-400">
-                  WPM stability across tests
+                <p className="text-3xl font-bold text-white">
+                  {consistency === "N/A" ? "N/A" : `${consistency}%`}
                 </p>
+                <p className="text-sm text-gray-400">WPM stability</p>
               </div>
               <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl shadow-xl">
                 <p className="text-xl font-semibold text-cyan-400">Best Exam</p>
@@ -499,13 +613,15 @@ const Dashboard = () => {
               </div>
               <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl shadow-xl">
                 <p className="text-xl font-semibold text-cyan-400">
-                  Average Accuracy
+                  Avg Accuracy
                 </p>
                 <p className="text-3xl font-bold text-white">
                   {testResults.length > 0
                     ? Math.round(
-                        testResults.reduce((sum, r) => sum + r.accuracy, 0) /
-                          testResults.length
+                        testResults.reduce(
+                          (sum, r) => sum + (r.accuracy || 0),
+                          0
+                        ) / testResults.length
                       )
                     : 0}
                   %
@@ -513,7 +629,7 @@ const Dashboard = () => {
               </div>
               <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl shadow-xl">
                 <p className="text-xl font-semibold text-cyan-400">
-                  Average Errors
+                  Avg Errors
                 </p>
                 <p className="text-3xl font-bold text-white">{avgErrors}</p>
                 <p className="text-sm text-gray-400">Per test</p>
@@ -529,62 +645,67 @@ const Dashboard = () => {
             </div>
           </section>
 
-          {(badges.length > 0 || remainingAchievements.length > 0) && (
+          {(achievedAchievements.length > 0 ||
+            remainingAchievements.length > 0) && (
             <section className="mb-12">
               <h2 className="text-3xl font-bold text-cyan-400 mb-6">
                 Achievements
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-6">
                 {/* Achieved Achievements */}
-                {badges.length > 0 && (
+                {achievedAchievements.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-semibold text-green-400 mb-4">
-                      Achieved ({badges.length})
+                    <h3 className="text-xl font-semibold text-green-400 mb-3">
+                      Achieved ({achievedAchievements.length})
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {badges.map((badge, index) => (
+                    <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-800">
+                      {achievedAchievements.map((badge, index) => (
                         <motion.div
                           key={index}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.2 }}
-                          className="bg-gray-800 bg-opacity-80 p-4 rounded-xl shadow-xl text-center"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex-shrink-0 w-32 bg-gray-800 bg-opacity-80 p-3 rounded-lg shadow-lg hover:shadow-cyan-500/50 transition-shadow duration-300 relative group"
                         >
-                          <p className="text-3xl">{badge.icon}</p>
-                          <p className="text-xl font-semibold text-white">
+                          <div className="w-12 h-12 mx-auto rounded-full bg-cyan-600 flex items-center justify-center text-2xl">
+                            {badge.icon}
+                          </div>
+                          <p className="text-sm font-semibold text-white text-center mt-2 truncate">
                             {badge.name}
                           </p>
-                          <p className="text-sm text-gray-400">{badge.desc}</p>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-xs text-gray-300 p-2 rounded shadow-lg z-10">
+                            {badge.desc}
+                          </div>
                         </motion.div>
                       ))}
                     </div>
                   </div>
                 )}
-
                 {/* Remaining Achievements */}
                 {remainingAchievements.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-semibold text-yellow-400 mb-4">
-                      Remaining ({remainingCount})
+                    <h3 className="text-xl font-semibold text-yellow-400 mb-3">
+                      Remaining ({remainingAchievements.length})
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-thin scrollbar-thumb-yellow-500 scrollbar-track-gray-800">
                       {remainingAchievements.map((achievement, index) => (
                         <motion.div
                           key={index}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.2 }}
-                          className="bg-gray-800 bg-opacity-80 p-4 rounded-xl shadow-xl text-center border border-gray-600"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex-shrink-0 w-32 bg-gray-800 bg-opacity-80 p-3 rounded-lg shadow-lg hover:shadow-yellow-500/50 transition-shadow duration-300 relative group grayscale"
                         >
-                          <p className="text-3xl text-gray-400">
+                          <div className="w-12 h-12 mx-auto rounded-full bg-gray-600 flex items-center justify-center text-2xl relative">
                             {achievement.icon}
-                          </p>
-                          <p className="text-xl font-semibold text-gray-300">
+                            <FaLock className="absolute text-gray-400 text-sm" />
+                          </div>
+                          <p className="text-sm font-semibold text-gray-300 text-center mt-2 truncate">
                             {achievement.name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-xs text-gray-300 p-2 rounded shadow-lg z-10">
                             {achievement.desc}
-                          </p>
+                          </div>
                         </motion.div>
                       ))}
                     </div>
@@ -640,8 +761,8 @@ const Dashboard = () => {
                       >
                         <td className="p-4">{test.examName}</td>
                         <td className="p-4">{test.wpm}</td>
-                        <td className="p-4">{test.accuracy}%</td>
-                        <td className="p-4">{test.errors}</td>
+                        <td className="p-4">{test.accuracy || 0}%</td>
+                        <td className="p-4">{test.errors || 0}</td>
                         <td className="p-4">
                           {new Date(test.timestamp).toLocaleDateString()}
                         </td>

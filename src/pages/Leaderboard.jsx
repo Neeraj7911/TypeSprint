@@ -37,44 +37,52 @@ const Leaderboard = () => {
       const usersSnapshot = await getDocs(collection(db, "users"));
       const allUserIds = usersSnapshot.docs.map((doc) => doc.id);
 
-      // Step 2: Fetch results for all users to include test-takers and track max WPM test
+      // Step 2: Fetch results for all users to include test-takers and track max Net WPM
       for (const userId of allUserIds) {
         const resultsSnapshot = await getDocs(
           collection(db, "users", userId, "results")
         );
+        const totalTests = resultsSnapshot.docs.length; // Total tests currently stored (max 10 due to Dashboard)
+        let highestNetWpm = 0;
+        let bestResult = null;
+
+        // Find the highest Net WPM and corresponding data
         resultsSnapshot.forEach((doc) => {
           const data = doc.data();
-          const wpm = parseInt(data.wpm, 10);
-          const userEmail = data.userEmail || `${userId}@example.com`;
-          const existing = userMap.get(userEmail);
-
-          if (!existing || wpm > existing.wpm) {
-            userMap.set(userEmail, {
-              name: data.userName || userEmail.split("@")[0],
-              wpm,
-              email: userEmail,
-              photoURL: data.photoURL || "https://via.placeholder.com/40",
-              examName: data.examName || "", // Test name for max WPM
-              isCertified: existing ? existing.isCertified : false, // Preserve certification status
-            });
+          const netWpm = parseInt(data.netWpm || data.wpm, 10) || 0;
+          if (netWpm > highestNetWpm) {
+            highestNetWpm = netWpm;
+            bestResult = data;
           }
         });
+
+        if (bestResult) {
+          const userEmail = bestResult.userEmail || `${userId}@example.com`;
+          userMap.set(userEmail, {
+            name: bestResult.userName || userEmail.split("@")[0],
+            netWpm: highestNetWpm,
+            email: userEmail,
+            photoURL: bestResult.photoURL || "https://via.placeholder.com/40",
+            examName: bestResult.examName || "",
+            isCertified: false, // Will be updated in certificate step
+            totalTests, // Use the actual count of stored tests
+          });
+        }
       }
 
-      // Step 3: Fetch certificates to mark users as certified
+      // Step 3: Fetch certificates to mark users as certified and update Net WPM if higher
       const certsSnapshot = await getDocs(collection(db, "certificates"));
       certsSnapshot.forEach((doc) => {
         const data = doc.data();
         const userId = data.userEmail;
-        const wpm = parseInt(data.wpm, 10);
+        const netWpm = parseInt(data.netWpm || data.wpm, 10) || 0;
         const existing = userMap.get(userId);
 
         if (existing) {
-          // User exists, update if WPM is higher and mark as certified
-          if (wpm > existing.wpm) {
+          if (netWpm > existing.netWpm) {
             userMap.set(userId, {
               ...existing,
-              wpm,
+              netWpm,
               examName: data.examName || existing.examName,
               isCertified: true,
             });
@@ -85,60 +93,61 @@ const Leaderboard = () => {
             });
           }
         } else {
-          // New user from certificates
           userMap.set(userId, {
             name: data.userName || data.userEmail.split("@")[0],
-            wpm,
+            netWpm,
             email: data.userEmail,
             photoURL: data.photoURL || "https://via.placeholder.com/40",
             examName: data.examName || "",
             isCertified: true,
+            totalTests: 0, // No results found, so total tests is 0
           });
         }
       });
 
-      // Step 4: Fetch leaderboard to update examName for personal bests
+      // Step 4: Fetch leaderboard collection to update Net WPM and examName if higher
       const leaderboardSnapshot = await getDocs(collection(db, "leaderboard"));
       leaderboardSnapshot.forEach((doc) => {
         const data = doc.data();
         const userId = data.userEmail;
-        const wpm = parseInt(data.wpm, 10);
+        const netWpm = parseInt(data.netWpm || data.wpm, 10) || 0;
         const existing = userMap.get(userId);
 
-        if (existing && wpm >= existing.wpm) {
+        if (existing && netWpm > existing.netWpm) {
           userMap.set(userId, {
             ...existing,
-            wpm,
-            examName: data.examName || existing.examName, // Update test name for max WPM
-            isCertified: existing.isCertified, // Preserve certification status
+            netWpm,
+            examName: data.examName || existing.examName,
           });
         } else if (!existing) {
           userMap.set(userId, {
             name: data.userName || data.userEmail.split("@")[0],
-            wpm,
+            netWpm,
             email: data.userEmail,
             photoURL: data.photoURL || "https://via.placeholder.com/40",
             examName: data.examName || "",
-            isCertified: false, // No certificate unless found in certsSnapshot
+            isCertified: false,
+            totalTests: 0, // No results found, so total tests is 0
           });
         }
       });
 
       // Step 5: Sort and format data
       const sortedData = Array.from(userMap.values())
-        .sort((a, b) => b.wpm - a.wpm)
+        .sort((a, b) => b.netWpm - a.netWpm)
         .map((entry, index) => ({
           position: index + 1,
           name: entry.name,
-          wpm: entry.wpm,
+          netWpm: entry.netWpm,
           examName: entry.examName,
           isCertified: entry.isCertified,
           photoURL: entry.photoURL,
           email: entry.email,
+          totalTests: entry.totalTests,
         }));
 
       setLeaderboardData(sortedData);
-      console.log("Leaderboard Data:", sortedData); // Debug output
+      console.log("Leaderboard Data:", sortedData);
     } catch (err) {
       setError("Failed to load leaderboard. Please try again later.");
       console.error("Leaderboard fetch error:", err);
@@ -189,7 +198,8 @@ const Leaderboard = () => {
         {user && (
           <>
             <p className="text-center text-gray-300 mb-8">
-              Top typists ranked by their highest Words Per Minute (WPM).
+              Top typists ranked by their highest Net Words Per Minute (Net
+              WPM).
             </p>
 
             {loading && (
@@ -236,7 +246,12 @@ const Leaderboard = () => {
                         Position
                       </th>
                       <th className="p-4 text-blue-400 font-semibold">Name</th>
-                      <th className="p-4 text-blue-400 font-semibold">WPM</th>
+                      <th className="p-4 text-blue-400 font-semibold">
+                        Net WPM
+                      </th>
+                      <th className="p-4 text-blue-400 font-semibold">
+                        Total Tests
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -284,7 +299,8 @@ const Leaderboard = () => {
                             )}
                           </span>
                         </td>
-                        <td className="p-4">{entry.wpm}</td>
+                        <td className="p-4">{entry.netWpm}</td>
+                        <td className="p-4">{entry.totalTests}</td>
                       </motion.tr>
                     ))}
                   </tbody>

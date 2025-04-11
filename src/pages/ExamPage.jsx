@@ -1269,7 +1269,7 @@ const ExamPage = () => {
   ];
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("English"); // Default to English
+  const [languageFilter, setLanguageFilter] = useState("All");
   const [fontFilter, setFontFilter] = useState("All");
 
   const filterExams = (examList) =>
@@ -1281,21 +1281,20 @@ const ExamPage = () => {
         languageFilter === "All" ||
         (languageFilter === "English" && exam.englishWPM) ||
         (languageFilter === "Hindi" && exam.hindiWPM) ||
-        (languageFilter === "Regional" &&
-          (exam.punjabiWPM ||
-            exam.odiaWPM ||
-            exam.bengaliWPM ||
-            exam.teluguWPM ||
-            exam.kannadaWPM ||
-            exam.tamilWPM ||
-            exam.malayalamWPM ||
-            exam.marathiWPM ||
-            exam.gujaratiWPM ||
-            exam.assameseWPM ||
-            exam.manipuriWPM ||
-            exam.khasiWPM ||
-            exam.urduWPM ||
-            exam.konkaniWPM));
+        (languageFilter === "Punjabi" && exam.punjabiWPM) ||
+        (languageFilter === "Odia" && exam.odiaWPM) ||
+        (languageFilter === "Bengali" && exam.bengaliWPM) ||
+        (languageFilter === "Telugu" && exam.teluguWPM) ||
+        (languageFilter === "Kannada" && exam.kannadaWPM) ||
+        (languageFilter === "Tamil" && exam.tamilWPM) ||
+        (languageFilter === "Malayalam" && exam.malayalamWPM) ||
+        (languageFilter === "Marathi" && exam.marathiWPM) ||
+        (languageFilter === "Gujarati" && exam.gujaratiWPM) ||
+        (languageFilter === "Assamese" && exam.assameseWPM) ||
+        (languageFilter === "Manipuri" && exam.manipuriWPM) ||
+        (languageFilter === "Khasi" && exam.khasiWPM) ||
+        (languageFilter === "Urdu" && exam.urduWPM) ||
+        (languageFilter === "Konkani" && exam.konkaniWPM);
       const matchesFont =
         fontFilter === "All" || exam.fonts.includes(fontFilter);
       return matchesSearch && matchesLanguage && matchesFont;
@@ -1305,82 +1304,74 @@ const ExamPage = () => {
   const filteredRegionalExams = filterExams(regionalExams);
 
   const handleCardClick = (exam) => {
-    const language =
-      languageFilter === "English" && exam.englishWPM
-        ? "english"
-        : languageFilter === "Hindi" && exam.hindiWPM
-        ? "hindi"
-        : languageFilter === "Regional" && exam.punjabiWPM
-        ? "punjabi"
-        : languageFilter === "Regional" && exam.odiaWPM
-        ? "odia"
-        : languageFilter === "Regional" && exam.bengaliWPM
-        ? "bengali"
-        : languageFilter === "Regional" && exam.teluguWPM
-        ? "telugu"
-        : languageFilter === "Regional" && exam.kannadaWPM
-        ? "kannada"
-        : languageFilter === "Regional" && exam.tamilWPM
-        ? "tamil"
-        : languageFilter === "Regional" && exam.malayalamWPM
-        ? "malayalam"
-        : languageFilter === "Regional" && exam.marathiWPM
-        ? "marathi"
-        : languageFilter === "Regional" && exam.gujaratiWPM
-        ? "gujarati"
-        : languageFilter === "Regional" && exam.assameseWPM
-        ? "assamese"
-        : languageFilter === "Regional" && exam.manipuriWPM
-        ? "manipuri"
-        : languageFilter === "Regional" && exam.khasiWPM
-        ? "khasi"
-        : languageFilter === "Regional" && exam.urduWPM
-        ? "urdu"
-        : languageFilter === "Regional" && exam.konkaniWPM
-        ? "konkani"
-        : "english";
+    const availableLanguages = [];
+    if (exam.englishWPM) availableLanguages.push("english");
+    if (exam.hindiWPM) availableLanguages.push("hindi");
+    if (exam.punjabiWPM) availableLanguages.push("punjabi");
+    if (exam.odiaWPM) availableLanguages.push("odia");
+    if (exam.bengaliWPM) availableLanguages.push("bengali");
+    if (exam.teluguWPM) availableLanguages.push("telugu");
+    if (exam.kannadaWPM) availableLanguages.push("kannada");
+    if (exam.tamilWPM) availableLanguages.push("tamil");
+    if (exam.malayalamWPM) availableLanguages.push("malayalam");
+    if (exam.marathiWPM) availableLanguages.push("marathi");
+    if (exam.gujaratiWPM) availableLanguages.push("gujarati");
+    if (exam.assameseWPM) availableLanguages.push("assamese");
+    if (exam.manipuriWPM) availableLanguages.push("manipuri");
+    if (exam.khasiWPM) availableLanguages.push("khasi");
+    if (exam.urduWPM) availableLanguages.push("urdu");
+    if (exam.konkaniWPM) availableLanguages.push("konkani");
+
+    const defaultLanguage = availableLanguages.includes(
+      languageFilter.toLowerCase()
+    )
+      ? languageFilter.toLowerCase()
+      : availableLanguages[0] || "english";
     const wpm =
-      language === "english"
+      defaultLanguage === "english"
         ? exam.englishWPM
-        : language === "hindi"
+        : defaultLanguage === "hindi"
         ? exam.hindiWPM
-        : language === "punjabi"
+        : defaultLanguage === "punjabi"
         ? exam.punjabiWPM
-        : language === "odia"
+        : defaultLanguage === "odia"
         ? exam.odiaWPM
-        : language === "bengali"
+        : defaultLanguage === "bengali"
         ? exam.bengaliWPM
-        : language === "telugu"
+        : defaultLanguage === "telugu"
         ? exam.teluguWPM
-        : language === "kannada"
+        : defaultLanguage === "kannada"
         ? exam.kannadaWPM
-        : language === "tamil"
+        : defaultLanguage === "tamil"
         ? exam.tamilWPM
-        : language === "malayalam"
+        : defaultLanguage === "malayalam"
         ? exam.malayalamWPM
-        : language === "marathi"
+        : defaultLanguage === "marathi"
         ? exam.marathiWPM
-        : language === "gujarati"
+        : defaultLanguage === "gujarati"
         ? exam.gujaratiWPM
-        : language === "assamese"
+        : defaultLanguage === "assamese"
         ? exam.assameseWPM
-        : language === "manipuri"
+        : defaultLanguage === "manipuri"
         ? exam.manipuriWPM
-        : language === "khasi"
+        : defaultLanguage === "khasi"
         ? exam.khasiWPM
-        : language === "urdu"
+        : defaultLanguage === "urdu"
         ? exam.urduWPM
-        : language === "konkani"
+        : defaultLanguage === "konkani"
         ? exam.konkaniWPM
         : 35;
     const font =
       fontFilter === "All" && exam.fonts.length > 0
         ? exam.fonts[0]
         : fontFilter;
+
     navigate(
-      `/typing-test?exam=${exam.name
+      `/select-language?exam=${exam.name
         .toLowerCase()
-        .replace(/\s+/g, "-")}&language=${language}&wpm=${wpm}&font=${font}`
+        .replace(/\s+/g, "-")}&availableLanguages=${availableLanguages.join(
+        ","
+      )}&wpm=${wpm}&font=${font}`
     );
   };
 
@@ -1407,7 +1398,7 @@ const ExamPage = () => {
       >
         <input
           type="text"
-          placeholder="Search exams (e.g., SSC CGL, UPSSSC)"
+          placeholder="Search exams (e.g., SSC CHSL, UPSSSC)"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-3 bg-gray-800 border border-blue-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-300"
@@ -1424,9 +1415,23 @@ const ExamPage = () => {
           onChange={(e) => setLanguageFilter(e.target.value)}
           className="p-2 bg-gray-800 border border-blue-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
+          <option value="All">All Languages</option>
           <option value="English">English</option>
           <option value="Hindi">Hindi</option>
-          <option value="Regional">Regional (Punjabi, Odia, etc.)</option>
+          <option value="Punjabi">Punjabi</option>
+          <option value="Odia">Odia</option>
+          <option value="Bengali">Bengali</option>
+          <option value="Telugu">Telugu</option>
+          <option value="Kannada">Kannada</option>
+          <option value="Tamil">Tamil</option>
+          <option value="Malayalam">Malayalam</option>
+          <option value="Marathi">Marathi</option>
+          <option value="Gujarati">Gujarati</option>
+          <option value="Assamese">Assamese</option>
+          <option value="Manipuri">Manipuri</option>
+          <option value="Khasi">Khasi</option>
+          <option value="Urdu">Urdu</option>
+          <option value="Konkani">Konkani</option>
         </select>
         <select
           value={fontFilter}
@@ -1560,10 +1565,7 @@ const ExamPage = () => {
 
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-0 w-64 h-64 bg-orange-500 opacity-10 rounded-full blur-3xl animate-pulse"></div>
-        <div
-          className="absolute/**
-bottom-0 right-0 w-72 h-72 bg-blue-500 opacity-10 rounded-full blur-3xl animate-pulse delay-1000"
-        ></div>
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-500 opacity-10 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
     </div>
   );

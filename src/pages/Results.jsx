@@ -18,6 +18,7 @@ import {
 } from "chart.js";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 
+// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -33,31 +34,48 @@ ChartJS.register(
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { wpm, accuracy, errors, targetWPM, examName, language, font } =
-    location.state || {};
+  const {
+    grossWpm,
+    netWpm,
+    accuracy,
+    errors,
+    targetWPM,
+    examName,
+    language,
+    font,
+  } = location.state || {};
   const containerRef = useRef(null);
+  const prevStateRef = useRef(null); // Track previous location.state
 
   const [userId, setUserId] = useState(null);
   const [pastResults, setPastResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [performanceScore, setPerformanceScore] = useState(0);
   const [leaderboardUpdated, setLeaderboardUpdated] = useState(false);
+  const [hasSaved, setHasSaved] = useState(false); // Prevent duplicate saves
 
   useEffect(() => {
     const saveAndFetchResults = async () => {
       setIsLoading(true);
       const user = auth.currentUser;
-      if (user) {
+      if (!user || hasSaved || !location.state) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
         setUserId(user.uid);
         const resultData = {
-          wpm,
-          accuracy,
-          errors,
+          grossWpm: grossWpm || 0,
+          netWpm: netWpm || 0,
+          accuracy: accuracy || 0,
+          errors: errors || 0,
           targetWPM,
           examName,
           language,
           timestamp: new Date().toISOString(),
         };
+
         const resultRef = doc(
           db,
           "users",
@@ -66,6 +84,7 @@ const Results = () => {
           `${examName}-${Date.now()}`
         );
         await setDoc(resultRef, resultData);
+        setHasSaved(true); // Mark as saved
 
         const resultsSnapshot = await getDocs(
           collection(db, "users", user.uid, "results")
@@ -78,23 +97,23 @@ const Results = () => {
 
         const score = Math.min(
           100,
-          (wpm / targetWPM) * 50 + accuracy / 2 - errors * 2
+          (netWpm / targetWPM) * 50 + accuracy / 2 - errors * 2
         );
         setPerformanceScore(Math.round(score));
 
         const leaderboardRef = doc(db, "leaderboard", user.uid);
         const leaderboardDoc = await getDoc(leaderboardRef);
         const previousBest = leaderboardDoc.exists()
-          ? leaderboardDoc.data().wpm
+          ? leaderboardDoc.data().netWpm || 0
           : 0;
 
-        if (wpm > previousBest) {
+        if (netWpm > previousBest) {
           await setDoc(
             leaderboardRef,
             {
               userName: user.displayName || user.email.split("@")[0],
               userEmail: user.email,
-              wpm,
+              netWpm,
               examName,
               photoURL: user.photoURL || "https://via.placeholder.com/40",
               timestamp: new Date().toISOString(),
@@ -103,16 +122,21 @@ const Results = () => {
           );
           setLeaderboardUpdated(true);
         }
+      } catch (error) {
+        console.error("Error saving or fetching results:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
-    if (location.state) {
+    if (location.state && location.state !== prevStateRef.current) {
+      prevStateRef.current = location.state;
+      setHasSaved(false); // Reset for new test data
       saveAndFetchResults();
     } else {
       setIsLoading(false);
     }
-  }, [examName, language]);
+  }, [location.state]);
 
   useEffect(() => {
     if (!isLoading && containerRef.current) {
@@ -124,17 +148,15 @@ const Results = () => {
     }
   }, [isLoading]);
 
-  // WPM Radial Progress Circle
   const WPMProgressCircle = ({ wpm, targetWPM }) => {
     const radius = 70;
     const circumference = 2 * Math.PI * radius;
-    const progress = Math.min(wpm / targetWPM, 1); // Cap at 100% of targetWPM
+    const progress = Math.min(wpm / targetWPM, 1);
     const strokeDashoffset = circumference * (1 - progress);
 
     return (
       <div className="relative flex items-center justify-center h-64">
         <svg width="200" height="200" className="transform -rotate-90">
-          {/* Background Circle */}
           <circle
             cx="100"
             cy="100"
@@ -143,7 +165,6 @@ const Results = () => {
             strokeWidth="10"
             fill="none"
           />
-          {/* Progress Circle */}
           <circle
             cx="100"
             cy="100"
@@ -156,7 +177,6 @@ const Results = () => {
             className="transition-all duration-1000 ease-out"
           />
         </svg>
-        {/* WPM Value in Center */}
         <div className="absolute text-center">
           <p className="text-4xl font-bold text-cyan-400">{wpm}</p>
           <p className="text-sm text-gray-400">of {targetWPM} WPM</p>
@@ -166,13 +186,17 @@ const Results = () => {
   };
 
   const barChartData = {
-    labels: ["Current WPM", "Target WPM"],
+    labels: ["Gross WPM", "Net WPM", "Target WPM"],
     datasets: [
       {
         label: "WPM",
-        data: [wpm, targetWPM],
-        backgroundColor: ["rgba(0, 255, 255, 0.7)", "rgba(255, 0, 128, 0.7)"],
-        borderColor: ["cyan", "magenta"],
+        data: [grossWpm || 0, netWpm || 0, targetWPM || 0],
+        backgroundColor: [
+          "rgba(0, 255, 255, 0.7)",
+          "rgba(0, 200, 200, 0.7)",
+          "rgba(255, 0, 128, 0.7)",
+        ],
+        borderColor: ["cyan", "teal", "magenta"],
         borderWidth: 2,
       },
     ],
@@ -182,8 +206,8 @@ const Results = () => {
     labels: pastResults.map((r) => new Date(r.timestamp).toLocaleTimeString()),
     datasets: [
       {
-        label: "WPM",
-        data: pastResults.map((r) => r.wpm),
+        label: "Net WPM",
+        data: pastResults.map((r) => r.netWpm || r.wpm || 0), // Handle legacy data
         borderColor: "cyan",
         backgroundColor: "rgba(0, 255, 255, 0.3)",
         fill: true,
@@ -191,7 +215,7 @@ const Results = () => {
       },
       {
         label: "Accuracy",
-        data: pastResults.map((r) => r.accuracy),
+        data: pastResults.map((r) => r.accuracy || 0),
         borderColor: "magenta",
         backgroundColor: "rgba(255, 0, 128, 0.3)",
         fill: true,
@@ -204,7 +228,7 @@ const Results = () => {
     labels: ["Correct", "Errors"],
     datasets: [
       {
-        data: [accuracy, 100 - accuracy],
+        data: [accuracy || 0, 100 - (accuracy || 0)],
         backgroundColor: ["rgba(0, 255, 255, 0.8)", "rgba(255, 0, 128, 0.8)"],
         borderColor: ["cyan", "magenta"],
         borderWidth: 2,
@@ -223,20 +247,20 @@ const Results = () => {
 
   const getAdvancedInsights = () => {
     const insights = [];
-    const wpmDiff = wpm - targetWPM;
+    const wpmDiff = (netWpm || 0) - (targetWPM || 0);
     if (wpmDiff < -5)
       insights.push(
         "Neural Analysis: Increase synaptic response time with rapid key drills."
       );
-    if (accuracy < 85)
+    if ((accuracy || 0) < 85)
       insights.push(
         "Precision Alert: Calibrate input accuracy with focused character repetition."
       );
-    if (errors > 10)
+    if ((errors || 0) > 10)
       insights.push(
         "Error Threshold Exceeded: Optimize hand-eye coordination via holographic keyboard sim."
       );
-    if (wpm > targetWPM && accuracy > 90)
+    if ((netWpm || 0) > (targetWPM || 0) && (accuracy || 0) > 90)
       insights.push(
         "Elite Status: Maintain quantum efficiency with advanced texts."
       );
@@ -295,7 +319,6 @@ const Results = () => {
           </motion.div>
         )}
 
-        {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <motion.div
             whileHover={{
@@ -304,10 +327,10 @@ const Results = () => {
             }}
             className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-cyan-500"
           >
-            <p className="text-xl font-semibold text-cyan-400">WPM Core</p>
-            <p className="text-3xl text-white">{wpm}</p>
-            <p className="text-sm text-gray-400">Target: {targetWPM}</p>
-            <WPMProgressCircle wpm={wpm} targetWPM={targetWPM} />
+            <p className="text-xl font-semibold text-cyan-400">Net WPM</p>
+            <p className="text-3xl text-white">{netWpm || 0}</p>
+            <p className="text-sm text-gray-400">Target: {targetWPM || 0}</p>
+            <WPMProgressCircle wpm={netWpm || 0} targetWPM={targetWPM || 0} />
           </motion.div>
           <motion.div
             whileHover={{
@@ -332,14 +355,14 @@ const Results = () => {
             className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-cyan-500"
           >
             <p className="text-xl font-semibold text-cyan-400">Error Flux</p>
-            <p className="text-3xl text-white">{errors}</p>
+            <p className="text-3xl text-white">{errors || 0}</p>
             <p className="text-sm text-gray-400">
               Score: {performanceScore}/100
             </p>
+            <p className="text-sm text-gray-400">Gross WPM: {grossWpm || 0}</p>
           </motion.div>
         </div>
 
-        {/* Graphs */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <motion.div
             initial={{ opacity: 0 }}
@@ -367,7 +390,6 @@ const Results = () => {
           )}
         </div>
 
-        {/* AI Insights */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -392,7 +414,6 @@ const Results = () => {
           </ul>
         </motion.div>
 
-        {/* Action Buttons */}
         <div className="flex justify-center gap-4">
           <motion.button
             whileHover={{
@@ -401,7 +422,7 @@ const Results = () => {
             }}
             onClick={() =>
               navigate(
-                `/typing-test?exam=${examName}&language=${language}&wpm=${targetWPM}&font=${font}`
+                `/typing-test?exam=${examName}&language=${language}&wpm=${targetWPM}&font=${font}&duration=5`
               )
             }
             className="px-6 py-3 bg-cyan-500 text-black rounded-lg font-semibold tracking-wide hover:bg-cyan-400 transition-all"
