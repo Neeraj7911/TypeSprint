@@ -8,6 +8,8 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { jsPDF } from "jspdf";
 import CustomCursor from "./CustomCursor";
@@ -51,6 +53,7 @@ const Dashboard = () => {
   const [testResults, setTestResults] = useState([]);
   const [latestCertificate, setLatestCertificate] = useState(null);
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const [credits, setCredits] = useState(0); // New state for credits
   const [loading, setLoading] = useState(true);
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
@@ -72,6 +75,15 @@ const Dashboard = () => {
   const fetchUserData = async (currentUser) => {
     setLoading(true);
     try {
+      // Fetch user credits
+      const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+      if (userDoc.exists()) {
+        setCredits(userDoc.data().credits || 0);
+      } else {
+        setCredits(0);
+      }
+
+      // Fetch test results
       const resultsSnapshot = await getDocs(
         collection(db, "users", currentUser.uid, "results")
       );
@@ -84,6 +96,7 @@ const Dashboard = () => {
         results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       );
 
+      // Fetch certificates
       const certsSnapshot = await getDocs(collection(db, "certificates"));
       const userCerts = certsSnapshot.docs
         .filter((doc) => doc.data().userEmail === currentUser.email)
@@ -91,6 +104,7 @@ const Dashboard = () => {
         .sort((a, b) => new Date(b.date) - new Date(a.date));
       setLatestCertificate(userCerts[0] || null);
 
+      // Fetch leaderboard
       const leaderboardSnapshot = await getDocs(collection(db, "leaderboard"));
       const leaderboard = leaderboardSnapshot.docs
         .map((doc) => ({ email: doc.id, ...doc.data() }))
@@ -283,7 +297,7 @@ const Dashboard = () => {
       case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
           url
-        )}"e=${encodeURIComponent(text)}`;
+        )}&quote=${encodeURIComponent(text)}`;
         break;
       case "twitter":
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -582,6 +596,7 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-400">
                   Leaderboard Rank: {leaderboardPosition}
                 </p>
+                <p className="text-sm text-cyan-400">Credits: {credits}</p>
               </div>
             </div>
           </section>
@@ -875,7 +890,7 @@ const Dashboard = () => {
                     scale: 1.1,
                     boxShadow: "0 0 15px rgba(0, 255, 255, 0.7)",
                   }}
-                  onClick={() => navigate("/exam")}
+                  onClick={() => navigate("/exams")}
                   className="px-6 py-3 bg-cyan-500 text-black rounded-lg font-semibold hover:bg-cyan-400 transition-colors"
                 >
                   Take a Test

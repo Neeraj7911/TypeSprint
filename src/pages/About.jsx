@@ -539,346 +539,135 @@ const About = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* New Pricing Page */}
       <section
         id="pricing"
-        ref={sectionRefs.pricing}
-        className="relative z-10 py-20"
+        className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden py-16"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className={`text-center mb-16 transition-all duration-1000 ${
-              isVisible.pricing
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-            }`}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-cyan-400">
-              Pricing Plans
-            </h2>
-            <p className="mt-4 text-xl text-gray-300 max-w-3xl mx-auto">
-              Choose the plan that fits your needs. All plans include access to
-              our core typing exercises.
+        {/* Background Effects */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-1/2 h-1/2 bg-gradient-to-br from-cyan-600 to-transparent opacity-20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-1/2 h-1/2 bg-gradient-to-tl from-purple-600 to-transparent opacity-20 rounded-full blur-3xl animate-float-delayed"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDB2aCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyaWRiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZjA1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmZmZmZmMDAiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWRiZykvPjwvc3ZnPg==')] opacity-5"></div>
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Header */}
+          <div className="mb-12 animate-slide-in-top">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-neon-glow">
+              Power Up with TypeCredits
+            </h1>
+            <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+              Buy TypeCredits to unlock a universe of premium features. Enjoy
+              core typing exercises for free and elevate your skills with
+              credits.
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 justify-center">
-            <div
-              className={`bg-gray-800 rounded-xl overflow-hidden transition-all duration-1000 delay-300 transform ${
-                isVisible.pricing
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
-              }`}
-            >
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-white mb-4">Free</h3>
-                <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-extrabold text-white">$0</span>
-                  <span className="ml-2 text-gray-400">/month</span>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">Basic typing tests</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">Progress tracking</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">Public leaderboards</span>
-                  </li>
-                  <li className="flex items-center text-gray-500">
-                    <svg
-                      className="h-5 w-5 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                    <span>Advanced analytics</span>
-                  </li>
-                  <li className="flex items-center text-gray-500">
-                    <svg
-                      className="h-5 w-5 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                    <span>Custom practice sets</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <button className="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors">
-                  Get Started
-                </button>
-              </div>
-            </div>
-
-            <div
-              className={`bg-gradient-to-b from-cyan-900 to-gray-800 rounded-xl overflow-hidden shadow-xl relative transition-all duration-1000 delay-500 transform ${
-                isVisible.pricing
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
-              }`}
-            >
-              <div className="absolute top-0 right-0 bg-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                POPULAR
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-white mb-4">Premium</h3>
-                <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-extrabold text-white">
-                    $9.99
+          {/* Main Credits Card */}
+          <div className="relative mb-12 animate-slide-in-bottom">
+            <div className="bg-gray-900/80 backdrop-blur-lg rounded-3xl p-8 max-w-lg mx-auto border border-cyan-500/30 shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all duration-500">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 hover:opacity-10 transition-opacity duration-500"></div>
+              <div className="relative">
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  TypeCredits
+                </h2>
+                <div className="flex items-baseline justify-center mb-6">
+                  <span className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+                    ₹3
                   </span>
-                  <span className="ml-2 text-gray-300">/month</span>
+                  <span className="ml-2 text-gray-300 text-lg">/credit</span>
                 </div>
+                <p className="text-gray-400 mb-6">
+                  Spend credits on premium features to customize your typing
+                  journey:
+                </p>
                 <ul className="space-y-4 mb-8">
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  {[
+                    {
+                      feature: "Detailed AI Report",
+                      cost: 5,
+                      desc: "Deep insights into your performance",
+                    },
+                    {
+                      feature: "Personalized Tips",
+                      cost: 2,
+                      desc: "Tailored advice to level up",
+                    },
+                    {
+                      feature: "Priority Support",
+                      cost: 3,
+                      desc: "Get help when you need it",
+                    },
+                    {
+                      feature: "Premium Content Access",
+                      cost: 4,
+                      desc: "Exclusive challenges await",
+                    },
+                    {
+                      feature: "Exclusive Themes",
+                      cost: 3,
+                      desc: "Style your typing experience",
+                    },
+                  ].map((item, index) => (
+                    <li
+                      key={index}
+                      className="flex items-start group hover:bg-gray-800/50 rounded-lg p-3 transition-all duration-300"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-200">All Free features</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-200">Advanced analytics</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-200">Custom practice sets</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-200">Skill certificates</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-200">Ad-free experience</span>
-                  </li>
+                      <svg
+                        className="h-6 w-6 text-cyan-400 mr-3 mt-1 group-hover:scale-110 transition-transform duration-300"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      <div className="text-left">
+                        <span className="text-gray-200 font-medium">
+                          {item.feature} ({item.cost} credits)
+                        </span>
+                        <p className="text-sm text-gray-400">{item.desc}</p>
+                      </div>
+                    </li>
+                  ))}
                 </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <button className="w-full py-3 px-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium transition-colors">
-                  Upgrade Now
+                <button className="w-full py-4 px-6 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl font-semibold hover:from-cyan-400 hover:to-purple-400 transition-all duration-300 transform hover:scale-105 focus:ring-4 focus:ring-cyan-400/50">
+                  Get TypeCredits
                 </button>
               </div>
             </div>
+          </div>
 
-            <div
-              className={`bg-gray-800 rounded-xl overflow-hidden transition-all duration-1000 delay-700 transform ${
-                isVisible.pricing
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
-              }`}
-            >
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  Enterprise
+          {/* Credit Bundles */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { credits: 10, price: "₹30", bonus: "Perfect for Trying Out" },
+              { credits: 50, price: "₹150", bonus: "+5 Bonus Credits" },
+              { credits: 100, price: "₹300", bonus: "+15 Bonus Credits" },
+            ].map((pack, index) => (
+              <div
+                key={index}
+                className={`bg-gray-900/70 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 hover:border-purple-500/50 transition-all duration-300 transform hover:scale-105 animate-slide-in-bottom delay-${
+                  index * 200
+                }`}
+              >
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  {pack.credits} Credits
                 </h3>
-                <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-extrabold text-white">
-                    Custom
-                  </span>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">All Premium features</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">Team management</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">Custom branding</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">Dedicated support</span>
-                  </li>
-                  <li className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-cyan-400 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-300">API access</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <button className="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors">
-                  Contact Sales
+                <p className="text-3xl font-bold text-purple-400 mb-2">
+                  {pack.price}
+                </p>
+                <p className="text-sm text-gray-300 mb-4">{pack.bonus}</p>
+                <button className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors duration-300">
+                  Buy Now
                 </button>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

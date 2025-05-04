@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CustomCursor from "../components/CustomCursor";
 
 const ExamPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialSearch = queryParams.get("search") || "";
 
   const nationalExams = [
     {
@@ -81,7 +84,7 @@ const ExamPage = () => {
     },
     {
       name: "ESIC",
-      englishWPM: 35,
+      englishWPM: "35",
       hindiWPM: null,
       fonts: [],
       details: "UDC, MTS. English focus.",
@@ -1268,9 +1271,17 @@ const ExamPage = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [languageFilter, setLanguageFilter] = useState("All");
   const [fontFilter, setFontFilter] = useState("All");
+
+  // Debug: Log initial search and filtered results
+  useEffect(() => {
+    console.log("Initial search term:", initialSearch);
+    console.log("Current search term:", searchTerm);
+    console.log("Filtered national exams:", filterExams(nationalExams));
+    console.log("Filtered regional exams:", filterExams(regionalExams));
+  }, [searchTerm, languageFilter, fontFilter]);
 
   const filterExams = (examList) =>
     examList.filter((exam) => {

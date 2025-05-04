@@ -9,7 +9,6 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import TypingTest from "./components/TypingTest";
 import Report from "./components/Report";
-import Payment from "./components/Payment";
 import Dashboard from "./components/Dashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
@@ -24,7 +23,7 @@ import Results from "./pages/Results";
 import Profile from "./pages/Profile";
 import Aboutus from "./pages/About";
 import SelectLanguage from "./components/SelectLanguage";
-
+import PaymentPage from "./components/PaymentPage"; // Assuming this is PaymentPage.jsx
 // Wrapper component to conditionally render Header
 const AppContent = () => {
   const location = useLocation();
@@ -59,7 +58,7 @@ const AppContent = () => {
             path="/payment"
             element={
               <PrivateRoute>
-                <Payment />
+                <PaymentPage />
               </PrivateRoute>
             }
           />
