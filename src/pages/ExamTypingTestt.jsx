@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import PropTypes from "prop-types";
 import paragraphs from "../components/paragraphs";
+import LogoSvg from "../assets/react.svg";
 
 const CustomCursor = lazy(() => import("../components/CustomCursor"));
 
@@ -462,7 +463,7 @@ const ExamTypingTestt = () => {
           className={`flex justify-between items-center p-4 ${config.headerColor} shadow-md z-10`}
         >
           <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="Testbook Logo" className="h-8" />
+            <img src={LogoSvg} alt="TypeSprint Logo" className="h-8" />
             <h1 className="text-xl font-bold text-white">
               {examName.replace(/-/g, " ").toUpperCase()} Typing Test
             </h1>

@@ -45,12 +45,22 @@ function Header() {
     closed: { opacity: 0, x: 20 },
   };
 
+  const mobileMenuVariants = {
+    open: { opacity: 1, height: "auto", transition: { duration: 0.3 } },
+    closed: { opacity: 0, height: 0, transition: { duration: 0.3 } },
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
+      setIsMenuOpen(false);
     } catch (error) {
       console.error("Error signing out: ", error);
     }
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
   };
 
   return (
@@ -67,7 +77,7 @@ function Header() {
             {logoText.split("").map((letter, index) => (
               <motion.span
                 key={index}
-                className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600" // Restored original gradient
+                className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"
                 whileHover={{
                   scale: [1, 1.2, 0.9, 1.1, 1],
                   transition: {
@@ -108,14 +118,16 @@ function Header() {
                     <div className="font-bold">{currentUser.email}</div>
                     <div className="mt-1 flex items-center">
                       <FaCrown className="mr-1 text-yellow-400" />
-                      <span>{currentUser.subscription}</span>
+                      <span>{currentUser.subscription || "Free"}</span>
                     </div>
                   </div>
                   <div className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                     <div className="mb-1">
-                      Typing Speed: {currentUser.typingSpeed} WPM
+                      Typing Speed: {currentUser.typingSpeed || 0} WPM
                     </div>
-                    <div>Tests Completed: {currentUser.testsCompleted}</div>
+                    <div>
+                      Tests Completed: {currentUser.testsCompleted || 0}
+                    </div>
                   </div>
                   <Link
                     to="/profile"
@@ -149,25 +161,25 @@ function Header() {
         </div>
 
         <motion.button
-          className="md:hidden text-gray-900 dark:text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden text-gray-900 dark:text-white z-50"
+          onClick={toggleMenu}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          {isMenuOpen ? <FaTimes /> : <FaBars />}
+          {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </motion.button>
       </nav>
 
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            className="md:hidden bg-gradient-to-b from-blue-600 to-purple-600 bg-opacity-95 backdrop-blur-md"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            className="md:hidden bg-gradient-to-b from-blue-600 to-purple-600 bg-opacity-95 backdrop-blur-md fixed w-full z-40 overflow-y-auto"
+            variants={mobileMenuVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
           >
-            <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+            <div className="container mx-auto px-4 py-4 flex flex-col space-y-4 min-h-[50vh] max-h-[80vh]">
               <MobileNavLink to="/exams" setIsMenuOpen={setIsMenuOpen}>
                 Exams
               </MobileNavLink>
@@ -191,13 +203,13 @@ function Header() {
                     <div className="font-bold">{currentUser.email}</div>
                     <div className="mt-2 flex items-center">
                       <FaCrown className="mr-1 text-yellow-400" />
-                      <span>{currentUser.subscription}</span>
+                      <span>{currentUser.subscription || "Free"}</span>
                     </div>
                     <div className="mt-1">
-                      Typing Speed: {currentUser.typingSpeed} WPM
+                      Typing Speed: {currentUser.typingSpeed || 0} WPM
                     </div>
                     <div className="mt-1">
-                      Tests Completed: {currentUser.testsCompleted}
+                      Tests Completed: {currentUser.testsCompleted || 0}
                     </div>
                   </div>
                   <motion.button
@@ -255,7 +267,10 @@ function NavLink({ to, children }) {
 function MobileNavLink({ to, children, setIsMenuOpen }) {
   return (
     <motion.div
-      variants={menuItemVariants}
+      variants={{
+        open: { opacity: 1, x: 0, transition: { duration: 0.2 } },
+        closed: { opacity: 0, x: 20, transition: { duration: 0.2 } },
+      }}
       initial="closed"
       animate="open"
       exit="closed"

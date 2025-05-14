@@ -30,7 +30,7 @@ const SelectLanguage = () => {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-blue-500"
+        className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-blue-500 mt-12"
       >
         Select Language for {examName.replace(/-/g, " ").toUpperCase()}
       </motion.h1>

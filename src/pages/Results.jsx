@@ -651,7 +651,7 @@ const Results = () => {
         ref={containerRef}
         className="max-w-5xl mx-auto p-8 relative z-10"
       >
-        <h1 className="text-5xl font-bold text-cyan-400 mb-8 text-center font-futura tracking-wider">
+        <h1 className="text-5xl font-bold text-cyan-400 mb-8 text-center font-futura tracking-wider mt-12">
           {examName} Neural Typing Matrix
         </h1>
 

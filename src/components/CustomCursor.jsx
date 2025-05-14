@@ -4,6 +4,7 @@ import { motion, useSpring } from "framer-motion";
 const CustomCursor = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const cursorX = useSpring(0, { stiffness: 1000, damping: 50 });
   const cursorY = useSpring(0, { stiffness: 1000, damping: 50 });
@@ -11,6 +12,16 @@ const CustomCursor = () => {
   const DOT_SIZE = 10; // Matches your .cursor width/height
   const RING_SIZE = 40; // Matches your .cursor-ring width/height
   const OFFSET = RING_SIZE / 2; // Center the ring
+
+  // Check if the screen size indicates a mobile device
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const onMouseMove = useCallback(
     ({ clientX, clientY }) => {
@@ -21,6 +32,8 @@ const CustomCursor = () => {
   );
 
   useEffect(() => {
+    if (isMobile) return; // Skip event listeners on mobile
+
     window.addEventListener("mousemove", onMouseMove);
 
     const interactiveElements = document.querySelectorAll(
@@ -56,9 +69,10 @@ const CustomCursor = () => {
         el.removeEventListener("blur", inputBlur);
       });
     };
-  }, [onMouseMove]);
+  }, [onMouseMove, isMobile]);
 
-  if (isHidden) {
+  // Don't render the cursor on mobile or when hidden
+  if (isMobile || isHidden) {
     return null;
   }
 
@@ -95,7 +109,7 @@ const CustomCursor = () => {
           transform: `translate(-${RING_SIZE / 2}px, -${RING_SIZE / 2}px)`, // Center ring
         }}
         animate={{
-          scale: isHovering ? 1.5 : 1, // Matches your .cursor-ring.hovering increase
+          scale: isHovering ? 1.5 : 1,
           opacity: isHovering ? 0.8 : 1,
         }}
         transition={{

@@ -16,19 +16,19 @@ import CustomCursor from "./CustomCursor";
 const socialLinks = [
   {
     icon: FaLinkedin,
-    url: "https://www.linkedin.com/in/yourprofile",
+    url: "http://linkedin.com/in/neeraj791",
     name: "LinkedIn",
     color: "hover:text-blue-500",
   },
   {
     icon: FaInstagram,
-    url: "https://www.instagram.com/yourprofile",
+    url: "https://instagram.com/kumarneeraj791",
     name: "Instagram",
     color: "hover:text-pink-500",
   },
   {
     icon: FaGithub,
-    url: "https://github.com/yourprofile",
+    url: "https://github.com/Neeraj7911",
     name: "GitHub",
     color: "hover:text-purple-500",
   },

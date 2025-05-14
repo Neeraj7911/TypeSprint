@@ -1276,12 +1276,7 @@ const ExamPage = () => {
   const [fontFilter, setFontFilter] = useState("All");
 
   // Debug: Log initial search and filtered results
-  useEffect(() => {
-    console.log("Initial search term:", initialSearch);
-    console.log("Current search term:", searchTerm);
-    console.log("Filtered national exams:", filterExams(nationalExams));
-    console.log("Filtered regional exams:", filterExams(regionalExams));
-  }, [searchTerm, languageFilter, fontFilter]);
+  useEffect(() => {}, [searchTerm, languageFilter, fontFilter]);
 
   const filterExams = (examList) =>
     examList.filter((exam) => {
@@ -1393,7 +1388,7 @@ const ExamPage = () => {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-blue-500"
+        className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-blue-500 mt-12"
       >
         Typing Exam Preparation Hub
       </motion.h1>

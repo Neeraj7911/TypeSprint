@@ -23,17 +23,22 @@ import clickSound from "../assets/click.mp3";
 
 // Exam data
 const exams = [
-  { id: 1, name: "SSC CGL", color: "from-blue-400 to-blue-600", icon: "📚" },
+  { id: 1, name: "SSC", color: "from-blue-400 to-blue-600", icon: "📚" },
   { id: 2, name: "NTPC", color: "from-green-400 to-green-600", icon: "🚂" },
   {
     id: 3,
-    name: "IBPS PO",
+    name: "COURT",
     color: "from-yellow-400 to-yellow-600",
     icon: "🏦",
   },
   { id: 4, name: "RRB", color: "from-red-400 to-red-600", icon: "🚉" },
-  { id: 5, name: "UPSC", color: "from-purple-400 to-purple-600", icon: "⚖️" },
-  { id: 6, name: "Bank PO", color: "from-pink-400 to-pink-600", icon: "💼" },
+  { id: 5, name: "TYPIST", color: "from-purple-400 to-purple-600", icon: "⚖️" },
+  {
+    id: 6,
+    name: "MUNICIPAL",
+    color: "from-pink-400 to-pink-600",
+    icon: "💼",
+  },
 ];
 
 // Premium plans data
@@ -146,10 +151,6 @@ function Home() {
 
   const handleExamClick = useCallback(
     (examName) => {
-      console.log(
-        "Navigating to:",
-        `/exams?search=${encodeURIComponent(examName)}`
-      );
       navigate(`/exams?search=${encodeURIComponent(examName)}`);
     },
     [navigate]
