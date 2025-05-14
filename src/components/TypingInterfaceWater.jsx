@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import paragraphs from "../paragraphs";
 
-const TypingInterfaceWater = () => {
+const TypingInterfaceSSCCHSL = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
@@ -24,6 +24,24 @@ const TypingInterfaceWater = () => {
   const [timeLeft, setTimeLeft] = useState(duration * 60);
   const [isPaused, setIsPaused] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [disabledKeys, setDisabledKeys] = useState({
+    backspace: false,
+    delete: false,
+    arrowLeft: false,
+    arrowRight: false,
+    arrowUp: false,
+    arrowDown: false,
+    tab: false,
+    enter: false,
+    space: false,
+    home: false,
+    end: false,
+    pageUp: false,
+    pageDown: false,
+    capsLock: false,
+  });
+  const [highlightCurrentWord, setHighlightCurrentWord] = useState(true);
 
   useEffect(() => {
     if (paragraphs[language] && paragraphs[language].length > 0) {
@@ -99,6 +117,7 @@ const TypingInterfaceWater = () => {
     setInputText("");
     setTimeLeft(duration * 60);
     setIsFullScreen(true);
+    setShowSettings(false); // Hide settings when test starts
     document.documentElement.requestFullscreen();
   }, [duration]);
 
@@ -139,6 +158,44 @@ const TypingInterfaceWater = () => {
     [isTestActive, isPaused, sampleText, handleSubmit]
   );
 
+  const handleKeyDown = useCallback(
+    (e) => {
+      const keyMap = {
+        Backspace: "backspace",
+        Delete: "delete",
+        ArrowLeft: "arrowLeft",
+        ArrowRight: "arrowRight",
+        ArrowUp: "arrowUp",
+        ArrowDown: "arrowDown",
+        Tab: "tab",
+        Enter: "enter",
+        " ": "space",
+        Home: "home",
+        End: "end",
+        PageUp: "pageUp",
+        PageDown: "pageDown",
+        CapsLock: "capsLock",
+      };
+
+      const key = e.key === " " ? " " : e.key;
+      if (keyMap[key] && disabledKeys[keyMap[key]]) {
+        e.preventDefault();
+      }
+    },
+    [disabledKeys]
+  );
+
+  const toggleKey = (key) => {
+    setDisabledKeys((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const toggleHighlight = () => {
+    setHighlightCurrentWord((prev) => !prev);
+  };
+
   const togglePause = useCallback(() => setIsPaused((prev) => !prev), []);
 
   const toggleFullScreen = useCallback(() => {
@@ -169,19 +226,56 @@ const TypingInterfaceWater = () => {
         isFullScreen ? "fixed inset-0" : "min-h-screen"
       } bg-gray-100`}
     >
-      <header className="bg-teal-700 p-4 flex justify-between items-center">
-        <div className="text-white">How to type this?</div>
+      <header className="bg-purple-800 p-4 flex justify-between items-center">
+        <div className="text-white font-bold">
+          {examName.replace(/-/g, " ").toUpperCase()}
+        </div>
         <div className="text-white">Time Left: {formatTime(timeLeft)}</div>
-        <div className="text-white">Font Size: 17</div>
+        <div className="text-white">Student Name</div>
       </header>
       <div className="flex-1 p-6">
+        <div className="mb-4 flex justify-between items-center">
+          <span className="text-sm text-gray-600">
+            Language: {language.toUpperCase()}
+          </span>
+        </div>
+        {!isTestActive && showSettings && (
+          <div className="mb-4 p-4 bg-gray-200 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Settings</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {Object.keys(disabledKeys).map((key) => (
+                <label key={key} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={disabledKeys[key]}
+                    onChange={() => toggleKey(key)}
+                    className="mr-2"
+                    disabled={isTestActive}
+                  />
+                  {key.charAt(0).toUpperCase() +
+                    key.slice(1).replace(/([A-Z])/g, " $1")}
+                </label>
+              ))}
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={highlightCurrentWord}
+                  onChange={toggleHighlight}
+                  className="mr-2"
+                  disabled={isTestActive}
+                />
+                Highlight Current Word
+              </label>
+            </div>
+          </div>
+        )}
         <div className="bg-gray-200 p-4 rounded-lg mb-4 overflow-x-auto whitespace-pre-wrap break-words">
           {sampleWords.map((word, index) => (
             <span
               key={index}
               className={`mr-2 ${
-                index === currentWordIndex
-                  ? "bg-black text-white px-1 rounded"
+                index === currentWordIndex && highlightCurrentWord
+                  ? "bg-blue-500 text-white px-1 rounded"
                   : index < currentWordIndex
                   ? inputText.split(/\s+/)[index] === word
                     ? "text-green-600"
@@ -194,29 +288,37 @@ const TypingInterfaceWater = () => {
             </span>
           ))}
         </div>
-        <select
-          value={selectedParagraph}
-          onChange={(e) => setSelectedParagraph(parseInt(e.target.value))}
-          className="mb-4 p-2 bg-gray-200 border border-gray-300 rounded-lg text-gray-800"
-          disabled={isTestActive}
-        >
-          {paragraphs[language]?.map((_, index) => (
-            <option key={index} value={index}>
-              Paragraph {index + 1}
-            </option>
-          ))}
-        </select>
         {!isTestActive && (
-          <button
-            onClick={startTest}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            Start Test
-          </button>
+          <div className="mb-4 flex items-center space-x-4">
+            <select
+              value={selectedParagraph}
+              onChange={(e) => setSelectedParagraph(parseInt(e.target.value))}
+              className="p-2 bg-gray-200 border border-gray-300 rounded-lg text-gray-800"
+            >
+              {paragraphs[language]?.map((_, index) => (
+                <option key={index} value={index}>
+                  Paragraph {index + 1}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+            >
+              {showSettings ? "Hide Settings" : "Show Settings"}
+            </button>
+            <button
+              onClick={startTest}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+              Start Test
+            </button>
+          </div>
         )}
         <textarea
           value={inputText}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           placeholder="*Start Typing Here*"
           className="w-full h-40 p-4 bg-white border border-gray-300 rounded-lg text-gray-800 focus:outline-none"
           disabled={!isTestActive || isPaused}
@@ -250,7 +352,7 @@ const TypingInterfaceWater = () => {
           </div>
         )}
       </div>
-      <footer className="bg-teal-700 p-4 text-white flex justify-end">
+      <footer className="bg-gray-800 p-4 text-white flex justify-end">
         <button
           onClick={handleSubmit}
           className="px-4 py-2 bg-gray-600 rounded-lg"
@@ -262,4 +364,4 @@ const TypingInterfaceWater = () => {
   );
 };
 
-export default TypingInterfaceWater;
+export default TypingInterfaceSSCCHSL;

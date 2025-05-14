@@ -116,6 +116,17 @@ const ExamTypingTestt = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [testId, setTestId] = useState(null);
+  const [keyboardSettings, setKeyboardSettings] = useState({
+    disableBackspace: false,
+    disableDelete: false,
+    disableLeftArrow: false,
+    disableRightArrow: false,
+    disableHighlighting: false,
+    disableCopy: false,
+    disablePaste: false,
+    disableCut: false,
+    disableSelectAll: false,
+  });
 
   const languageFonts = {
     english: "Arial",
@@ -128,18 +139,8 @@ const ExamTypingTestt = () => {
 
   const handleSubmit = useCallback(() => {
     if (!isTestActive || hasSubmitted) {
-      console.log(
-        "Submit blocked: Test not active or already submitted for testId:",
-        testId
-      );
       return;
     }
-    console.log("Submitting test with testId:", testId, "Stats:", {
-      grossWpm,
-      netWpm,
-      accuracy,
-      errors,
-    });
     setHasSubmitted(true);
     setIsTestActive(false);
     if (isFullScreen) document.exitFullscreen();
@@ -196,7 +197,6 @@ const ExamTypingTestt = () => {
               : "not paid"
           );
         } catch (error) {
-          console.error("Error fetching user status:", error);
           setUserStatus("not paid");
         }
       } else {
@@ -214,7 +214,6 @@ const ExamTypingTestt = () => {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            console.log("Timer triggered submit for testId:", testId);
             handleSubmit();
             return 0;
           }
@@ -223,7 +222,7 @@ const ExamTypingTestt = () => {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [isTestActive, isPaused, hasSubmitted, testId, handleSubmit, startTime]);
+  }, [isTestActive, isPaused, hasSubmitted, handleSubmit, startTime]);
 
   useEffect(() => {
     let freeTimer;
@@ -260,9 +259,9 @@ const ExamTypingTestt = () => {
   useEffect(() => {
     if (isTestActive && startTime && !isPaused && !hasSubmitted) {
       const interval = setInterval(() => {
-        const timeElapsed = (Date.now() - startTime) / 60000; // Time in minutes
-        const inputWords = inputText.trim().split(/\s+/).filter(Boolean); // Split input into words
-        const sampleWords = sampleText.trim().split(/\s+/); // Split sample into words
+        const timeElapsed = Math.max((Date.now() - startTime) / 60000, 0.0167); // At least 1 second
+        const inputWords = inputText.trim().split(/\s+/).filter(Boolean);
+        const sampleWords = sampleText.trim().split(/\s+/);
 
         // Gross WPM: Total words typed divided by time (standard word = 5 chars)
         const totalCharsTyped = inputText.length;
@@ -276,7 +275,6 @@ const ExamTypingTestt = () => {
             errorCount++;
           }
         }
-        // If input exceeds sample, count extra words as errors
         if (inputWords.length > sampleWords.length) {
           errorCount += inputWords.length - sampleWords.length;
         }
@@ -286,25 +284,34 @@ const ExamTypingTestt = () => {
         const net = Math.max(0, gross - Math.round(errorCount / timeElapsed));
         setNetWpm(isFinite(net) ? net : 0);
 
-        // Accuracy: Percentage of correct characters
+        // Accuracy: Percentage of correct characters up to typed input
+        const normalizedInput = inputText.trimEnd(); // Remove trailing spaces
+        const normalizedSample = sampleText.slice(0, normalizedInput.length); // Compare only up to input length
         let correctChars = 0;
-        for (let i = 0; i < inputText.length; i++) {
-          if (i < sampleText.length && inputText[i] === sampleText[i]) {
+        for (let i = 0; i < normalizedInput.length; i++) {
+          if (normalizedInput[i] === normalizedSample[i]) {
             correctChars++;
           }
         }
-        const totalChars = Math.max(inputText.length, sampleText.length); // Use max to account for extra/missing chars
-        setAccuracy(
-          totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100
-        );
-      }, 1000);
+        const totalChars = normalizedInput.length || 1; // Avoid division by zero
+        let calculatedAccuracy = Math.round((correctChars / totalChars) * 100);
+
+        // Final check: If input matches sample words exactly, set accuracy to 100%
+        if (
+          inputWords.length === sampleWords.length &&
+          inputWords.every((word, i) => word === sampleWords[i])
+        ) {
+          calculatedAccuracy = 100;
+        }
+
+        setAccuracy(calculatedAccuracy);
+      }, 500); // Update every 500ms
       return () => clearInterval(interval);
     }
   }, [isTestActive, startTime, inputText, sampleText, isPaused, hasSubmitted]);
 
   const startTest = useCallback(() => {
     const newTestId = `${examName}-${Date.now()}`;
-    console.log("Starting new test with testId:", newTestId);
     setTestId(newTestId);
     setIsTestActive(true);
     setGrossWpm(0);
@@ -317,41 +324,85 @@ const ExamTypingTestt = () => {
     setHasSubmitted(false);
     setIsFullScreen(true);
     setShowInstructions(true);
-    document.documentElement
-      .requestFullscreen()
-      .catch((err) => console.error("Fullscreen error:", err));
+    document.documentElement.requestFullscreen().catch((err) => {});
   }, [duration, examName]);
 
   const handleStartAfterInstructions = useCallback(() => {
     setStartTime(Date.now());
   }, []);
 
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (!isTestActive || isPaused) return;
+
+      if (keyboardSettings.disableBackspace && e.key === "Backspace") {
+        e.preventDefault();
+      }
+      if (keyboardSettings.disableDelete && e.key === "Delete") {
+        e.preventDefault();
+      }
+      if (keyboardSettings.disableLeftArrow && e.key === "ArrowLeft") {
+        e.preventDefault();
+      }
+      if (keyboardSettings.disableRightArrow && e.key === "ArrowRight") {
+        e.preventDefault();
+      }
+      if (
+        keyboardSettings.disableCopy &&
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "c"
+      ) {
+        e.preventDefault();
+      }
+      if (
+        keyboardSettings.disablePaste &&
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "v"
+      ) {
+        e.preventDefault();
+      }
+      if (
+        keyboardSettings.disableCut &&
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "x"
+      ) {
+        e.preventDefault();
+      }
+      if (
+        keyboardSettings.disableSelectAll &&
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "a"
+      ) {
+        e.preventDefault();
+      }
+    },
+    [isTestActive, isPaused, keyboardSettings]
+  );
+
   const handleInputChange = useCallback(
     (e) => {
       if (!isTestActive || isPaused) return;
       const value = e.target.value;
-      console.log(`Input in ${language}:`, value);
       setInputText(value);
       if (value.trim().length >= sampleText.length) {
-        console.log("Input length triggered submit for testId:", testId);
         handleSubmit();
       }
     },
-    [isTestActive, isPaused, sampleText, testId, handleSubmit, language]
+    [isTestActive, isPaused, sampleText, handleSubmit]
   );
+
+  const handleCheckboxChange = (key) => {
+    setKeyboardSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const togglePause = useCallback(() => setIsPaused((prev) => !prev), []);
 
   const toggleFullScreen = useCallback(() => {
     if (!isFullScreen) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.error("Fullscreen error:", err);
-      });
+      document.documentElement.requestFullscreen().catch((err) => {});
       setIsFullScreen(true);
     } else {
-      document.exitFullscreen().catch((err) => {
-        console.error("Exit fullscreen error:", err);
-      });
+      document.exitFullscreen().catch((err) => {});
       setIsFullScreen(false);
     }
   }, [isFullScreen]);
@@ -469,7 +520,8 @@ const ExamTypingTestt = () => {
                 <span
                   key={index}
                   className={`mr-2 ${
-                    index === currentWordIndex
+                    index === currentWordIndex &&
+                    !keyboardSettings.disableHighlighting
                       ? "bg-blue-500 text-white px-1 rounded"
                       : index < currentWordIndex
                       ? inputText.split(/\s+/)[index] === word
@@ -483,16 +535,39 @@ const ExamTypingTestt = () => {
               ))}
             </div>
             {!isTestActive && (
-              <button
-                onClick={startTest}
-                className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
-              >
-                Start Test
-              </button>
+              <div className="mb-4 flex flex-col space-y-4">
+                <div className="flex flex-wrap items-center space-x-4">
+                  <button
+                    onClick={startTest}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                  >
+                    Start Test
+                  </button>
+                  <div className="flex flex-wrap gap-4">
+                    {Object.keys(keyboardSettings).map((key) => (
+                      <label key={key} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={keyboardSettings[key]}
+                          onChange={() => handleCheckboxChange(key)}
+                          className="h-4 w-4 text-blue-500"
+                        />
+                        <span className="text-gray-700 text-sm">
+                          Disable{" "}
+                          {key
+                            .replace(/([A-Z])/g, " $1")
+                            .replace(/^./, (str) => str.toUpperCase())}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
             <textarea
               value={inputText}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               placeholder={`*Start Typing Here in ${
                 language.charAt(0).toUpperCase() + language.slice(1)
               }*`}
