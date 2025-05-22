@@ -113,7 +113,7 @@ const Footer = ({ darkMode }) => {
                 className={darkMode ? "text-gray-600" : "text-gray-400"}
               />
               <span className={darkMode ? "text-gray-600" : " text-gray-400"}>
-                123 Typing Street, Keyboard City
+                New Delhi, India
               </span>
             </div>
           </motion.div>
