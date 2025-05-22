@@ -40,7 +40,7 @@ const examConfigs = {
 const InstructionsModal = ({ isOpen, onClose, language, onStart }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white p-6 rounded-lg max-w-lg w-full">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Instructions</h2>
         <ul className="list-disc pl-5 mb-4 text-gray-700">
@@ -95,7 +95,6 @@ const ExamTypingTestt = () => {
   const targetWPM = parseInt(query.get("wpm")) || 35;
   const font = query.get("font") || (language === "hindi" ? "Mangal" : "Arial");
   const duration = parseInt(query.get("duration")) || 10;
-
   const config = examConfigs[examName] || examConfigs["default"];
 
   const [inputText, setInputText] = useState("");
@@ -117,6 +116,7 @@ const ExamTypingTestt = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [testId, setTestId] = useState(null);
+  const [fontSize, setFontSize] = useState(16);
   const [keyboardSettings, setKeyboardSettings] = useState({
     disableBackspace: false,
     disableDelete: false,
@@ -138,10 +138,13 @@ const ExamTypingTestt = () => {
 
   const currentFont = languageFonts[language] || font;
 
+  // Normalize apostrophes (straight ' and curly ’ to the same character)
+  const normalizeText = (text) => {
+    return text.replace(/[\u2018\u2019]/g, "'"); // Replace curly apostrophes with straight
+  };
+
   const handleSubmit = useCallback(() => {
-    if (!isTestActive || hasSubmitted) {
-      return;
-    }
+    if (!isTestActive || hasSubmitted) return;
     setHasSubmitted(true);
     setIsTestActive(false);
     if (isFullScreen) document.exitFullscreen();
@@ -176,11 +179,13 @@ const ExamTypingTestt = () => {
 
   useEffect(() => {
     if (paragraphs[language] && paragraphs[language].length > 0) {
-      setSampleText(paragraphs[language][selectedParagraph]);
+      setSampleText(normalizeText(paragraphs[language][selectedParagraph]));
     } else {
       setSampleText(
-        paragraphs[config.sampleTextKey][selectedParagraph] ||
-          "Default text if language not found."
+        normalizeText(
+          paragraphs[config.sampleTextKey][selectedParagraph] ||
+            "Default text if language not found."
+        )
       );
     }
   }, [language, selectedParagraph, config.sampleTextKey]);
@@ -260,56 +265,77 @@ const ExamTypingTestt = () => {
   useEffect(() => {
     if (isTestActive && startTime && !isPaused && !hasSubmitted) {
       const interval = setInterval(() => {
-        const timeElapsed = Math.max((Date.now() - startTime) / 60000, 0.0167); // At least 1 second
-        const inputWords = inputText.trim().split(/\s+/).filter(Boolean);
-        const sampleWords = sampleText.trim().split(/\s+/);
+        const timeElapsed = Math.max((Date.now() - startTime) / 60000, 0.0167);
+        // Normalize input and sample text
+        const normalizedInput = normalizeText(inputText);
+        const normalizedSample = normalizeText(sampleText);
+        // Split words while preserving punctuation
+        const inputWords = normalizedInput.trim().split(/\s+/).filter(Boolean);
+        const sampleWords = normalizedSample
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
 
-        // Gross WPM: Total words typed divided by time (standard word = 5 chars)
-        const totalCharsTyped = inputText.length;
-        const gross = Math.round(totalCharsTyped / 5 / timeElapsed);
-        setGrossWpm(isFinite(gross) ? gross : 0);
-
-        // Errors: Count mismatched words
+        // Count only correct words for WPM
+        let correctChars = 0;
         let errorCount = 0;
+        let correctWords = 0;
+
         for (let i = 0; i < inputWords.length; i++) {
-          if (i < sampleWords.length && inputWords[i] !== sampleWords[i]) {
-            errorCount++;
+          if (i < sampleWords.length) {
+            if (inputWords[i] === sampleWords[i]) {
+              correctWords++;
+              correctChars +=
+                inputWords[i].length + (i < inputWords.length - 1 ? 1 : 0); // Add space for non-last word
+            } else {
+              errorCount++;
+              console.log(
+                `Mismatch at word ${i}: Input="${inputWords[i]}" vs Sample="${sampleWords[i]}"`
+              );
+            }
+          } else {
+            errorCount++; // Extra words are errors
+            console.log(`Extra word at index ${i}: "${inputWords[i]}"`);
           }
         }
-        if (inputWords.length > sampleWords.length) {
-          errorCount += inputWords.length - sampleWords.length;
-        }
+
+        // Calculate gross WPM based on correct characters only
+        const gross = Math.round(correctChars / 5 / timeElapsed);
+        setGrossWpm(isFinite(gross) ? gross : 0);
+
+        // Set errors
         setErrors(errorCount);
 
-        // Net WPM: Gross WPM minus errors per minute
+        // Calculate net WPM (gross minus errors per minute)
         const net = Math.max(0, gross - Math.round(errorCount / timeElapsed));
         setNetWpm(isFinite(net) ? net : 0);
 
-        // Accuracy: Percentage of correct characters up to typed input
-        const normalizedInput = inputText.trimEnd(); // Remove trailing spaces
-        const normalizedSample = sampleText.slice(0, normalizedInput.length); // Compare only up to input length
-        let correctChars = 0;
-        for (let i = 0; i < normalizedInput.length; i++) {
-          if (normalizedInput[i] === normalizedSample[i]) {
-            correctChars++;
-          }
-        }
-        const totalChars = normalizedInput.length || 1; // Avoid division by zero
-        let calculatedAccuracy = Math.round((correctChars / totalChars) * 100);
+        // Calculate accuracy based on correct characters
+        const totalCharsTyped = normalizedInput.length || 1;
+        const accuracyPercentage = Math.round(
+          (correctChars / totalCharsTyped) * 100
+        );
+        setAccuracy(isFinite(accuracyPercentage) ? accuracyPercentage : 100);
 
-        // Final check: If input matches sample words exactly, set accuracy to 100%
+        // Auto-submit if all words are correctly typed
         if (
-          inputWords.length === sampleWords.length &&
-          inputWords.every((word, i) => word === sampleWords[i])
+          correctWords === sampleWords.length &&
+          inputWords.length === sampleWords.length
         ) {
-          calculatedAccuracy = 100;
+          handleSubmit();
         }
-
-        setAccuracy(calculatedAccuracy);
-      }, 500); // Update every 500ms
+      }, 500);
       return () => clearInterval(interval);
     }
-  }, [isTestActive, startTime, inputText, sampleText, isPaused, hasSubmitted]);
+  }, [
+    isTestActive,
+    startTime,
+    inputText,
+    sampleText,
+    isPaused,
+    hasSubmitted,
+    handleSubmit,
+  ]);
 
   const startTest = useCallback(() => {
     const newTestId = `${examName}-${Date.now()}`;
@@ -385,11 +411,8 @@ const ExamTypingTestt = () => {
       if (!isTestActive || isPaused) return;
       const value = e.target.value;
       setInputText(value);
-      if (value.trim().length >= sampleText.length) {
-        handleSubmit();
-      }
     },
-    [isTestActive, isPaused, sampleText, handleSubmit]
+    [isTestActive, isPaused]
   );
 
   const handleCheckboxChange = (key) => {
@@ -416,9 +439,20 @@ const ExamTypingTestt = () => {
       .padStart(2, "0")}`;
   };
 
+  const increaseFontSize = () => {
+    setFontSize((prev) => Math.min(prev + 2, 32));
+  };
+
+  const decreaseFontSize = () => {
+    setFontSize((prev) => Math.max(prev - 2, 12));
+  };
+
   const currentWordIndex =
-    inputText.trim().split(/\s+/).filter(Boolean).length - 1;
-  const sampleWords = sampleText.split(/\s+/);
+    normalizeText(inputText).trim().split(/\s+/).filter(Boolean).length - 1;
+  const sampleWords = normalizeText(sampleText)
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 
   if (isLoading)
     return (
@@ -431,12 +465,12 @@ const ExamTypingTestt = () => {
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <CustomCursor />
-        <div className="min-h-screen bg-gray-100 text-gray-800 flex flex-col items-center justify-center">
+        <div className="min-h-screen bg-gray-100 text-gray-800 flex flex-col items-center justify-center p-4">
           <motion.h1
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="text-3xl font-bold mb-6"
+            className="text-2xl sm:text-3xl font-bold mb-6 text-center"
           >
             Login to Continue
           </motion.h1>
@@ -460,15 +494,15 @@ const ExamTypingTestt = () => {
         } bg-gray-100`}
       >
         <header
-          className={`flex justify-between items-center p-4 ${config.headerColor} shadow-md z-10`}
+          className={`flex flex-col sm:flex-row justify-between items-center p-4 ${config.headerColor} shadow-md z-10`}
         >
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mb-2 sm:mb-0">
             <img src={LogoSvg} alt="TypeSprint Logo" className="h-8" />
-            <h1 className="text-xl font-bold text-white">
+            <h1 className="text-lg sm:text-xl font-bold text-white text-center">
               {examName.replace(/-/g, " ").toUpperCase()} Typing Test
             </h1>
           </div>
-          <div className="text-lg font-semibold text-white">
+          <div className="text-base sm:text-lg font-semibold text-white">
             Time Left:{" "}
             {formatTime(
               language !== "english" && userStatus === "not paid"
@@ -476,16 +510,16 @@ const ExamTypingTestt = () => {
                 : timeLeft
             )}
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 mt-2 sm:mt-0">
             <button
               onClick={toggleFullScreen}
-              className="px-4 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all"
+              className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all text-sm sm:text-base"
             >
               {isFullScreen ? "Exit Full Screen" : "Enter Full Screen"}
             </button>
             <button
               onClick={togglePause}
-              className="px-4 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50"
+              className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50 text-sm sm:text-base"
               disabled={!isTestActive}
             >
               {isPaused ? "Resume" : "Pause"}
@@ -493,103 +527,137 @@ const ExamTypingTestt = () => {
           </div>
         </header>
 
-        <div className="flex flex-1 p-6">
-          <div className="w-full md:w-3/4 p-6 overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">
-              Typing Test (
-              {language.charAt(0).toUpperCase() + language.slice(1)})
-            </h2>
-            <select
-              value={selectedParagraph}
-              onChange={(e) => setSelectedParagraph(parseInt(e.target.value))}
-              className="mb-4 p-2 bg-gray-200 border border-gray-300 rounded-lg text-gray-800"
-              disabled={isTestActive}
-            >
-              {paragraphs[language]?.map((_, index) => (
-                <option key={index} value={index}>
-                  Paragraph {index + 1}
-                </option>
-              )) || (
-                <option value={0}>No {language} paragraphs available</option>
-              )}
-            </select>
-            <div
-              className="bg-gray-200 p-4 rounded-lg mb-4 overflow-x-auto whitespace-pre-wrap break-words"
-              style={{ fontFamily: currentFont }}
-            >
-              {sampleWords.map((word, index) => (
-                <span
-                  key={index}
-                  className={`mr-2 ${
-                    index === currentWordIndex &&
-                    !keyboardSettings.disableHighlighting
-                      ? "bg-blue-500 text-white px-1 rounded"
-                      : index < currentWordIndex
-                      ? inputText.split(/\s+/)[index] === word
-                        ? "text-green-600"
-                        : "text-red-600"
-                      : "text-gray-800"
-                  }`}
+        <div className="flex flex-col flex-1 p-4 sm:p-6 max-w-7xl mx-auto w-full">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="w-full lg:w-3/4">
+              <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                Typing Test (
+                {language.charAt(0).toUpperCase() + language.slice(1)})
+              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-4">
+                <select
+                  value={selectedParagraph}
+                  onChange={(e) =>
+                    setSelectedParagraph(parseInt(e.target.value))
+                  }
+                  className="p-2 bg-gray-200 border border-gray-300 rounded-lg text-gray-800 w-full max-w-xs"
+                  disabled={isTestActive}
                 >
-                  {word}
-                </span>
-              ))}
-            </div>
-            {!isTestActive && (
-              <div className="mb-4 flex flex-col space-y-4">
-                <div className="flex flex-wrap items-center space-x-4">
+                  {paragraphs[language]?.map((_, index) => (
+                    <option key={index} value={index}>
+                      Paragraph {index + 1}
+                    </option>
+                  )) || (
+                    <option value={0}>
+                      No {language} paragraphs available
+                    </option>
+                  )}
+                </select>
+                <div className="flex gap-2 mt-2 sm:mt-0">
                   <button
-                    onClick={startTest}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                    onClick={increaseFontSize}
+                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all text-sm"
                   >
-                    Start Test
+                    Increase Font
                   </button>
-                  <div className="flex flex-wrap gap-4">
-                    {Object.keys(keyboardSettings).map((key) => (
-                      <label key={key} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={keyboardSettings[key]}
-                          onChange={() => handleCheckboxChange(key)}
-                          className="h-4 w-4 text-blue-500"
-                        />
-                        <span className="text-gray-700 text-sm">
-                          Disable{" "}
-                          {key
-                            .replace(/([A-Z])/g, " $1")
-                            .replace(/^./, (str) => str.toUpperCase())}
-                        </span>
-                      </label>
-                    ))}
+                  <button
+                    onClick={decreaseFontSize}
+                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all text-sm"
+                  >
+                    Decrease Font
+                  </button>
+                </div>
+              </div>
+              <div
+                className="bg-gray-200 p-4 rounded-lg mb-4 h-40 sm:h-48 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-words border border-gray-300"
+                style={{ fontFamily: currentFont, fontSize: `${fontSize}px` }}
+              >
+                {sampleWords.map((word, index) => (
+                  <span
+                    key={index}
+                    className={`mr-2 ${
+                      index === currentWordIndex &&
+                      !keyboardSettings.disableHighlighting
+                        ? "bg-blue-500 text-white px-1 rounded"
+                        : index < currentWordIndex
+                        ? normalizeText(inputText).split(/\s+/)[index] === word
+                          ? "text-green-600"
+                          : "text-red-600"
+                        : "text-gray-800"
+                    }`}
+                  >
+                    {word}
+                  </span>
+                ))}
+              </div>
+              {!isTestActive && (
+                <div className="mb-4 flex flex-col space-y-4">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <button
+                      onClick={startTest}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                    >
+                      Start Test
+                    </button>
+                    <div className="flex flex-wrap gap-2 sm:gap-4">
+                      {Object.keys(keyboardSettings).map((key) => (
+                        <label
+                          key={key}
+                          className="flex items-center space-x-2"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={keyboardSettings[key]}
+                            onChange={() => handleCheckboxChange(key)}
+                            className="h-4 w-4 text-blue-500"
+                          />
+                          <span className="text-gray-700 text-xs sm:text-sm">
+                            Disable{" "}
+                            {key
+                              .replace(/([A-Z])/g, " $1")
+                              .replace(/^./, (str) => str.toUpperCase())}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
+                </div>
+              )}
+              <textarea
+                value={inputText}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={`*Start Typing Here in ${
+                  language.charAt(0).toUpperCase() + language.slice(1)
+                }*`}
+                className="w-full h-32 sm:h-40 p-4 bg-white border border-gray-300 rounded-lg text-gray-800 focus:outline-none resize-none"
+                disabled={!isTestActive || isPaused}
+                style={{ fontFamily: currentFont, fontSize: `${fontSize}px` }}
+                lang={language}
+                inputMode="text"
+              />
+            </div>
+
+            {config.rightPanel && (
+              <div className="w-full lg:w-1/4 p-4 sm:p-6 bg-gray-200 hidden lg:block">
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-gray-600">
+                    SECTION: Typing Test
+                  </h3>
+                  <button className="mt-2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center text-gray-800">
+                    1
+                  </button>
                 </div>
               </div>
             )}
-            <textarea
-              value={inputText}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={`*Start Typing Here in ${
-                language.charAt(0).toUpperCase() + language.slice(1)
-              }*`}
-              className="w-full h-40 p-4 bg-white border border-gray-300 rounded-lg text-gray-800 focus:outline-none"
-              disabled={!isTestActive || isPaused}
-              style={{ fontFamily: currentFont }}
-              lang={language}
-              inputMode="text"
-            />
           </div>
 
-          {config.rightPanel && (
-            <div className="w-1/4 p-6 bg-gray-200 hidden md:block">
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-gray-600">
-                  SECTION: Typing Test
-                </h3>
-                <button className="mt-2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center text-gray-800">
-                  1
-                </button>
-              </div>
+          {config.showStatsOverlay && isTestActive && (
+            <div className="fixed bottom-16 sm:bottom-20 left-4 bg-white p-4 rounded-lg shadow-lg z-10">
+              <p className="text-gray-800">Gross WPM: {grossWpm}</p>
+              <p className="text-gray-800">Net WPM: {netWpm}</p>
+              <p className="text-gray-800">Accuracy: {accuracy}%</p>
+              <p className="text-gray-800">Errors: {errors}</p>
             </div>
           )}
         </div>
@@ -597,27 +665,18 @@ const ExamTypingTestt = () => {
         <footer className="fixed bottom-0 left-0 right-0 flex justify-end p-4 bg-white shadow-md z-10">
           <button
             onClick={() => setShowInstructions(true)}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all mr-2"
+            className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all mr-2 text-sm sm:text-base"
           >
             Instructions
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50 text-sm sm:text-base"
             disabled={!isTestActive || hasSubmitted}
           >
             Submit Test
           </button>
         </footer>
-
-        {config.showStatsOverlay && isTestActive && (
-          <div className="fixed bottom-20 left-4 bg-white p-4 rounded-lg shadow-lg z-10">
-            <p className="text-gray-800">Gross WPM: {grossWpm}</p>
-            <p className="text-gray-800">Net WPM: {netWpm}</p>
-            <p className="text-gray-800">Accuracy: {accuracy}%</p>
-            <p className="text-gray-800">Errors: {errors}</p>
-          </div>
-        )}
 
         <InstructionsModal
           isOpen={showInstructions}

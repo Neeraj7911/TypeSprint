@@ -193,22 +193,39 @@ const About = () => {
   // Testimonial carousel
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "Software Developer",
-      text: "TypeSprint transformed my coding efficiency. My typing speed increased by 35% in just one month!",
-      avatar: "https://randomuser.me/api/portraits/women/32.jpg",
+      name: "Priya Sharma",
+      role: "SSC CGL Aspirant (SELECTED)",
+      text: "TypeSprint bahut helpful hai! SSC ke typing test ke liye daily practice kar rahi hoon. Interface bhi simple aur student-friendly hai. Mere speed mein clearly improvement hua hai.",
+      avatar:
+        "https://img.freepik.com/free-photo/young-pretty-model-is-smiling_114579-13323.jpg?ga=GA1.1.1630504922.1747914560&semt=ais_hybrid&w=740",
     },
     {
-      name: "Michael Chen",
-      role: "Content Writer",
-      text: "As a professional writer, speed matters. TypeSprint helped me meet tight deadlines with ease.",
-      avatar: "https://randomuser.me/api/portraits/men/44.jpg",
+      name: "Ravi Yadav",
+      role: "NTPC Aspirant (SELECTED)",
+      text: "TypeSprint ekdam badhiya platform hai. SSC aur NTPC jaise exams ke liye jo typing practice chahiye hoti hai, yahan sab kuch milta hai. Har din naye practice sets milte hain aur progress bhi track kar sakte hain.",
+      avatar:
+        "https://img.freepik.com/free-photo/smiley-man-posing-medium-shot_23-2149915893.jpg?semt=ais_hybrid&w=740",
     },
     {
-      name: "Emily Rodriguez",
-      role: "Student",
-      text: "The gamified approach makes practice fun! I can now take notes in class without falling behind.",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+      name: "Neha Patil",
+      role: "GOVERNMENT JOB ASPIRANT",
+      text: "TypeSprint has been a game-changer for my SSC preparation. I love how it gives a real exam-like environment. My typing speed improved from 25 WPM to 38 WPM in just 3 weeks!",
+      avatar:
+        "https://img.freepik.com/free-photo/woman-doing-close-up-photoshoot-studio_53876-14476.jpg?semt=ais_hybrid&w=740",
+    },
+    {
+      name: "Aman Verma",
+      role: "CSIR-JSA (SELECTED)",
+      text: "TypeSprint se daily practice karta hoon aur mujhe AI ke through jo insights milte hain, unse mujhe samajh aata hai ki kaha galti ho rahi hai. Speed aur accuracy dono improve ho rahe hain. Mast platform hai bhai!",
+      avatar:
+        "https://img.freepik.com/premium-photo/young-indian-man-wearing-long-sleeve-striped-polo-shirt_251136-18134.jpg?ga=GA1.1.1630504922.1747914560&semt=ais_hybrid&w=740",
+    },
+    {
+      name: "Rakesh Nair",
+      role: "Railway Exam Aspirant",
+      text: "TypeSprint is amazing! The AI feedback after every test shows where I'm weak — like missing spacebar or certain letters. It helped me jump from 28 to 42 WPM. I highly recommend it for any government job aspirant.",
+      avatar:
+        "https://img.freepik.com/free-photo/young-adult-enjoying-virtual-date_23-2149328221.jpg?ga=GA1.1.1630504922.1747914560&semt=ais_hybrid&w=740",
     },
   ];
 
@@ -253,13 +270,13 @@ const About = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate("/try")}
+              onClick={() => navigate("/exams")}
               className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white font-medium hover:from-cyan-400 hover:to-blue-500 transition-all transform hover:scale-105 shadow-lg"
             >
               Try For Free
             </button>
             <button
-              onClick={() => navigate("/learn")}
+              onClick={() => navigate("/")}
               className="px-8 py-3 bg-gray-800 rounded-full text-white font-medium hover:bg-gray-700 transition-all transform hover:scale-105 border border-cyan-500 shadow-lg"
             >
               Learn More
@@ -858,7 +875,7 @@ const About = () => {
                     </div>
                     <div className="ml-4">
                       <h4 className="text-lg font-medium text-white">Phone</h4>
-                      <p className="mt-1 text-cyan-400">+1 (555) 123-4567</p>
+                      <p className="mt-1 text-cyan-400">+91 9870487658</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -879,7 +896,9 @@ const About = () => {
                     </div>
                     <div className="ml-4">
                       <h4 className="text-lg font-medium text-white">Email</h4>
-                      <p className="mt-1 text-cyan-400">info@typesprint.com</p>
+                      <p className="mt-1 text-cyan-400">
+                        liveproject072+typesprint@gmail.com
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -908,9 +927,7 @@ const About = () => {
                       <h4 className="text-lg font-medium text-white">
                         Location
                       </h4>
-                      <p className="mt-1 text-gray-300">
-                        123 Typing Lane, San Francisco, CA 94107
-                      </p>
+                      <p className="mt-1 text-gray-300">New Delhi, India</p>
                     </div>
                   </div>
                 </div>
@@ -921,7 +938,7 @@ const About = () => {
                   </h4>
                   <div className="flex space-x-4">
                     <a
-                      href="#"
+                      href="http://instagram.com/kumarneeraj791"
                       className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-cyan-600 hover:text-white transition-colors"
                     >
                       <svg
@@ -933,7 +950,7 @@ const About = () => {
                       </svg>
                     </a>
                     <a
-                      href="#"
+                      href="http://instagram.com/kumarneeraj791"
                       className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-cyan-600 hover:text-white transition-colors"
                     >
                       <svg
@@ -945,7 +962,7 @@ const About = () => {
                       </svg>
                     </a>
                     <a
-                      href="#"
+                      href="http://instagram.com/kumarneeraj791"
                       className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-cyan-600 hover:text-white transition-colors"
                     >
                       <svg
@@ -957,7 +974,7 @@ const About = () => {
                       </svg>
                     </a>
                     <a
-                      href="#"
+                      href="http://linkedin.com/in/neeraj791"
                       className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-cyan-600 hover:text-white transition-colors"
                     >
                       <svg
@@ -990,7 +1007,7 @@ const About = () => {
                       htmlFor="name"
                       className="block text-sm font-medium text-gray-300 mb-1"
                     >
-                      NEERAJ KUMAR
+                      Name
                     </label>
                     <input
                       type="text"
