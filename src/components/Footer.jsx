@@ -43,9 +43,9 @@ const socialLinks = [
 const quickLinks = [
   { name: "Home", path: "/" },
   { name: "About", path: "/about" },
-  { name: "Exams", path: "/exams" },
-  { name: "Leaderboard", path: "/leaderboard" },
-  { name: "Contact", path: "/contact" },
+  { name: "Privacy Policy", path: "/PrivacyPolicy" },
+  { name: "Terms & Conditions", path: "/t&c" },
+  { name: "No Refund & Shipping Policy", path: "/norefundandshippingpolicy" },
   { name: "Verify Certificate", path: "/verify" },
 ];
 

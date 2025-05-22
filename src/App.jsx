@@ -25,6 +25,9 @@ import Aboutus from "./pages/About";
 import SelectLanguage from "./components/SelectLanguage";
 import PaymentPage from "./components/PaymentPage"; // Assuming this is PaymentPage.jsx
 // Wrapper component to conditionally render Header
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TnC from "./pages/TnC";
+import Norns from "./pages/RefundandShippingPolicy"; // Assuming this is norns.jsx
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -46,6 +49,10 @@ const AppContent = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/about" element={<Aboutus />} />
           <Route path="/select-language" element={<SelectLanguage />} />
+          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+          <Route path="/t&c" element={<TnC />} />
+          <Route path="/norefundandshippingpolicy" element={<Norns />} />
+
           <Route
             path="/report"
             element={
