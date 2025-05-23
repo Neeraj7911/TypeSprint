@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://typesprint.live/</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <!-- Add more URLs below as you create new pages -->
+  <url>
+    <loc>https://typesprint.live/exams?search=SSC%20chsl</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/exams?search=RRB</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/exams?search=uppsc%20ro/aro</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+   <url>
+    <loc>  https://typesprint.live/exams?search=sci</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>  https://typesprint.live/exams?search=csir</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>  https://typesprint.live/exams</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>  https://typesprint.live/exams?search=junior%20assistant</loc>
+    <lastmod>2025-05-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+</urlset>
