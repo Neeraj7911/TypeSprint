@@ -322,7 +322,9 @@ function Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              Elevate your typing skills for government exams
+              Free online typing practice for <br />
+              SSC CGL, CHSL, RRB, UPPSC RO/ARO, CSIR and other <br /> government
+              typing exams <br /> with real test formats and instant feedback.
             </motion.p>
           </motion.div>
           <motion.div
