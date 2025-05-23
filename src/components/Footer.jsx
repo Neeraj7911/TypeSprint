@@ -42,6 +42,7 @@ const socialLinks = [
 
 const quickLinks = [
   { name: "Home", path: "/" },
+  { name: "Blogs", path: "/blogs" },
   { name: "About", path: "/about" },
   { name: "Privacy Policy", path: "/PrivacyPolicy" },
   { name: "Terms & Conditions", path: "/t&c" },

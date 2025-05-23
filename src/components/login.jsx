@@ -1,14 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { auth, provider, db } from "../firebase.jsx";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-} from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { FaGoogle } from "react-icons/fa";
 import CustomCursor from "../components/CustomCursor";
 
@@ -59,16 +52,9 @@ const Login = ({ darkMode }) => {
   const [authError, setAuthError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Redirect if user is already logged in
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        navigate("/"); // Redirect to home page if logged in
-      }
-    });
-    return () => unsubscribe(); // Cleanup subscription
-  }, [navigate]);
+  const location = useLocation();
+  const { login, loginWithGoogle, signup } = useAuth();
+  const from = location.state?.from || "/"; // Default to home if no 'from' state
 
   // Validate email domain
   const validateEmailDomain = (email) => {
@@ -98,29 +84,6 @@ const Login = ({ darkMode }) => {
     return { isValid: true, error: "" };
   };
 
-  const saveTestResults = async (userId) => {
-    try {
-      const testResults = JSON.parse(localStorage.getItem("testResults"));
-      if (!testResults) {
-        navigate("/");
-        return;
-      }
-
-      await addDoc(collection(db, "testResults"), {
-        ...testResults,
-        userId,
-        timestamp: new Date().toISOString(),
-      });
-
-      localStorage.removeItem("testResults");
-      navigate("/certificate");
-    } catch (error) {
-      console.error("Error saving results:", error);
-      setAuthError("Failed to save results. Please try again.");
-      navigate("/");
-    }
-  };
-
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     setAuthError("");
@@ -135,21 +98,12 @@ const Login = ({ darkMode }) => {
     }
 
     try {
-      let userCredential;
       if (isSignUp) {
-        userCredential = await createUserWithEmailAndPassword(
-          auth,
-          authData.email,
-          authData.password
-        );
+        await signup(authData.email, authData.password, "User"); // Default displayName
       } else {
-        userCredential = await signInWithEmailAndPassword(
-          auth,
-          authData.email,
-          authData.password
-        );
+        await login(authData.email, authData.password);
       }
-      await saveTestResults(userCredential.user.uid);
+      navigate(from, { replace: true });
     } catch (error) {
       console.error("Auth error:", error);
       setAuthError(
@@ -172,7 +126,7 @@ const Login = ({ darkMode }) => {
     setAuthError("");
     setIsLoading(true);
     try {
-      const result = await signInWithPopup(auth, provider);
+      const result = await loginWithGoogle();
       const user = result.user;
 
       // Validate Google email domain
@@ -184,7 +138,7 @@ const Login = ({ darkMode }) => {
         return;
       }
 
-      await saveTestResults(user.uid);
+      navigate(from, { replace: true });
     } catch (error) {
       console.error("Google auth error:", error);
       setAuthError("Failed to sign in with Google. Please try again.");

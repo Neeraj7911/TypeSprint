@@ -17,7 +17,8 @@ import {
 } from "firebase/firestore";
 import { auth, db, provider } from "../firebase";
 
-const AuthContext = createContext();
+// Create and export AuthContext
+export const AuthContext = createContext();
 
 export function useAuth() {
   return useContext(AuthContext);

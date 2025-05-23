@@ -28,59 +28,69 @@ import PaymentPage from "./components/PaymentPage"; // Assuming this is PaymentP
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TnC from "./pages/TnC";
 import Norns from "./pages/RefundandShippingPolicy"; // Assuming this is norns.jsx
+import Blogs from "./pages/blogs.jsx"; // Assuming this is Blogs.jsx
+import { HelmetProvider } from "react-helmet-async";
+import Blog1 from "./pages/Blog1"; // Assuming this is Blog1.jsx
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      {!hideHeader && <Header />}
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/test/:examId" element={<TypingTest />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/exam/:examId" element={<ExamTypingTest />} />
-          <Route path="/verify" element={<CertificateVerify />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/exams" element={<ExamPage />} />
-          <Route path="/typing-test" element={<ExamTypingT />} />
-          <Route path="/results" element={<Results />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/about" element={<Aboutus />} />
-          <Route path="/select-language" element={<SelectLanguage />} />
-          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-          <Route path="/t&c" element={<TnC />} />
-          <Route path="/norefundandshippingpolicy" element={<Norns />} />
+    <HelmetProvider>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+        {!hideHeader && <Header />}
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/test/:examId" element={<TypingTest />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/exam/:examId" element={<ExamTypingTest />} />
+            <Route path="/verify" element={<CertificateVerify />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/exams" element={<ExamPage />} />
+            <Route path="/typing-test" element={<ExamTypingT />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<Aboutus />} />
+            <Route path="/select-language" element={<SelectLanguage />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+            <Route path="/t&c" element={<TnC />} />
+            <Route path="/norefundandshippingpolicy" element={<Norns />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route
+              path="/blogs/boost-typing-speed-competitive-exams"
+              element={<Blog1 />}
+            />
 
-          <Route
-            path="/report"
-            element={
-              <PrivateRoute>
-                <Report />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/payment"
-            element={
-              <PrivateRoute>
-                <PaymentPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-        <div>{!hideHeader && <Footer />}</div>
-      </main>
-    </div>
+            <Route
+              path="/report"
+              element={
+                <PrivateRoute>
+                  <Report />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                <PrivateRoute>
+                  <PaymentPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+          <div>{!hideHeader && <Footer />}</div>
+        </main>
+      </div>
+    </HelmetProvider>
   );
 };
 
