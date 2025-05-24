@@ -30,7 +30,9 @@ import TnC from "./pages/TnC";
 import Norns from "./pages/RefundandShippingPolicy"; // Assuming this is norns.jsx
 import Blogs from "./pages/blogs.jsx"; // Assuming this is Blogs.jsx
 import { HelmetProvider } from "react-helmet-async";
-import Blog1 from "./pages/Blog1"; // Assuming this is Blog1.jsx
+import Blog1 from "./pages/Blog1";
+import Blog2 from "./pages/Blog2"; // Assuming this is Blog2.jsx
+import Blog3 from "./pages/Blog3.jsx";
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -60,6 +62,14 @@ const AppContent = () => {
             <Route
               path="/blogs/boost-typing-speed-competitive-exams"
               element={<Blog1 />}
+            />
+            <Route
+              path="/blogs/prepare-csir-jsa-typing-test"
+              element={<Blog2 />}
+            />
+            <Route
+              path="/blogs/full-paragraph-typing-tests-ssc-chsl"
+              element={<Blog3 />}
             />
 
             <Route

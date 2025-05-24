@@ -75,6 +75,14 @@ const Blogs = () => {
       image: "https://typesprint.com/images/typing-blog-hero.jpg",
       date: "May 23, 2025",
     },
+    {
+      slug: "prepare-csir-jsa-typing-test",
+      title: "Prepare for CSIR JSA Typing Test with TypeSprint",
+      excerpt:
+        "Get ready for the CSIR JSA typing test with our comprehensive guide. Master the skills you need to succeed.",
+      image: "https://typesprint.com/images/typing-blog-hero.jpg",
+      date: "May 24, 2025",
+    },
     // Add more blog posts here as you create them
     // Example:
     // {
