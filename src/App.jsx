@@ -33,6 +33,8 @@ import { HelmetProvider } from "react-helmet-async";
 import Blog1 from "./pages/Blog1";
 import Blog2 from "./pages/Blog2"; // Assuming this is Blog2.jsx
 import Blog3 from "./pages/Blog3.jsx";
+import SscCgl from "./pages/SscCgl.jsx";
+import Min from "./pages/MinTyping.jsx"; // Assuming this is 10minTyping.jsx
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -70,6 +72,11 @@ const AppContent = () => {
             <Route
               path="/blogs/full-paragraph-typing-tests-ssc-chsl"
               element={<Blog3 />}
+            />
+            <Route path="/ssc-cgl-typing-test" element={<SscCgl />} />
+            <Route
+              path="/10-minute-typing-test-for-government-jobs"
+              element={<Min />}
             />
 
             <Route
