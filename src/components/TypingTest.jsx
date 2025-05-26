@@ -52,7 +52,7 @@ const TypingTest = ({ darkMode }) => {
     let newPangram;
     do {
       newPangram = pangrams[Math.floor(Math.random() * pangrams.length)];
-    } while (newPangram === lastPangram && pangrams.length > 1); // Ensure it's different unless only one option
+    } while (newPangram === lastPangram && pangrams.length > 1);
     localStorage.setItem("lastPangram", newPangram);
     return newPangram;
   };
@@ -140,7 +140,6 @@ const TypingTest = ({ darkMode }) => {
     localStorage.setItem("completedTests", JSON.stringify(updatedTests));
     localStorage.removeItem("testResults");
 
-    // Set a new random pangram on reset
     const newText = getRandomPangram();
     setText(newText);
     setWords(newText.split(" "));
@@ -217,6 +216,13 @@ const TypingTest = ({ darkMode }) => {
     }
   };
 
+  // New handler to disable backspace and delete keys
+  const handleKeyDown = (e) => {
+    if (e.key === "Backspace" || e.key === "Delete") {
+      e.preventDefault(); // Prevent default behavior of backspace and delete
+    }
+  };
+
   const generateCertificate = async () => {
     if (!user) {
       navigate("/login");
@@ -238,7 +244,6 @@ const TypingTest = ({ darkMode }) => {
     )}`;
     const userName = user.displayName || "User";
 
-    // Save to Firebase
     try {
       await setDoc(doc(db, "certificates", uniqueNumber), {
         userEmail: user.email,
@@ -251,20 +256,16 @@ const TypingTest = ({ darkMode }) => {
       return;
     }
 
-    // Generate PDF
     const pdfDoc = new jsPDF();
     const pageWidth = pdfDoc.internal.pageSize.getWidth();
     const pageHeight = pdfDoc.internal.pageSize.getHeight();
 
-    // Title
     pdfDoc.setFontSize(24);
     pdfDoc.setTextColor(0, 102, 204);
     pdfDoc.text("Typing Certificate", pageWidth / 2, 20, { align: "center" });
 
-    // Logo
     pdfDoc.addImage(Logo, "PNG", (pageWidth - 50) / 2, 30, 50, 50);
 
-    // Certification Statement with Name
     pdfDoc.setFontSize(14);
     pdfDoc.setTextColor(0);
     pdfDoc.text(
@@ -286,7 +287,6 @@ const TypingTest = ({ darkMode }) => {
       { align: "center" }
     );
 
-    // User Details (without Name, since it's in the statement)
     pdfDoc.setFontSize(16);
     pdfDoc.text(`Email: ${user.email}`, 20, 150);
     pdfDoc.text(`Words Per Minute (WPM): ${wpm}`, 20, 160);
@@ -294,10 +294,8 @@ const TypingTest = ({ darkMode }) => {
     pdfDoc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 180);
     pdfDoc.text(`Certificate Number: ${uniqueNumber}`, 20, 190);
 
-    // Stamp
     pdfDoc.addImage(Stamp, "PNG", pageWidth - 70, pageHeight - 70, 50, 50);
 
-    // Verification Footer
     pdfDoc.setFontSize(10);
     pdfDoc.setTextColor(100);
     pdfDoc.text(
@@ -417,6 +415,11 @@ const TypingTest = ({ darkMode }) => {
                             scale: { duration: 0.2 },
                             textShadow: { duration: 0.3 },
                           }
+                        : 1
+                        ? {
+                            scale: { duration: 0.2 },
+                            textShadow: { duration: 0.3 },
+                          }
                         : { duration: 0.3 }
                     }
                   >
@@ -440,6 +443,7 @@ const TypingTest = ({ darkMode }) => {
               type="text"
               value={userInput}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown} // Added keydown handler
               onFocus={startTest}
               className={`w-full p-2 border rounded ${
                 darkMode
