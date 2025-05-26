@@ -10,7 +10,7 @@ import Home from "./components/Home";
 import TypingTest from "./components/TypingTest";
 import Report from "./components/Report";
 import Dashboard from "./components/Dashboard";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./components/login";
 import ExamTypingTest from "./components/ExamTypingTest";
@@ -23,18 +23,18 @@ import Results from "./pages/Results";
 import Profile from "./pages/Profile";
 import Aboutus from "./pages/About";
 import SelectLanguage from "./components/SelectLanguage";
-import PaymentPage from "./components/PaymentPage"; // Assuming this is PaymentPage.jsx
-// Wrapper component to conditionally render Header
+import PaymentPage from "./components/PaymentPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TnC from "./pages/TnC";
-import Norns from "./pages/RefundandShippingPolicy"; // Assuming this is norns.jsx
-import Blogs from "./pages/blogs.jsx"; // Assuming this is Blogs.jsx
+import Norns from "./pages/RefundandShippingPolicy";
+import Blogs from "./pages/blogs.jsx";
 import { HelmetProvider } from "react-helmet-async";
-import Blog1 from "./pages/Blog1";
-import Blog2 from "./pages/Blog2"; // Assuming this is Blog2.jsx
-import Blog3 from "./pages/Blog3.jsx";
-import SscCgl from "./pages/SscCgl.jsx";
-import Min from "./pages/MinTyping.jsx"; // Assuming this is 10minTyping.jsx
+import Blog1 from "./pages/blogs/Blog1.jsx";
+import Blog2 from "./pages/blogs/Blog2.jsx";
+import Blog3 from "./pages/blogs/Blog3.jsx";
+import SscCgl from "./pages/contents/SscCgl.jsx";
+import Min from "./pages/contents/MinTyping.jsx";
+import Typingcon from "./pages/contents/EnglishTypingTest.jsx"; // Assuming this is Typingcon.jsx
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -78,6 +78,7 @@ const AppContent = () => {
               path="/10-minute-typing-test-for-government-jobs"
               element={<Min />}
             />
+            <Route path="/English-typing-test" element={<Typingcon />} />
 
             <Route
               path="/report"

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaKeyboard, FaTrophy, FaChartLine, FaLock } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -23,7 +23,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const Blog3 = () => {
+const BlogCSIRJSATypingTest = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,6 +34,7 @@ const Blog3 = () => {
     faqs: useRef(null),
   };
 
+  // Intersection observer for scroll animations
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -69,11 +70,40 @@ const Blog3 = () => {
     };
   }, []);
 
+  // FAQ state for accordion
   const [activeFaq, setActiveFaq] = useState(null);
   const toggleFaq = (index) => {
     setActiveFaq(activeFaq === index ? null : index);
   };
 
+  const faqs = [
+    {
+      question:
+        "What is the typing speed requirement for the CSIR JSA typing test?",
+      answer:
+        "The CSIR JSA typing test requires a minimum speed of 35 words per minute (WPM) in English or 30 WPM in Hindi, equivalent to 10,500 or 9,000 key depressions per hour (KDPH), respectively, with high accuracy in a 10-minute test.",
+    },
+    {
+      question:
+        "Can I use backspace or arrow keys during the CSIR JSA typing test?",
+      answer:
+        "No, the CSIR JSA typing test typically disables editing functions like backspace, delete, or arrow keys to assess raw typing proficiency. Practicing on platforms like TypeSprint, which simulates these conditions, is highly recommended.",
+    },
+    {
+      question:
+        "How does TypeSprint help with CSIR JSA typing test preparation?",
+      answer:
+        "TypeSprint offers exam-like practice with disabled editing keys, supports English and Hindi (including Kruti Dev and Mangal fonts), and provides AI-driven feedback to identify and improve weak areas, enhancing speed and accuracy.",
+    },
+    {
+      question:
+        "How long should I practice daily for the CSIR JSA typing test?",
+      answer:
+        "Daily practice of 30-60 minutes on a platform like TypeSprint, focusing on accuracy and speed, can lead to significant improvements within 2-4 weeks, preparing you effectively for the test.",
+    },
+  ];
+
+  // Handle login button click
   const handleLogin = () => {
     navigate("/login", { state: { from: location.pathname } });
   };
@@ -81,33 +111,34 @@ const Blog3 = () => {
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-gradient-to-b from-gray-900 via-blue-950 to-gray-900 text-white overflow-hidden">
+        {/* SEO Meta Tags */}
         <Helmet>
-          <title>Full-Paragraph Typing Tests for SSC CHSL | TypeSprint</title>
+          <title>How to Prepare for CSIR JSA Typing Test | TypeSprint</title>
           <meta
             name="description"
-            content="Discover platforms like TypeSprint for full-paragraph typing tests to prepare for SSC CHSL and government exams. Practice with exam-like passages to boost speed and accuracy."
+            content="Discover effective strategies to prepare for the CSIR JSA typing test. Learn how TypeSprint’s platform can help you practice and excel in English and Hindi typing tests."
           />
           <meta
             name="keywords"
-            content="SSC CHSL typing test, full-paragraph typing, typing test preparation, TypeSprint, improve typing speed, Hindi typing practice, English typing practice, government exams"
+            content="CSIR JSA typing test, typing test preparation, TypeSprint, improve typing speed, Hindi typing practice, English typing practice, competitive exam typing, keyboard skills"
           />
           <meta name="author" content="Neeraj Kumar" />
           <meta name="robots" content="index, follow" />
           <meta
             property="og:title"
-            content="Where to Take a Typing Test with Full Paragraphs for SSC CHSL"
+            content="How to Prepare for CSIR JSA Typing Test with TypeSprint"
           />
           <meta
             property="og:description"
-            content="Master SSC CHSL typing tests with full-paragraph practice on TypeSprint. Log in to access expert tips and exam-like tests for free."
+            content="Master the CSIR JSA typing test with expert tips and TypeSprint’s exam-like practice environment. Log in to access the full guide for free."
           />
           <meta
             property="og:image"
-            content="https://typesprint.live/images/paragraph-typing-blog-hero.jpg"
+            content="https://typesprint.live/images/csir-jsa-typing-blog-hero.jpg"
           />
           <meta
             property="og:url"
-            content="https://typesprint.live/blogs/full-paragraph-typing-tests-ssc-chsl"
+            content="https://typesprint.live/blogs/prepare-csir-jsa-typing-test"
           />
           <meta name="twitter:card" content="summary_large_image" />
           <script type="application/ld+json">
@@ -115,9 +146,9 @@ const Blog3 = () => {
               "@context": "https://schema.org",
               "@type": "BlogPosting",
               headline:
-                "Where to Take a Typing Test with Full Paragraphs for SSC CHSL",
+                "How to Prepare for CSIR JSA Typing Test with TypeSprint",
               description:
-                "Learn where to practice full-paragraph typing tests for SSC CHSL and government exams with TypeSprint’s exam-like platform.",
+                "Learn how to prepare for the CSIR JSA typing test with expert strategies and TypeSprint’s tailored practice platform.",
               author: {
                 "@type": "Person",
                 name: "Neeraj Kumar",
@@ -130,14 +161,15 @@ const Blog3 = () => {
                   url: "https://typesprint.live/images/logo.png",
                 },
               },
-              datePublished: "2025-05-25",
+              datePublished: "2025-05-24",
               image:
-                "https://typesprint.live/images/paragraph-typing-blog-hero.jpg",
-              url: "https://typesprint.live/blogs/full-paragraph-typing-tests-ssc-chsl",
+                "https://typesprint.live/images/csir-jsa-typing-blog-hero.jpg",
+              url: "https://typesprint.live/blogs/prepare-csir-jsa-typing-test",
             })}
           </script>
         </Helmet>
 
+        {/* Hero Section (Visible to All) */}
         <section
           id="hero"
           ref={sectionRefs.hero}
@@ -152,13 +184,12 @@ const Blog3 = () => {
           >
             <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                Full-Paragraph Typing Tests for SSC CHSL
+                Prepare for the CSIR JSA Typing Test with Confidence
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
-              Prepare for SSC CHSL and government exams with TypeSprint’s
-              full-paragraph typing tests, designed to boost speed and accuracy
-              in exam-like conditions.
+              Master the CSIR JSA typing test with expert strategies and
+              TypeSprint’s exam-like practice environment for English and Hindi.
             </p>
             {currentUser ? (
               <button
@@ -178,6 +209,7 @@ const Blog3 = () => {
           </div>
         </section>
 
+        {/* Content Section (Partial for Non-Logged-In Users) */}
         <section
           id="content"
           ref={sectionRefs.content}
@@ -192,22 +224,23 @@ const Blog3 = () => {
               }`}
             >
               <h2 className="text-3xl font-bold text-cyan-400 mb-6">
-                Why Full-Paragraph Typing Tests Matter
+                Understanding the CSIR JSA Typing Test
               </h2>
               <p className="text-lg text-gray-300 mb-6">
-                Typing tests for SSC CHSL and government exams require
-                candidates to type full paragraphs with proper formatting,
-                punctuation, and sentence structure, unlike random-word tests.
-                SSC CHSL, for instance, demands approximately 1750 key
-                depressions in 10 minutes for LDC/JSA posts, with a minimum
-                speed of 35 words per minute (WPM) in English or 30 WPM in
-                Hindi, and high accuracy.
+                The CSIR Junior Secretariat Assistant (JSA) typing test is a
+                critical component of the selection process, conducted after the
+                written exam. Candidates must achieve a typing speed of 35 words
+                per minute (WPM) in English or 30 WPM in Hindi, equivalent to
+                10,500 or 9,000 key depressions per hour (KDPH), respectively,
+                within a 10-minute duration. Notably, editing functions such as
+                backspace, delete, or arrow keys are typically disabled,
+                requiring high accuracy under strict conditions.
               </p>
               <p className="text-lg text-gray-300 mb-8">
-                TypeSprint offers full-paragraph typing tests that mirror these
-                exam conditions, helping you build speed, accuracy, and
-                endurance. Below are five strategies to excel in paragraph-based
-                typing tests using TypeSprint.
+                Effective preparation involves practicing in an environment that
+                mimics these constraints. TypeSprint offers a tailored platform
+                to build the necessary skills. Below is the first of five
+                strategies to excel in the CSIR JSA typing test.
               </p>
 
               <div className="space-y-8">
@@ -215,13 +248,14 @@ const Blog3 = () => {
                   <FaKeyboard className="h-8 w-8 text-cyan-400 mr-4" />
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-2">
-                      1. Practice Exam-Like Paragraphs
+                      1. Practice Without Editing Keys
                     </h3>
                     <p className="text-gray-400">
-                      TypeSprint provides full-paragraph tests that replicate
-                      SSC CHSL passages, including complex sentences and
-                      formatting requirements like Tab key usage. This builds
-                      familiarity with real exam content.
+                      The CSIR JSA typing test restricts the use of backspace,
+                      delete, and arrow keys. Practice on TypeSprint with these
+                      functions disabled to build muscle memory for error-free
+                      typing, ensuring you meet the exam’s stringent
+                      requirements.
                     </p>
                   </div>
                 </div>
@@ -232,13 +266,13 @@ const Blog3 = () => {
                       <FaChartLine className="h-8 w-8 text-cyan-400 mr-4" />
                       <div>
                         <h3 className="text-xl font-semibold text-white mb-2">
-                          2. Leverage AI Feedback
+                          2. Use AI-Driven Feedback
                         </h3>
                         <p className="text-gray-400">
-                          TypeSprint’s AI analyzes your typing, identifying
-                          errors in spacing, punctuation, or specific keys. Use
-                          this feedback to refine your technique and achieve the
-                          90%+ accuracy required for SSC CHSL.
+                          TypeSprint’s AI analyzes your typing patterns,
+                          identifying errors in specific keys or spacing. Use
+                          this feedback to focus on weak areas, improving both
+                          speed and accuracy for the CSIR JSA test.
                         </p>
                       </div>
                     </div>
@@ -246,12 +280,14 @@ const Blog3 = () => {
                       <FaTrophy className="h-8 w-8 text-cyan-400 mr-4" />
                       <div>
                         <h3 className="text-xl font-semibold text-white mb-2">
-                          3. Simulate Timed Conditions
+                          3. Simulate Exam Conditions
                         </h3>
                         <p className="text-gray-400">
-                          Practice under SSC CHSL’s 10-minute time limit with
-                          TypeSprint’s timed tests. This helps you manage time
-                          pressure and maintain focus throughout the test.
+                          TypeSprint offers timed tests that replicate the CSIR
+                          JSA typing test environment, including font options
+                          like Kruti Dev or Mangal for Hindi. Regular practice
+                          under these conditions reduces exam-day stress and
+                          enhances performance.
                         </p>
                       </div>
                     </div>
@@ -259,13 +295,14 @@ const Blog3 = () => {
                       <FaKeyboard className="h-8 w-8 text-cyan-400 mr-4" />
                       <div>
                         <h3 className="text-xl font-semibold text-white mb-2">
-                          4. Disable Editing Keys
+                          4. Prioritize Accuracy Over Speed
                         </h3>
                         <p className="text-gray-400">
-                          SSC exams often restrict backspace and other editing
-                          keys. TypeSprint’s strict mode disables these
-                          functions, training you to type accurately from the
-                          start.
+                          Accuracy is critical in the CSIR JSA typing test due
+                          to the lack of editing options. Begin with slow,
+                          precise typing to minimize errors, then gradually
+                          increase speed using TypeSprint’s progressive
+                          exercises.
                         </p>
                       </div>
                     </div>
@@ -273,32 +310,37 @@ const Blog3 = () => {
                       <FaTrophy className="h-8 w-8 text-cyan-400 mr-4" />
                       <div>
                         <h3 className="text-xl font-semibold text-white mb-2">
-                          5. Earn Certificates
+                          5. Earn Certificates for Motivation
                         </h3>
                         <p className="text-gray-400">
-                          Complete TypeSprint’s typing challenges to earn
-                          certificates, boosting motivation and providing proof
-                          of your skills for SSC CHSL preparation.
+                          TypeSprint’s challenges allow you to earn certificates
+                          upon completion, boosting motivation and providing
+                          tangible proof of your skills. These milestones help
+                          track progress toward the CSIR JSA typing test
+                          requirements.
                         </p>
                       </div>
                     </div>
 
                     <div className="mt-12">
                       <h2 className="text-3xl font-bold text-cyan-400 mb-6">
-                        Why Choose TypeSprint for SSC CHSL Typing
+                        Why Choose TypeSprint for CSIR JSA Preparation
                       </h2>
                       <p className="text-lg text-gray-300 mb-6">
-                        TypeSprint’s platform is tailored for SSC CHSL and
-                        government exam preparation, offering exam-like practice
-                        and advanced features. Benefits include:
+                        TypeSprint is designed to prepare candidates for the
+                        CSIR JSA typing test through a realistic practice
+                        environment and advanced features. Key benefits include:
                       </p>
                       <ul className="list-disc list-inside text-gray-300 space-y-2">
-                        <li>Full-paragraph tests with SSC-like formatting.</li>
                         <li>
-                          Support for English and Hindi (Kruti Dev, Mangal).
+                          Exam-like settings with disabled editing functions.
                         </li>
                         <li>
-                          AI-driven error analysis for targeted improvement.
+                          Support for English and Hindi, including Kruti Dev and
+                          Mangal fonts.
+                        </li>
+                        <li>
+                          AI-driven feedback to pinpoint and correct errors.
                         </li>
                         <li>
                           Certificates to validate your typing proficiency.
@@ -320,8 +362,9 @@ const Blog3 = () => {
                     </h3>
                     <p className="text-lg text-gray-300 mb-6">
                       Log in to TypeSprint to access the complete guide,
-                      including all five strategies and exclusive tips for SSC
-                      CHSL typing tests. No subscription required—just sign in!
+                      including all five strategies and exclusive tips for the
+                      CSIR JSA typing test. No subscription or payment
+                      required—just sign in!
                     </p>
                     <button
                       onClick={handleLogin}
@@ -354,36 +397,12 @@ const Blog3 = () => {
                   Frequently Asked Questions
                 </h2>
                 <p className="mt-4 text-xl text-gray-300">
-                  Have questions about full-paragraph typing tests for SSC CHSL?
+                  Have questions about preparing for the CSIR JSA typing test?
                   Find answers below.
                 </p>
               </div>
               <div className="space-y-4">
-                {[
-                  {
-                    question:
-                      "What typing speed is required for SSC CHSL typing tests?",
-                    answer:
-                      "SSC CHSL requires 35 WPM in English or 30 WPM in Hindi, equivalent to 1750 key depressions in 10 minutes, with at least 90% accuracy.",
-                  },
-                  {
-                    question:
-                      "Why are full-paragraph tests better than random-word tests?",
-                    answer:
-                      "Full-paragraph tests mimic SSC CHSL’s exam format, requiring proper formatting, punctuation, and sustained focus, unlike random-word tests that lack context.",
-                  },
-                  {
-                    question: "How does TypeSprint prepare me for SSC CHSL?",
-                    answer:
-                      "TypeSprint offers exam-like paragraph tests, AI feedback, and strict modes (no backspace), helping you achieve the speed and accuracy needed for SSC CHSL.",
-                  },
-                  {
-                    question:
-                      "How long should I practice daily for SSC CHSL typing?",
-                    answer:
-                      "Daily practice of 30-60 minutes on TypeSprint, focusing on accuracy and speed, can improve your typing within 2-4 weeks for SSC CHSL.",
-                  },
-                ].map((faq, index) => (
+                {faqs.map((faq, index) => (
                   <div
                     key={index}
                     className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-cyan-500 transition-all duration-300"
@@ -411,13 +430,13 @@ const Blog3 = () => {
               <h3 className="text-xl font-semibold text-white mb-4">Tags</h3>
               <div className="flex flex-wrap justify-center gap-2">
                 {[
-                  "SSC CHSL Typing Test",
-                  "Full-Paragraph Typing",
+                  "CSIR JSA Typing Test",
+                  "Typing Test Preparation",
                   "TypeSprint",
                   "Hindi Typing",
                   "English Typing",
                   "Typing Accuracy",
-                  "Government Exams",
+                  "Competitive Exams",
                   "Keyboard Skills",
                 ].map((tag, index) => (
                   <span
@@ -436,4 +455,4 @@ const Blog3 = () => {
   );
 };
 
-export default Blog3;
+export default BlogCSIRJSATypingTest;

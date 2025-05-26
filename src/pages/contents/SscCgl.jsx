@@ -7,7 +7,7 @@ import {
   FaCheckCircle,
   FaArrowRight,
 } from "react-icons/fa";
-import { useAuth } from "../contexts/AuthContext"; // Adjust path as needed
+import { useAuth } from "../../contexts/AuthContext"; // Adjust path as needed
 
 const SscCgl = () => {
   const navigate = useNavigate();
@@ -84,7 +84,10 @@ const SscCgl = () => {
         />
         <meta name="author" content="Neeraj Kumar" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://typesprint.live/ssc-cgl" />
+        <link
+          rel="canonical"
+          href="https://typesprint.live/ssc-cgl-typing-test"
+        />
         <meta
           property="og:title"
           content="Master SSC CGL Typing Test with TypeSprint"
@@ -97,7 +100,10 @@ const SscCgl = () => {
           property="og:image"
           content="https://typesprint.live/images/ssc-cgl-typing-hero.jpg"
         />
-        <meta property="og:url" content="https://typesprint.live/ssc-cgl" />
+        <meta
+          property="og:url"
+          content="https://typesprint.live/ssc-cgl-typing-test"
+        />
         <meta name="twitter:card" content="summary_large_image" />
         <script type="application/ld+json">
           {JSON.stringify({

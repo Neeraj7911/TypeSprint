@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { FaKeyboard, FaPlay, FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { useAuth } from "../contexts/AuthContext"; // Adjust path
+import { useAuth } from "../../contexts/AuthContext"; // Adjust path
 
 const TenMinuteTest = () => {
   const navigate = useNavigate();
@@ -92,7 +92,10 @@ const TenMinuteTest = () => {
         />
         <meta name="author" content="Neeraj Kumar" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://typesprint.live/10-minute-test" />
+        <link
+          rel="canonical"
+          href="https://typesprint.live/10-minute-test-for-government-jobs"
+        />
         <meta
           property="og:title"
           content="10 Minute Typing Test for Government Jobs | TypeSprint"
@@ -107,7 +110,7 @@ const TenMinuteTest = () => {
         />
         <meta
           property="og:url"
-          content="https://typesprint.live/10-minute-test"
+          content="https://typesprint.live/10-minute-test-for-government-jobs"
         />
         <meta name="twitter:card" content="summary_large_image" />
         <script type="application/ld+json">
