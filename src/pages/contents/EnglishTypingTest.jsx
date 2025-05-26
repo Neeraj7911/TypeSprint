@@ -85,7 +85,7 @@ const EnglishTypingTest = () => {
     setCurrentTip((prev) => (prev - 1 + tips.length) % tips.length);
 
   const handleStartTest = () => {
-    navigate("/");
+    navigate("/typing-test");
   };
 
   const handleSaveAsPDF = () => {

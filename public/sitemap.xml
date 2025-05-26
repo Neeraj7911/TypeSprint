@@ -2,52 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://typesprint.live/</loc>
-    <lastmod>2025-05-23</lastmod>
-    <priority>1.00</priority>
-  </url>
-  <url>
-    <loc>https://typesprint.live/exams?search=SSC%20chsl</loc>
-    <lastmod>2025-05-23</lastmod>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://typesprint.live/exams?search=RRB</loc>
-    <lastmod>2025-05-23</lastmod>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://typesprint.live/exams?search=uppsc%20ro%2Faro</loc>
-    <lastmod>2025-05-23</lastmod>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://typesprint.live/10-minute-typing-test-for-government-jobs</loc>
-    <lastmod>2025-05-25</lastmod>
-    <priority>0.90</priority>
-  </url>
-  <url>
-    <loc>https://typesprint.live/ssc-cgl-typing-test</loc>
-    <lastmod>2025-05-23</lastmod>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.00</priority>
   </url>
   <url>
     <loc>https://typesprint.live/exams</loc>
-    <lastmod>2025-05-23</lastmod>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
-    <loc>https://typesprint.live/exams?search=junior%20assistant</loc>
-    <lastmod>2025-05-23</lastmod>
+    <loc>https://typesprint.live/ssc-cgl-typing-test</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/10-minute-typing-test-for-government-jobs</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/English-typing-test</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/blogs</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typesprint.live/blogs/boost-typing-speed-competitive-exams</loc>
-    <lastmod>2025-05-23</lastmod>
-    <priority>0.90</priority>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
   </url>
   <url>
     <loc>https://typesprint.live/blogs/prepare-csir-jsa-typing-test</loc>
-    <lastmod>2025-05-23</lastmod>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/blogs/full-paragraph-typing-tests-ssc-chsl</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/typing-test</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
 </urlset>
