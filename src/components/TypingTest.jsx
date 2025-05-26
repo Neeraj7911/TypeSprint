@@ -1,5 +1,3 @@
-//    pdfDoc.addImage(Logo, "PNG", (pageWidth - 50) / 2, 30, 50, 50);
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -30,12 +28,22 @@ const TypingTest = ({ darkMode }) => {
 
   // Array of 6 challenging pangrams
   const pangrams = [
-    "A wizard briskly packed five dozen jugs of liquor into a quartz box while nimble nymphs observed with great curiosity.",
-    "Jumpy zebras dashed over thick vines as quick foxes vexed the puzzled sphinx in a moonlit glade under the starry sky.",
-    "The black quartz rock shimmered mysteriously while five jocks played jazz tunes on an ancient golden jukebox near the bonfire.",
-    "A dozen vexed dwarves juggled heavy boxes filled with waxy gems as a giant owl watched with wide eyes from the old tower.",
-    "Bright sphinx statues guarded the wizard's tall tower while quizzical nymphs deciphered cryptic runes carved into the marble walls.",
-    "Dizzy from the wizard's swirling spells, quick foxes and jagged rocks whirled in a gusty, dazzling storm of golden dust.",
+    "A wizard briskly packed five dozen jugs of liquor into a Quartz box while nimble nymphs observed with great curiosity.",
+    "Jumpy zebras dashed over thick vines as quick foxes vexed the Puzzled sphinx in a moonlit glade under the starry sky.",
+    "The black quartz rock shimmered mysteriou_ly while five jocks played jazz tunes on an ancient golden jukebox near the bonfire.",
+    "A dozen vexed dwarves juggled heavy boxes . filled with waxy Gems as a giant owl watched with wide eyes from the old tower.",
+    "Bright sphinx statues guarded the wizard's tall tower while quiz.zical nymphs deciphered cryptic runes carved into the marble walls.",
+    "Dizzy from the wizard's swirlinG spells,,,. quick foxes and jagged rocks whirled in a gusty, dazzling storm of golden dust.",
+    "A vexed judge zipped his fuzzy jacket and flung twelve quartz stones into the buzzing vortex where nymphs and foxes twirled in rhythmic chaos.",
+    "Jaded sphinxes with glowing glyphs guarded the waxy temple Gates while dwarves hauled jumbo crates through zigzag paths lined with quizzical runes and vines.",
+    "Quickly jumping over broken fences, the jazzy lynx vexed two puzzled gnomes who clutched glowing orbs near a quartz obelisk under neon stars.",
+    "Blazing with fury, the wizard juggled six fi_zy flasks while nyMphs danced on jagged ledges and a ghostly owl watched from the quartz spire above.",
+    "Twelve dwarves boxed up waX staTues and zipped across icy floors while quivering foxes and jittery jackals mapped the cryptic glyphs on cave walls.",
+    "Giant quartz wheels spun Wildly as quick ghouls and zany jesters wrestled in dusty fog under buzzing lights near a crumbling obsidian statue.",
+    "Bright jackals juggled golden eggs near a fizzIng pool whilE vexed witches zapped quartz vines that wrapped around the crumbling marble stairway of fate.",
+    "The wizard_s jukebox playeD ja_zy beats as nimble foxes and fuzzy dwarves decoded strange symbols etched deep into the cold quartz dungeon wall.",
+    "With a flick of her wand,, the queen summoned twenty jaded jesters to juggle glyph-marked boxes across zigzagging bridges made of shimmering black quartz.",
+    "Quick brown ghouls zipped across frozen fields while dwarves tossed glowing gems into a bronze firepit surrounded by jackals, foxes, and whispering sphinxes.",
   ];
 
   // Function to select a random pangram different from the last one
@@ -139,13 +147,43 @@ const TypingTest = ({ darkMode }) => {
   };
 
   const calculateAccuracy = (original, typed) => {
-    const originalWords = original.trim().split(" ");
-    const typedWords = typed.trim().split(" ");
-    let correctWords = 0;
-    typedWords.forEach((word, index) => {
-      if (word === originalWords[index]) correctWords++;
-    });
-    return (correctWords / originalWords.length) * 100;
+    const originalWords = original
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
+    const typedWords = typed
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
+
+    if (typedWords.length === 0) return 0;
+
+    let correctChars = 0;
+    let totalChars = 0;
+
+    for (let i = 0; i < typedWords.length; i++) {
+      const typedWord = typedWords[i];
+      const originalWord = originalWords[i] || "";
+
+      for (
+        let j = 0;
+        j < Math.max(typedWord.length, originalWord.length);
+        j++
+      ) {
+        if (j < typedWord.length && j < originalWord.length) {
+          totalChars++;
+          if (typedWord[j] === originalWord[j]) {
+            correctChars++;
+          }
+        } else if (j < typedWord.length) {
+          totalChars++;
+        } else if (j < originalWord.length) {
+          totalChars++;
+        }
+      }
+    }
+
+    return totalChars === 0 ? 0 : (correctChars / totalChars) * 100;
   };
 
   const calculateWPM = (wordsTyped, timeInSeconds) => {
@@ -263,7 +301,7 @@ const TypingTest = ({ darkMode }) => {
     pdfDoc.setFontSize(10);
     pdfDoc.setTextColor(100);
     pdfDoc.text(
-      "Verify this certificate at: typingtest-9f8f6.web.app/verify",
+      "Verify this certificate at: https://typesprint.live/verify",
       pageWidth / 2,
       pageHeight - 10,
       { align: "center" }
