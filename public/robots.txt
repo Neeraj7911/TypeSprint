@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /exams
+Allow: /ssc-cgl-typing-test
+Allow: /10-minute-typing-test-for-government-jobs
+Allow: /typing-test
+Allow: /English-typing-test
+Allow: /blogs
+Allow: /blogs/boost-typing-speed-competitive-exams
+Allow: /blogs/prepare-csir-jsa-typing-test
+Allow: /blogs/full-paragraph-typing-tests-ssc-chsl
+Disallow: /login
+Disallow: /signup
+Disallow: /dashboard
+Disallow: /admin/
+Disallow: /api/
+Sitemap: https://typesprint.live/sitemap.xml
