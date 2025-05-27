@@ -83,6 +83,14 @@ const Blogs = () => {
       image: "https://typesprint.com/images/typing-blog-hero.jpg",
       date: "May 24, 2025",
     },
+    {
+      slug: "csir-jsa-eligiblity-and-typing-speed-criteria",
+      title: "Master the CSIR JSA Typing Test with TypeSprint’s Free Practice",
+      excerpt:
+        "Prepare for the CSIR JSA typing test with TypeSprint’s expert guide. Achieve 35 WPM in English or 30 WPM in Hindi with 80%+ accuracy and join our community of aspirants!",
+      image: "https://typesprint.com/images/csir-jsa-typing-blog-hero.jpg",
+      date: "2025-05-27",
+    },
     // Add more blog posts here as you create them
     // Example:
     // {

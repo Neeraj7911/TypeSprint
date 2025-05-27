@@ -35,6 +35,8 @@ import Blog3 from "./pages/blogs/Blog3.jsx";
 import SscCgl from "./pages/contents/SscCgl.jsx";
 import Min from "./pages/contents/MinTyping.jsx";
 import Typingcon from "./pages/contents/EnglishTypingTest.jsx"; // Assuming this is Typingcon.jsx
+import CSIRJSATypingTest from "./pages/contents/CSIRJSA.jsx";
+import Blog4 from "./pages/blogs/Blog4.jsx"; // Assuming this is Blog4.jsx
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -73,12 +75,20 @@ const AppContent = () => {
               path="/blogs/full-paragraph-typing-tests-ssc-chsl"
               element={<Blog3 />}
             />
+            <Route
+              path="/blogs/csir-jsa-eligiblity-and-typing-speed-criteria"
+              element={<Blog4 />}
+            />
             <Route path="/ssc-cgl-typing-test" element={<SscCgl />} />
             <Route
               path="/10-minute-typing-test-for-government-jobs"
               element={<Min />}
             />
             <Route path="/English-typing-test" element={<Typingcon />} />
+            <Route
+              path="/CSIR-JSA-typing-test-practice"
+              element={<CSIRJSATypingTest />}
+            />
 
             <Route
               path="/report"
