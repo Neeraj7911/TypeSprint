@@ -1,6 +1,10 @@
 # 🌟 TypeSprint — Government Typing Exam Practice Made Easy
 
-![TypeSprint Banner](https://blogger.googleusercontent.com/img/a/AVvXsEjYzZw6n2JALMNz0YahDUBOEs4gknATILgv49AY79N728JogePSGgnhGXBw3NU3iiwecFFfBkE5RZDJqQtFaX-ZGtZus2-P2D6yCSvU009w4UumYnFVhRxCVYX7YzT04mXrFgV-HPaxb5Hhxu7il0WjP7Jn65tkJZ0MiZ03q2dSSMYAQwue0zqozEn-ONQ)
+<p align="center">
+  <img src="[https://typesprint.live/assets/images/logo.png" alt="TypeSprint Logo" width="200"](https://blogger.googleusercontent.com/img/a/AVvXsEjYzZw6n2JALMNz0YahDUBOEs4gknATILgv49AY79N728JogePSGgnhGXBw3NU3iiwecFFfBkE5RZDJqQtFaX-ZGtZus2-P2D6yCSvU009w4UumYnFVhRxCVYX7YzT04mXrFgV-HPaxb5Hhxu7il0WjP7Jn65tkJZ0MiZ03q2dSSMYAQwue0zqozEn-ONQ) />
+</p>
+
+<h1 align="center">🌟 TypeSprint</h1>
 
 > **Master Typing for SSC, CHSL, RRB, Court, NTPC, UPPSC RO/ARO & more — in English, Hindi, Tamil, Odia, Kannada and other regional languages.**
 
