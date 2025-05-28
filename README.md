@@ -1,6 +1,6 @@
 # 🌟 TypeSprint — Government Typing Exam Practice Made Easy
 
-![TypeSprint Banner](https://typesprint.live/assets/react-DtWikwx4.svg)
+![TypeSprint Banner](https://blogger.googleusercontent.com/img/a/AVvXsEjYzZw6n2JALMNz0YahDUBOEs4gknATILgv49AY79N728JogePSGgnhGXBw3NU3iiwecFFfBkE5RZDJqQtFaX-ZGtZus2-P2D6yCSvU009w4UumYnFVhRxCVYX7YzT04mXrFgV-HPaxb5Hhxu7il0WjP7Jn65tkJZ0MiZ03q2dSSMYAQwue0zqozEn-ONQ)
 
 > **Master Typing for SSC, CHSL, RRB, Court, NTPC, UPPSC RO/ARO & more — in English, Hindi, Tamil, Odia, Kannada and other regional languages.**
 
@@ -8,20 +8,31 @@
 
 ## 🚀 What is TypeSprint?
 
-**[TypeSprint](https://typesprint.live)** is a **free online typing practice platform** tailored for **government exam aspirants** in India. Whether you’re preparing for **SSC CGL/CHSL**, **RRB**, **UPPSC**, or **Court Typist exams**, we provide **real exam formats**, **instant feedback**, and a **personalized dashboard** to help you type with confidence.
+**[TypeSprint](https://typesprint.live)** is a **React-based typing practice platform** built for **government exam aspirants** across India. It simulates **real exam conditions** and supports regional language typing in **Kruti Dev**, **Remington**, and more — helping candidates prepare for **SSC, RRB, NTPC, Court Clerk, and other typist exams** efficiently.
+
+---
+
+## ⚛️ Built with React
+
+> TypeSprint is developed using **React.js**, ensuring:
+- ⚡️ Fast performance with optimized rendering
+- 🔄 Real-time feedback using React state management
+- 📱 Smooth responsive design with Tailwind CSS
+- 🧪 Seamless integration with Firebase backend
+
+Whether on mobile or desktop, the experience is **fluid, interactive, and blazing fast.**
 
 ---
 
 ## ✨ Features
 
-- ✅ **Real Exam Formats** – SSC, CHSL, RRB, NTPC, UPPSC RO/ARO, Court, and more  
-- 🕐 **Instant Feedback** – Get accuracy %, WPM, and improvement tips  
-- 🧠 **Multilingual Support** – English, Hindi (Kruti Dev), Tamil, Odia, Kannada & more  
-- 📊 **Interactive Dashboard** – View progress, goals, and typing history  
-- 🏆 **Global Leaderboard** – Compete and rank among the best typists  
-- 🧾 **Certificate Verification** – Download & verify certificates for your records  
-- 📱 **Mobile-Friendly UI** – Practice on any device, anytime  
-- 🌐 **SEO Optimized & Fast** – Built with performance and discovery in mind
+- ✅ **Exam-Ready Formats** – SSC, CHSL, RRB, NTPC, Court, UPPSC & more  
+- 🧠 **Multilingual Typing** – Hindi (Kruti Dev), English, Tamil, Odia, Kannada  
+- 📈 **Live Accuracy & Speed** – Instant WPM and Error Stats  
+- 🧾 **Typing Certificate Generator** – Get & verify your progress  
+- 📊 **React Dashboard** – View your history, analytics & rank  
+- 🏆 **Global Leaderboard** – Compete with users across India  
+- 🌐 **Progressive Web App** – Use like a native app, built on React
 
 ---
 
@@ -33,42 +44,41 @@
 | **NTPC**  | 🚂   | Railway Recruitment Board Typing Test |
 | **COURT** | 🏦   | Court Clerk & Typist Typing Exams |
 | **RRB**   | 🚉   | RRB & Railway Group D Typing |
-| **TYPIST**| ⚖️   | General Typist Government Jobs |
-| **MUNICIPAL**| 💼 | Local Government / Nagar Nigam typing tests |
+| **UPPSC** | 🧾   | UPPSC RO/ARO Typing Test |
+| **TYPIST**| ⚖️   | General Government Typist Exams |
 
 ---
 
-## 🎯 Why TypeSprint?
+## 📱 Live Demo
 
-- Built **by aspirants, for aspirants** in 🇮🇳
-- Accurate simulation of **Kruti Dev** and other regional fonts
-- Helps you **track improvement** and **analyze performance**
-- Simple, clean, and distraction-free UI
+👉 Try it now: [https://typesprint.live](https://typesprint.live)
 
----
-
-## 🖥️ Live Platform
-
-👉 **Visit now:** [https://typesprint.live](https://typesprint.live)
-
-🔐 **No sign-up required** to start typing — Just **click and begin typing instantly**.
+> No sign-up required — Start typing right away.
 
 ---
 
-## 📸 Sneak Peek
+## 🖼️ UI Preview
 
-> Experience the future of government typing prep
-
-![Screenshot 1](https://typesprint.live/assets/images/screenshot1.png)
-![Screenshot 2](https://typesprint.live/assets/images/screenshot2.png)
+![Dashboard](https://typesprint.live/assets/images/screenshot1.png)
+![Typing Page](https://typesprint.live/assets/images/screenshot2.png)
 
 ---
 
-## 📢 Join the TypeSprint Challenge!
+## 💻 Tech Stack
 
-1. Go to [https://typesprint.live](https://typesprint.live)
-2. Choose your exam (SSC, RRB, Court, etc.)
-3. Start typing – Instantly. No distractions.
+- **Frontend**: [React.js](https://reactjs.org/) + [Tailwind CSS](https://tailwindcss.com/)
+- **Backend**: [Firebase Auth + Firestore](https://firebase.google.com/)
+- **Deployment**: Firebase Hosting
+- **State Management**: React Hooks
+
+---
+
+## 🧠 SEO Keywords
+
+React typing test platform, typing practice for SSC CHSL, Hindi Kruti Dev typing exam,
+government typing test preparation, typing speed test in multiple languages,
+RRB NTPC typing test practice, court typist test India, React-based typing platform,
+free online typing practice app, typing certificate generator
 
 ---
 
@@ -86,15 +96,6 @@
 
 ---
 
-## 🛠 Built With
-
-- HTML5 + CSS3 + JavaScript
-- TailwindCSS for fast and responsive design
-- Firebase (Auth, Firestore, Hosting)
-- Open-source spirit and aspirant feedback ❤️
-
----
-
 ## 📌 Legal & Policies
 
 - [Privacy Policy](https://typesprint.live/privacy-policy)
@@ -104,16 +105,7 @@
 
 ---
 
-## 🔍 SEO Keywords
-
-typing test for government jobs, ssc typing practice, hindi kruti dev typing test,
-rrb ntpc typing test, uppsc ro aro typing, court typing test india,
-online typing practice platform, typing practice hindi english,
-free typing certification for ssc chsl, typesprint live
-
----
-
-## Made in 🇮🇳 with ❤️ by [Neeraj](https://github.com/neeraj7911) and the [TypeSprint Team](https://typesprint.live)
+## 🙌 Made in 🇮🇳 with ❤️ using React by [Neeraj](https://github.com/neerajkumarsrm) & Team
 
 > “Empowering India's Aspirants, One Word at a Time.”
 
