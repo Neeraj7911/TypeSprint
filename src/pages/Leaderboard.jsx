@@ -460,7 +460,7 @@ const Leaderboard = () => {
   };
 
   const handleSignupRedirect = () => {
-    navigate("/signup");
+    navigate("/login");
   };
 
   // SVG fallback for profile picture
