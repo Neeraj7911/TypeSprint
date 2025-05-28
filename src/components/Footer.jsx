@@ -34,8 +34,8 @@ const socialLinks = [
   },
   {
     icon: FaFileAlt,
-    url: "/path/to/your/resume.pdf",
-    name: "Resume",
+    url: "https://neeraj791.me",
+    name: "Portfolio",
     color: "hover:text-green-500",
   },
 ];
@@ -165,7 +165,7 @@ const Footer = ({ darkMode }) => {
             <h3 className="text-xl font-bold mb-4">Contact Us</h3>
             <div className="space-y-4">
               <motion.a
-                href="mailto:Liveproject072@gmail.com"
+                href="mailto:Liveproject072+typesprint@gmail.com"
                 className={`flex items-center ${
                   darkMode
                     ? "text-gray-300 hover:text-blue-400"
@@ -177,7 +177,7 @@ const Footer = ({ darkMode }) => {
                 Mail us
               </motion.a>
               <motion.a
-                href="tel:+1234567890"
+                href="tel:+91 - 9870487659"
                 className={`flex items-center ${
                   darkMode
                     ? "text-gray-300 hover:text-blue-400"
