@@ -1,7 +1,7 @@
 # 🌟 TypeSprint — Government Typing Exam Practice Made Easy
 
 <p align="center">
-  <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjYzZw6n2JALMNz0YahDUBOEs4gknATILgv49AY79N728JogePSGgnhGXBw3NU3iiwecFFfBkE5RZDJqQtFaX-ZGtZus2-P2D6yCSvU009w4UumYnFVhRxCVYX7YzT04mXrFgV-HPaxb5Hhxu7il0WjP7Jn65tkJZ0MiZ03q2dSSMYAQwue0zqozEn-ONQ" />
+  <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjYzZw6n2JALMNz0YahDUBOEs4gknATILgv49AY79N728JogePSGgnhGXBw3NU3iiwecFFfBkE5RZDJqQtFaX-ZGtZus2-P2D6yCSvU009w4UumYnFVhRxCVYX7YzT04mXrFgV-HPaxb5Hhxu7il0WjP7Jn65tkJZ0MiZ03q2dSSMYAQwue0zqozEn-ONQ" alt="TypeSprint Logo" width="200" />
 </p>
 
 <h1 align="center">🌟 TypeSprint</h1>
