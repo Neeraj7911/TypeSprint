@@ -11,15 +11,77 @@ import {
   FaCrown,
 } from "react-icons/fa";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 
 function Header() {
   const { currentUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollDirection, setScrollDirection] = useState("up");
   const [lastScrollTop, setLastScrollTop] = useState(0);
+  const [userData, setUserData] = useState({
+    subscription: "Free",
+    typingSpeed: 0,
+    testsCompleted: 0,
+  });
   const logoText = "TypeSprint";
 
+  // Fetch user data from Firestore
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (currentUser) {
+        try {
+          // Fetch credits from users/{userId}
+          const userRef = doc(db, "users", currentUser.uid);
+          const userDoc = await getDoc(userRef);
+          const credits = userDoc.exists() ? userDoc.data().credits || 0 : 0;
+
+          // Fetch test results from users/{userId}/results
+          const resultsRef = collection(
+            db,
+            "users",
+            currentUser.uid,
+            "results"
+          );
+          const resultsSnapshot = await getDocs(resultsRef);
+          const testResults = resultsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            wpm: doc.data().netWpm || doc.data().wpm || 0,
+          }));
+
+          // Calculate typingSpeed and testsCompleted
+          const typingSpeed = testResults.length
+            ? Math.max(...testResults.map((r) => r.wpm || 0))
+            : 0;
+          const testsCompleted = testResults.length;
+
+          setUserData({
+            subscription: credits > 0 ? "Premium" : "Free",
+            typingSpeed,
+            testsCompleted,
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setUserData({
+            subscription: "Free",
+            typingSpeed: 0,
+            testsCompleted: 0,
+          });
+        }
+      } else {
+        setUserData({
+          subscription: "Free",
+          typingSpeed: 0,
+          testsCompleted: 0,
+        });
+      }
+    };
+
+    fetchUserData();
+  }, [currentUser]);
+
+  // Handle scroll behavior
   useEffect(() => {
     const handleScroll = () => {
       const st = window.pageYOffset || document.documentElement.scrollTop;
@@ -30,7 +92,6 @@ function Header() {
       }
       setLastScrollTop(st <= 0 ? 0 : st);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollTop]);
@@ -38,11 +99,6 @@ function Header() {
   const headerVariants = {
     visible: { opacity: 1, y: 0 },
     hidden: { opacity: 0, y: -100 },
-  };
-
-  const menuItemVariants = {
-    open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: 20 },
   };
 
   const mobileMenuVariants = {
@@ -55,7 +111,7 @@ function Header() {
       await signOut(auth);
       setIsMenuOpen(false);
     } catch (error) {
-      console.error("Error signing out: ", error);
+      console.error("Error signing out:", error);
     }
   };
 
@@ -71,7 +127,7 @@ function Header() {
       variants={headerVariants}
       transition={{ duration: 0.3 }}
     >
-      <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="text-3xl font-extrabold">
           <div className="flex">
             {logoText.split("").map((letter, index) => (
@@ -117,27 +173,25 @@ function Header() {
                   <div className="px-4 py-3 text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-white dark:border-opacity-20">
                     <div className="font-bold">{currentUser.email}</div>
                     <div className="mt-1 flex items-center">
-                      <FaCrown className="mr-1 text-yellow-400" />
-                      <span>{currentUser.subscription || "Free"}</span>
+                      <FaCrown className="mr-1 text-yellow-500" />
+                      <span>{userData.subscription}</span>
                     </div>
                   </div>
                   <div className="px-4 py-2 text-sm text-gray-900 dark:text-white">
                     <div className="mb-1">
-                      Typing Speed: {currentUser.typingSpeed || 0} WPM
+                      Typing Speed: {userData.typingSpeed} WPM
                     </div>
-                    <div>
-                      Tests Completed: {currentUser.testsCompleted || 0}
-                    </div>
+                    <div>Tests Completed: {userData.testsCompleted}</div>
                   </div>
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white dark:hover:bg-opacity-10 transition-colors duration-200"
+                    className="block px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white dark:hover:bg-opacity-75 transition-colors duration-200"
                   >
                     Edit Profile
                   </Link>
                   <button
                     onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white dark:hover:bg-opacity-10 transition-colors duration-200"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white dark:hover:bg-opacity-75 transition-colors duration-200"
                   >
                     Sign Out
                   </button>
@@ -202,14 +256,14 @@ function Header() {
                   <div className="px-4 py-2 text-sm text-gray-900 dark:text-white bg-white bg-opacity-10 rounded-lg">
                     <div className="font-bold">{currentUser.email}</div>
                     <div className="mt-2 flex items-center">
-                      <FaCrown className="mr-1 text-yellow-400" />
-                      <span>{currentUser.subscription || "Free"}</span>
+                      <FaCrown className="mr-1 text-yellow-500" />
+                      <span>{userData.subscription}</span>
                     </div>
                     <div className="mt-1">
-                      Typing Speed: {currentUser.typingSpeed || 0} WPM
+                      Typing Speed: {userData.typingSpeed} WPM
                     </div>
                     <div className="mt-1">
-                      Tests Completed: {currentUser.testsCompleted || 0}
+                      Tests Completed: {userData.testsCompleted}
                     </div>
                   </div>
                   <motion.button
@@ -220,7 +274,6 @@ function Header() {
                     className="bg-red-500 bg-opacity-80 text-white px-4 py-2 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-300"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    variants={menuItemVariants}
                   >
                     <FaSignOutAlt className="mr-2" />
                     Logout
@@ -230,7 +283,6 @@ function Header() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  variants={menuItemVariants}
                 >
                   <Link
                     to="/login"
