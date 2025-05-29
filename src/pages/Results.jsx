@@ -69,6 +69,16 @@ const Results = () => {
   const [aiReport, setAiReport] = useState("");
   const [reportError, setReportError] = useState("");
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedback, setFeedback] = useState({
+    usabilityRating: 0,
+    performanceRating: 0,
+    overallRating: 0,
+    feedbackType: "general",
+    comments: "",
+  });
+  const [feedbackError, setFeedbackError] = useState("");
+  const [feedbackSuccess, setFeedbackSuccess] = useState("");
 
   useEffect(() => {
     const fetchCredits = async (uid) => {
@@ -373,7 +383,6 @@ const Results = () => {
     const margin = 20;
     let yOffset = margin;
 
-    // Add TypeSprint Logo
     try {
       const imgProps = pdf.getImageProperties("../assets/logo.png");
       const imgWidth = 40;
@@ -396,7 +405,6 @@ const Results = () => {
       yOffset += 10;
     }
 
-    // Header
     pdf.setFontSize(24);
     pdf.setTextColor(0, 102, 204);
     pdf.text("TypeSprint Premium Performance Report", pageWidth / 2, yOffset, {
@@ -404,7 +412,6 @@ const Results = () => {
     });
     yOffset += 15;
 
-    // User Info
     pdf.setFontSize(12);
     pdf.setTextColor(0);
     pdf.text(
@@ -420,7 +427,6 @@ const Results = () => {
     pdf.text(`Date: ${new Date().toLocaleDateString()}`, margin, yOffset);
     yOffset += 10;
 
-    // Add Charts
     const chartWidth = 50;
     const chartHeight = 30;
 
@@ -469,7 +475,6 @@ const Results = () => {
       yOffset += chartHeight + 10;
     }
 
-    // Report Content
     pdf.setFontSize(10);
     const lines = pdf.splitTextToSize(aiReport, pageWidth - 2 * margin);
     for (const line of lines) {
@@ -481,7 +486,6 @@ const Results = () => {
       yOffset += 5;
     }
 
-    // Footer
     if (yOffset > pageHeight - margin - 20) {
       pdf.addPage();
       yOffset = margin;
@@ -496,6 +500,65 @@ const Results = () => {
     );
 
     pdf.save(`TypeSprint_AI_Report_${examName}_${Date.now()}.pdf`);
+  };
+
+  const handleFeedbackChange = (e) => {
+    const { name, value } = e.target;
+    setFeedback((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRatingChange = (name, value) => {
+    setFeedback((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitFeedback = async (e) => {
+    e.preventDefault();
+    setFeedbackError("");
+    setFeedbackSuccess("");
+
+    if (
+      !feedback.usabilityRating ||
+      !feedback.performanceRating ||
+      !feedback.overallRating ||
+      !feedback.feedbackType ||
+      !feedback.comments.trim()
+    ) {
+      setFeedbackError("Please complete all fields and provide a comment.");
+      return;
+    }
+
+    try {
+      const feedbackRef = doc(
+        db,
+        "feedback",
+        `${examName}-${userId}-${Date.now()}`
+      );
+      await setDoc(feedbackRef, {
+        userId,
+        userName:
+          auth.currentUser?.displayName ||
+          auth.currentUser?.email.split("@")[0],
+        userEmail: auth.currentUser?.email,
+        usabilityRating: feedback.usabilityRating,
+        performanceRating: feedback.performanceRating,
+        overallRating: feedback.overallRating,
+        feedbackType: feedback.feedbackType,
+        comments: feedback.comments,
+        examName,
+        timestamp: new Date().toISOString(),
+      });
+      setFeedbackSuccess("Thank you for your feedback!");
+      setFeedback({
+        usabilityRating: 0,
+        performanceRating: 0,
+        overallRating: 0,
+        feedbackType: "general",
+        comments: "",
+      });
+      setTimeout(() => setShowFeedbackModal(false), 2000);
+    } catch (err) {
+      setFeedbackError("Failed to submit feedback. Please try again.");
+    }
   };
 
   const WPMProgressCircle = ({ wpm, targetWPM }) => {
@@ -600,30 +663,30 @@ const Results = () => {
     const wpmDiff = (netWpm || 0) - (targetWPM || 0);
     if (wpmDiff < -5)
       insights.push(
-        "Neural Analysis: Increase synaptic response time with rapid key drills."
+        "Speed Tip: Practice quick key presses with short typing drills to boost your speed."
       );
     if ((accuracy || 0) < 85)
       insights.push(
-        "Precision Alert: Calibrate input accuracy with focused character repetition."
+        "Accuracy Tip: Focus on typing common words slowly to reduce mistakes."
       );
     if ((errors || 0) > 10)
       insights.push(
-        "Error Threshold Exceeded: Optimize hand-eye coordination via holographic keyboard sim."
+        "Error Reduction: Try finger placement exercises to improve precision."
       );
     if ((netWpm || 0) > (targetWPM || 0) && (accuracy || 0) > 90)
       insights.push(
-        "Elite Status: Maintain quantum efficiency with advanced texts."
+        "Great Work: Keep practicing with challenging texts to maintain your high performance."
       );
     return insights.length > 0
       ? insights
-      : ["System Optimal: Continue enhancing neural pathways."];
+      : ["You're on Track: Continue regular practice to enhance your skills."];
   };
 
   if (!location.state) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <p className="text-red-500 font-futura text-xl">
-          Error: No Data Detected. Initiate a Test Sequence.
+          Error: No Data Detected. Please Start a New Test.
         </p>
       </div>
     );
@@ -652,7 +715,7 @@ const Results = () => {
         className="max-w-5xl mx-auto p-8 relative z-10"
       >
         <h1 className="text-5xl font-bold text-cyan-400 mb-8 text-center font-futura tracking-wider mt-12">
-          {examName} Neural Typing Matrix
+          {examName} Typing Performance Results
         </h1>
 
         <div className="bg-gray-900 bg-opacity-80 p-4 rounded-lg border border-cyan-500 mb-6">
@@ -668,10 +731,7 @@ const Results = () => {
             transition={{ duration: 0.5 }}
             className="bg-green-900 bg-opacity-80 p-4 rounded-lg border border-green-500 text-green-200 text-center mb-6"
           >
-            <p>
-              Quantum Leap Detected! Leaderboard Updated with New Personal Best
-              ({examName}).
-            </p>
+            <p>Personal Best Achieved! Leaderboard Updated for {examName}.</p>
           </motion.div>
         )}
 
@@ -696,7 +756,7 @@ const Results = () => {
             className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-magenta-500"
           >
             <p className="text-xl font-semibold text-magenta-400">
-              Accuracy Grid
+              Accuracy Breakdown
             </p>
             <Doughnut
               ref={doughnutChartRef}
@@ -711,7 +771,7 @@ const Results = () => {
             }}
             className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-cyan-500"
           >
-            <p className="text-xl font-semibold text-cyan-400">Error Flux</p>
+            <p className="text-xl font-semibold text-cyan-400">Errors</p>
             <p className="text-3xl text-white">{errors || 0}</p>
             <p className="text-sm text-gray-400">
               Score: {performanceScore}/100
@@ -728,7 +788,7 @@ const Results = () => {
             className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-cyan-500"
           >
             <h2 className="text-2xl font-semibold text-cyan-400 mb-4">
-              WPM Sync Analysis
+              WPM Comparison
             </h2>
             <Bar ref={barChartRef} data={barChartData} options={chartOptions} />
           </motion.div>
@@ -740,7 +800,7 @@ const Results = () => {
               className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-magenta-500"
             >
               <h2 className="text-2xl font-semibold text-magenta-400 mb-4">
-                Temporal Progress Scan
+                Performance Trends
               </h2>
               <Line
                 ref={lineChartRef}
@@ -758,7 +818,7 @@ const Results = () => {
           className="bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-cyan-500 mb-8"
         >
           <h2 className="text-2xl font-semibold text-cyan-400 mb-4">
-            AI Neural Insights
+            Performance Insights
           </h2>
           <ul className="list-disc pl-5 text-gray-300">
             {getAdvancedInsights().map((insight, index) => (
@@ -827,6 +887,16 @@ const Results = () => {
               ? "Generating..."
               : "Generate Premium AI Report (5 Credits)"}
           </motion.button>
+          <motion.button
+            whileHover={{
+              scale: 1.1,
+              boxShadow: "0 0 15px rgba(0, 255, 255, 0.7)",
+            }}
+            onClick={() => setShowFeedbackModal(true)}
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-lg font-semibold tracking-wide hover:from-cyan-400 hover:to-purple-400 transition-all"
+          >
+            Provide Feedback
+          </motion.button>
         </div>
 
         {showReportModal && (
@@ -865,6 +935,164 @@ const Results = () => {
                   </div>
                 </>
               )}
+            </motion.div>
+          </div>
+        )}
+
+        {showFeedbackModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gray-900/95 rounded-2xl p-6 max-w-lg w-full border border-cyan-400/30"
+            >
+              <h3 className="text-2xl font-semibold text-cyan-400 mb-4">
+                Share Your Feedback
+              </h3>
+              {feedbackError && (
+                <p className="text-red-400 mb-4">{feedbackError}</p>
+              )}
+              {feedbackSuccess && (
+                <p className="text-green-400 mb-4">{feedbackSuccess}</p>
+              )}
+              <form onSubmit={submitFeedback}>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">Name</label>
+                  <input
+                    type="text"
+                    value={
+                      auth.currentUser?.displayName ||
+                      auth.currentUser?.email.split("@")[0]
+                    }
+                    className="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700"
+                    disabled
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={auth.currentUser?.email}
+                    className="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700"
+                    disabled
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Usability Rating (1-5)
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() =>
+                          handleRatingChange("usabilityRating", star)
+                        }
+                        className={`text-2xl ${
+                          feedback.usabilityRating >= star
+                            ? "text-yellow-400"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Performance Rating (1-5)
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() =>
+                          handleRatingChange("performanceRating", star)
+                        }
+                        className={`text-2xl ${
+                          feedback.performanceRating >= star
+                            ? "text-yellow-400"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Overall Experience (1-5)
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() =>
+                          handleRatingChange("overallRating", star)
+                        }
+                        className={`text-2xl ${
+                          feedback.overallRating >= star
+                            ? "text-yellow-400"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Feedback Type
+                  </label>
+                  <select
+                    name="feedbackType"
+                    value={feedback.feedbackType}
+                    onChange={handleFeedbackChange}
+                    className="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700"
+                  >
+                    <option value="general">General Feedback</option>
+                    <option value="suggestion">Suggestion</option>
+                    <option value="error">Error Report</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Comments or Suggestions
+                  </label>
+                  <textarea
+                    name="comments"
+                    value={feedback.comments}
+                    onChange={handleFeedbackChange}
+                    className="w-full bg-gray-800 text-white rounded-lg p-2 border border-gray-700"
+                    rows="4"
+                    placeholder="Share your thoughts or report any issues..."
+                  />
+                </div>
+                <div className="flex gap-4 justify-end">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    type="submit"
+                    className="px-4 py-2 bg-cyan-500 text-black rounded-lg font-semibold hover:bg-cyan-400"
+                  >
+                    Submit Feedback
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    type="button"
+                    onClick={() => setShowFeedbackModal(false)}
+                    className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-semibold hover:bg-gray-600"
+                  >
+                    Cancel
+                  </motion.button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}
