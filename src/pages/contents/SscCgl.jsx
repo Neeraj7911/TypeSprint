@@ -352,7 +352,7 @@ const SscCgl = () => {
                 progress or start a new test now.
               </p>
               <button
-                onClick={() => navigate("/dashboard")} // or /exams?search=SSC%20CGL
+                onClick={() => navigate("/dashboard")}
                 className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white font-medium hover:from-cyan-400 hover:to-blue-500 transition-all transform hover:scale-105"
               >
                 View Progress
