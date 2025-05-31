@@ -17,6 +17,8 @@ import { FaChevronDown } from "react-icons/fa";
 const CustomCursor = lazy(() => import("./CustomCursor"));
 const TypingTest = lazy(() => import("./TypingTest"));
 const ReportGenerator = lazy(() => import("./ReportGenerator"));
+import FeatureCards from "./FeatureCards"; // Import the FeatureCards component
+import AlertSystem from "./AlertSystem"; // Import the new AlertSystem component
 
 import LogoSvg from "../assets/react.svg";
 import clickSound from "../assets/click.mp3";
@@ -25,20 +27,10 @@ import clickSound from "../assets/click.mp3";
 const exams = [
   { id: 1, name: "SSC", color: "from-blue-400 to-blue-600", icon: "📚" },
   { id: 2, name: "NTPC", color: "from-green-400 to-green-600", icon: "🚂" },
-  {
-    id: 3,
-    name: "COURT",
-    color: "from-yellow-400 to-yellow-600",
-    icon: "🏦",
-  },
+  { id: 3, name: "COURT", color: "from-yellow-400 to-yellow-600", icon: "🏦" },
   { id: 4, name: "RRB", color: "from-red-400 to-red-600", icon: "🚉" },
   { id: 5, name: "TYPIST", color: "from-purple-400 to-purple-600", icon: "⚖️" },
-  {
-    id: 6,
-    name: "MUNICIPAL",
-    color: "from-pink-400 to-pink-600",
-    icon: "💼",
-  },
+  { id: 6, name: "MUNICIPAL", color: "from-pink-400 to-pink-600", icon: "💼" },
 ];
 
 // Premium plans data
@@ -114,49 +106,36 @@ function Home() {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
 
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [typingTestRef, typingTestInView] = useInView({
     triggerOnce: true,
     threshold: 0.5,
   });
 
-  // Memoized handlers
-  const toggleDarkMode = useCallback(() => {
-    setDarkMode((prevMode) => !prevMode);
-  }, []);
-
+  const toggleDarkMode = useCallback(
+    () => setDarkMode((prevMode) => !prevMode),
+    []
+  );
   const handleTestComplete = useCallback((results) => {
     setTestResults(results);
     setShowDownloadButton(true);
     setShowPlans(false);
   }, []);
-
-  const scrollToContent = useCallback(() => {
-    window.scrollTo({
-      top: window.innerHeight,
-      behavior: "smooth",
-    });
-  }, []);
-
+  const scrollToContent = useCallback(
+    () => window.scrollTo({ top: window.innerHeight, behavior: "smooth" }),
+    []
+  );
   const playSound = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {}); // Handle autoplay errors
+      audioRef.current.play().catch(() => {});
     }
   }, []);
-
   const handleExamClick = useCallback(
-    (examName) => {
-      navigate(`/exams?search=${encodeURIComponent(examName)}`);
-    },
+    (examName) => navigate(`/exams?search=${encodeURIComponent(examName)}`),
     [navigate]
   );
 
-  // Memoized exam cards
   const examCards = useMemo(
     () =>
       exams.map((exam, index) => (
@@ -198,7 +177,6 @@ function Home() {
     [inView, handleExamClick]
   );
 
-  // Memoized premium plans
   const premiumPlanCards = useMemo(
     () =>
       premiumPlans.map((plan, index) => (
@@ -344,7 +322,6 @@ function Home() {
             />
           </motion.div>
         </section>
-
         <section className="py-16">
           <motion.div
             ref={ref}
@@ -430,6 +407,8 @@ function Home() {
             </section>
           )}
         </AnimatePresence>
+
+        <AlertSystem darkMode={darkMode} isLoading={isLoading} />
       </div>
       <motion.button
         onClick={toggleDarkMode}
@@ -437,7 +416,7 @@ function Home() {
           darkMode ? "bg-white text-gray-800" : "bg-gray-800 text-white"
         } transition-colors duration-300 hover:bg-opacity-80 z-50 focus:outline-none focus:ring-2 focus:ring-orange-400`}
         whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileTap={{ scale: 0.95 }}
         aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
       >
         {darkMode ? "🌞" : "🌙"}
