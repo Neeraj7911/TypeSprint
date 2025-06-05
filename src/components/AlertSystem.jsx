@@ -558,7 +558,7 @@ const AlertSystem = ({ darkMode, isLoading }) => {
                 : currentAlert.type === "achievement"
                 ? "from-yellow-600 to-amber-800"
                 : currentAlert.type === "challenge"
-                ? "from-red-600 to-orange-600"
+                ? "from-red-600 to-orange-800"
                 : "from-orange-600 to-red-800" // rivalry
             } rounded-lg p-4 shadow-lg text-white flex items-center justify-between backdrop-blur-md border border-white/10`}
             initial={{ opacity: 0, x: -20, scale: 0.95 }}

@@ -17,8 +17,9 @@ import { FaChevronDown } from "react-icons/fa";
 const CustomCursor = lazy(() => import("./CustomCursor"));
 const TypingTest = lazy(() => import("./TypingTest"));
 const ReportGenerator = lazy(() => import("./ReportGenerator"));
-import FeatureCards from "./FeatureCards"; // Import the FeatureCards component
-import AlertSystem from "./AlertSystem"; // Import the new AlertSystem component
+import FeatureCards from "./FeatureCards";
+import AlertSystem from "./AlertSystem";
+import LiveStats from "./LiveStats";
 
 import LogoSvg from "../assets/react.svg";
 import clickSound from "../assets/click.mp3";
@@ -223,7 +224,7 @@ function Home() {
         <CustomCursor />
       </Suspense>
       <div className="container mx-auto px-4 relative z-10">
-        <section className="min-h-screen flex flex-col justify-center items-center py-12">
+        <section className="min-h-screen flex flex-col justify-center items-center py-12 relative">
           <motion.div
             className="text-center"
             initial={{ opacity: 0, y: -50 }}
@@ -322,6 +323,9 @@ function Home() {
             />
           </motion.div>
         </section>
+        <div className="absolute  right-2 sm:right-4">
+          <LiveStats darkMode={darkMode} />
+        </div>
         <section className="py-16">
           <motion.div
             ref={ref}
@@ -387,6 +391,8 @@ function Home() {
           </motion.div>
         </section>
 
+        <FeatureCards darkMode={darkMode} isLoading={isLoading} />
+
         <AnimatePresence>
           {showPlans && (
             <section className="py-16">
@@ -414,7 +420,7 @@ function Home() {
         onClick={toggleDarkMode}
         className={`fixed bottom-4 right-4 p-3 rounded-full ${
           darkMode ? "bg-white text-gray-800" : "bg-gray-800 text-white"
-        } transition-colors duration-300 hover:bg-opacity-80 z-50 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+        } transition-colors duration-300 hover:bg-opacity-80 z-80 focus:outline-none focus:ring-2 focus:ring-orange-400`}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
