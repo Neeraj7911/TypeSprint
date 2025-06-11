@@ -75,11 +75,11 @@ const ExamPage = () => {
       category: "National",
     },
     {
-      name: "DRDO",
+      name: "DGAFMS LDC",
       englishWPM: 35,
-      hindiWPM: null,
-      fonts: [],
-      details: "English typing only.",
+      hindiWPM: 30,
+      fonts: ["Mangal", "Krutidev"],
+      details: "English and Hindi typing only.",
       category: "Defence",
     },
     {

@@ -25,6 +25,12 @@
     <priority>0.90</priority>
   </url>
   <url>
+    <loc>https://typesprint.live/dgafms-group-c-2025-typing-test</loc>
+    <lastmod>2025-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
     <loc>https://typesprint.live/CSIR-JSA-typing-test-practice</loc>
     <lastmod>2025-05-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -63,6 +69,12 @@
   <url>
     <loc>https://typesprint.live/blogs/full-paragraph-typing-tests-ssc-chsl</loc>
     <lastmod>2025-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://typesprint.live/blogs/dgafms-group-c-typing-test-2025</loc>
+    <lastmod>2025-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.70</priority>
   </url>

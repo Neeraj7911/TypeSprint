@@ -198,7 +198,7 @@ const FeatureCards = ({ darkMode, isLoading }) => {
           Discover Our Unique Features
           <span className="text-sm text-gray-500 block mt-2">
             {" "}
-            (Comming Soon)
+            (Coming Soon)
           </span>
         </h2>
         <AnimatePresence>
