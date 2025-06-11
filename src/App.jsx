@@ -37,6 +37,10 @@ import Min from "./pages/contents/MinTyping.jsx";
 import Typingcon from "./pages/contents/EnglishTypingTest.jsx"; // Assuming this is Typingcon.jsx
 import CSIRJSATypingTest from "./pages/contents/CSIRJSA.jsx";
 import Blog4 from "./pages/blogs/Blog4.jsx"; // Assuming this is Blog4.jsx
+import DGAFMSGroupCSyllabus from "./pages/contents/Dgafmstyping.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Blog5 from "./pages/blogs/Blog5.jsx"; // Assuming this is Blog5.jsx
+
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -49,7 +53,14 @@ const AppContent = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/test/:examId" element={<TypingTest />} />
-            <Route path="/login" element={<Login />} />
+            <Route
+              path="/login"
+              element={
+                <ProtectedRoute>
+                  <Login />
+                </ProtectedRoute>
+              }
+            />{" "}
             <Route path="/exam/:examId" element={<ExamTypingTest />} />
             <Route path="/verify" element={<CertificateVerify />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
@@ -79,6 +90,10 @@ const AppContent = () => {
               path="/blogs/csir-jsa-eligiblity-and-typing-speed-criteria"
               element={<Blog4 />}
             />
+            <Route
+              path="/blogs/dgafms-group-c-typing-test-2025"
+              element={<Blog5 />}
+            />
             <Route path="/ssc-cgl-typing-test" element={<SscCgl />} />
             <Route
               path="/10-minute-typing-test-for-government-jobs"
@@ -89,7 +104,10 @@ const AppContent = () => {
               path="/CSIR-JSA-typing-test-practice"
               element={<CSIRJSATypingTest />}
             />
-
+            <Route
+              path="/dgafms-group-c-2025-typing-test"
+              element={<DGAFMSGroupCSyllabus />}
+            />
             <Route
               path="/report"
               element={

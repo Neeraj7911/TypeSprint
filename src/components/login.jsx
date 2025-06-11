@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { FaGoogle } from "react-icons/fa";
 import CustomCursor from "../components/CustomCursor";
 
-// List of valid email domains
 const VALID_EMAIL_DOMAINS = [
   "gmail.com",
   "outlook.com",
@@ -27,7 +26,6 @@ const VALID_EMAIL_DOMAINS = [
   "rediffmail.com",
 ];
 
-// List of known temporary email domains (expanded for better coverage)
 const TEMP_EMAIL_DOMAINS = [
   "tempmail.com",
   "10minutemail.com",
@@ -53,12 +51,20 @@ const Login = ({ darkMode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginWithGoogle, signup } = useAuth();
-  const from = location.state?.from || "/"; // Default to home if no 'from' state
+  const { login, loginWithGoogle, signup, currentUser, loading } = useAuth();
+  const from = location.state?.from || "/";
 
-  // Validate email domain
+  useEffect(() => {
+    if (!loading && currentUser) {
+      navigate(from, { replace: true });
+    }
+  }, [currentUser, loading, navigate, from]);
+
+  if (loading || currentUser) {
+    return null;
+  }
+
   const validateEmailDomain = (email) => {
-    // Basic email format check
     if (!email.includes("@")) {
       return { isValid: false, error: "Please enter a valid email address." };
     }
@@ -68,17 +74,12 @@ const Login = ({ darkMode }) => {
       return { isValid: false, error: "Please enter a valid email address." };
     }
 
-    // Check for temporary email domains
     if (TEMP_EMAIL_DOMAINS.includes(domain)) {
       return { isValid: false, error: "Do not use temporary email services." };
     }
 
-    // Check if domain is in valid list
     if (!VALID_EMAIL_DOMAINS.includes(domain)) {
-      return {
-        isValid: false,
-        error: "Please do not use Temp Mails :/",
-      };
+      return { isValid: false, error: "Please do not use Temp Mails :/" };
     }
 
     return { isValid: true, error: "" };
@@ -86,10 +87,13 @@ const Login = ({ darkMode }) => {
 
   const handleEmailAuth = async (e) => {
     e.preventDefault();
+    if (currentUser) {
+      setAuthError("Already logged in. Please log out first.");
+      return;
+    }
     setAuthError("");
     setIsLoading(true);
 
-    // Validate email domain before proceeding
     const { isValid, error } = validateEmailDomain(authData.email);
     if (!isValid) {
       setAuthError(error);
@@ -99,15 +103,16 @@ const Login = ({ darkMode }) => {
 
     try {
       if (isSignUp) {
-        await signup(authData.email, authData.password, "User"); // Default displayName
+        await signup(authData.email, authData.password, "User");
       } else {
         await login(authData.email, authData.password);
       }
       navigate(from, { replace: true });
     } catch (error) {
-      console.error("Auth error:", error);
       setAuthError(
-        error.code === "auth/user-not-found"
+        error.message.includes("Already logged in")
+          ? error.message
+          : error.code === "auth/user-not-found"
           ? "No account found with this email. Please sign up."
           : error.code === "auth/wrong-password"
           ? "Incorrect password. Please try again."
@@ -123,16 +128,19 @@ const Login = ({ darkMode }) => {
   };
 
   const handleGoogleAuth = async () => {
+    if (currentUser) {
+      setAuthError("Already logged in. Please log out first.");
+      return;
+    }
     setAuthError("");
     setIsLoading(true);
     try {
       const result = await loginWithGoogle();
-      const user = result.user;
+      const googleUser = result.user;
 
-      // Validate Google email domain
-      const { isValid, error } = validateEmailDomain(user.email);
+      const { isValid, error } = validateEmailDomain(googleUser.email);
       if (!isValid) {
-        await auth.signOut(); // Sign out if invalid domain
+        await logout(); // Use logout from useAuth
         setAuthError(error);
         setIsLoading(false);
         return;
@@ -140,8 +148,11 @@ const Login = ({ darkMode }) => {
 
       navigate(from, { replace: true });
     } catch (error) {
-      console.error("Google auth error:", error);
-      setAuthError("Failed to sign in with Google. Please try again.");
+      setAuthError(
+        error.message.includes("Already logged in")
+          ? error.message
+          : "Failed to sign in with Google. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -167,9 +178,9 @@ const Login = ({ darkMode }) => {
 
         <button
           onClick={handleGoogleAuth}
-          disabled={isLoading}
+          disabled={isLoading || !!currentUser}
           className={`w-full mb-6 flex items-center justify-center gap-2 p-3 rounded ${
-            isLoading
+            isLoading || currentUser
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-red-500 hover:bg-red-600"
           } text-white transition-colors`}
@@ -215,7 +226,7 @@ const Login = ({ darkMode }) => {
                   email: e.target.value,
                 }))
               }
-              disabled={isLoading}
+              disabled={isLoading || !!currentUser}
             />
           </div>
           <div>
@@ -234,15 +245,15 @@ const Login = ({ darkMode }) => {
                   password: e.target.value,
                 }))
               }
-              disabled={isLoading}
+              disabled={isLoading || !!currentUser}
             />
           </div>
           {authError && <p className="text-red-500 text-sm">{authError}</p>}
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !!currentUser}
             className={`w-full p-3 rounded ${
-              isLoading
+              isLoading || currentUser
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
             } text-white transition-colors`}
@@ -260,7 +271,7 @@ const Login = ({ darkMode }) => {
           <button
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-blue-500 hover:underline"
-            disabled={isLoading}
+            disabled={isLoading || !!currentUser}
           >
             {isSignUp ? "Login" : "Sign Up"}
           </button>

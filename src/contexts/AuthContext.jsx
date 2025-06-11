@@ -17,7 +17,6 @@ import {
 } from "firebase/firestore";
 import { auth, db, provider } from "../firebase";
 
-// Create and export AuthContext
 export const AuthContext = createContext();
 
 export function useAuth() {
@@ -30,6 +29,9 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState("");
 
   async function signup(email, password, displayName) {
+    if (currentUser) {
+      throw new Error("Already logged in. Please log out first.");
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -37,15 +39,11 @@ export function AuthProvider({ children }) {
         password
       );
 
-      // Update profile with display name
-      await updateProfile(userCredential.user, {
-        displayName: displayName,
-      });
+      await updateProfile(userCredential.user, { displayName });
 
-      // Create user document in Firestore
       await setDoc(doc(db, "users", userCredential.user.uid), {
-        email: email,
-        displayName: displayName,
+        email,
+        displayName,
         createdAt: serverTimestamp(),
         isPremium: false,
         dailyAttempts: 0,
@@ -72,6 +70,9 @@ export function AuthProvider({ children }) {
   }
 
   async function login(email, password) {
+    if (currentUser) {
+      throw new Error("Already logged in. Please log out first.");
+    }
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -87,15 +88,15 @@ export function AuthProvider({ children }) {
   }
 
   async function loginWithGoogle() {
+    if (currentUser) {
+      throw new Error("Already logged in. Please log out first.");
+    }
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if user document exists
       const userDoc = await getDoc(doc(db, "users", user.uid));
-
       if (!userDoc.exists()) {
-        // Create new user document if it doesn't exist
         await setDoc(doc(db, "users", user.uid), {
           email: user.email,
           displayName: user.displayName,
@@ -118,7 +119,6 @@ export function AuthProvider({ children }) {
           },
         });
       } else {
-        // Update login timestamp
         await updateLoginTimestamp(user.uid);
       }
 
@@ -133,6 +133,7 @@ export function AuthProvider({ children }) {
     try {
       await signOut(auth);
       setCurrentUser(null);
+      setError("");
     } catch (error) {
       setError(error.message);
       throw error;
@@ -160,7 +161,6 @@ export function AuthProvider({ children }) {
       const currentStats = userData.typingStats;
       const testsCompleted = currentStats.testsCompleted + 1;
 
-      // Calculate new averages
       const newAverageWPM = Math.round(
         (currentStats.averageWPM * currentStats.testsCompleted + wpm) /
           testsCompleted
@@ -171,7 +171,6 @@ export function AuthProvider({ children }) {
           testsCompleted
       );
 
-      // Keep track of recent tests (last 10)
       const recentTests = [
         {
           date: new Date().toISOString(),
@@ -202,7 +201,7 @@ export function AuthProvider({ children }) {
     try {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
-        preferences: preferences,
+        preferences,
       });
     } catch (error) {
       console.error("Error updating user preferences:", error);
@@ -225,7 +224,7 @@ export function AuthProvider({ children }) {
     try {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
-        isPremium: isPremium,
+        isPremium,
         premiumUpdatedAt: serverTimestamp(),
       });
     } catch (error) {
@@ -236,28 +235,41 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Get additional user data from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          setCurrentUser({
-            ...user,
-            ...userDoc.data(),
-          });
+      try {
+        if (user) {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          setCurrentUser(
+            userDoc.exists() ? { ...user, ...userDoc.data() } : user
+          );
         } else {
-          setCurrentUser(user);
+          setCurrentUser(null);
         }
-      } else {
+      } catch (error) {
+        console.error("Error in onAuthStateChanged:", error);
+        setError(error.message);
         setCurrentUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return unsubscribe;
+    // Fallback to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn("Auth loading timeout, forcing load complete");
+        setLoading(false);
+      }
+    }, 5000); // 5-second timeout
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const value = {
     currentUser,
+    loading,
     error,
     signup,
     login,
