@@ -9,7 +9,7 @@ import CustomCursor from "./CustomCursor";
 import Logo from "../assets/logo.png"; // Adjust path to your logo
 import Stamp from "../assets/stamp.png"; // Adjust path to your stamp
 
-const TypingTest = ({ darkMode }) => {
+const TypingTest = ({ darkMode, initialText }) => {
   const [text, setText] = useState("");
   const [userInput, setUserInput] = useState("");
   const [timer, setTimer] = useState(30);
@@ -58,9 +58,9 @@ const TypingTest = ({ darkMode }) => {
   };
 
   useEffect(() => {
-    const initialText = getRandomPangram();
-    setText(initialText);
-    setWords(initialText.split(" "));
+    const t = initialText && initialText.length ? initialText : getRandomPangram();
+    setText(t);
+    setWords(t.split(" "));
 
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -72,7 +72,7 @@ const TypingTest = ({ darkMode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [initialText]);
 
   useEffect(() => {
     if (isTestActive && timer > 0) {
@@ -186,7 +186,8 @@ const TypingTest = ({ darkMode }) => {
   };
 
   const calculateWPM = (wordsTyped, timeInSeconds) => {
-    return Math.round((wordsTyped / timeInSeconds) * 60);
+    const wpm = Math.round((wordsTyped / timeInSeconds) * 60);
+    return Math.min(wpm, 300); // Cap at 300 WPM to prevent unrealistic values
   };
 
   const formatAccuracy = (accuracy) => {

@@ -7,7 +7,7 @@ import React, {
   Suspense,
   lazy,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Tilt from "react-parallax-tilt";
@@ -23,6 +23,7 @@ import LiveStats from "./LiveStats";
 
 import LogoSvg from "../assets/react.svg";
 import clickSound from "../assets/click.mp3";
+import ChatPreview from "./ChatPreview";
 
 // Exam data
 const exams = [
@@ -220,6 +221,7 @@ function Home() {
           : "bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100"
       }`}
     >
+      {/* banner removed — moved into a dedicated Home section below FeatureCards to avoid navbar overlap */}
       <Suspense fallback={null}>
         <CustomCursor />
       </Suspense>
@@ -390,8 +392,31 @@ function Home() {
             </AnimatePresence>
           </motion.div>
         </section>
+        <Suspense
+          fallback={
+            <div className="py-16 text-center text-white">Loading Chat...</div>
+          }
+        >
+          <ChatPreview darkMode={darkMode} playSound={playSound} />
+        </Suspense>
 
         <FeatureCards darkMode={darkMode} isLoading={isLoading} />
+
+        {/* All-India Live Test section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg p-8 shadow-lg flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+              <div className="text-center md:text-left">
+                <h2 className="text-2xl font-bold">All-India Live Test</h2>
+                <p className="text-sm text-cyan-100 mt-1">Register for upcoming nationwide live typing tests — starts simultaneously for all participants.</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link to="/live-tests" className="bg-white text-blue-600 px-4 py-2 rounded font-semibold">View & Register</Link>
+                <Link to="/live-tests" className="border border-white text-white px-3 py-2 rounded">See Details</Link>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <AnimatePresence>
           {showPlans && (

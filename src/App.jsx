@@ -7,6 +7,9 @@ import {
 } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./components/Home";
+import LiveTests from "./pages/LiveTests";
+import LiveTestRunner from "./pages/LiveTestRunner";
+import AdminLiveTests from "./pages/AdminLiveTests";
 import TypingTest from "./components/TypingTest";
 import Report from "./components/Report";
 import Dashboard from "./components/Dashboard";
@@ -40,7 +43,18 @@ import Blog4 from "./pages/blogs/Blog4.jsx"; // Assuming this is Blog4.jsx
 import DGAFMSGroupCSyllabus from "./pages/contents/Dgafmstyping.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Blog5 from "./pages/blogs/Blog5.jsx"; // Assuming this is Blog5.jsx
-
+import ChatApp from "./pages/ChatApp.jsx";
+import CsirTypingRules from "./pages/contents/CsirTypingRule.jsx";
+import Blogcsir from "./pages/blogs/Blog6.jsx"; // Assuming this is Blog6.jsx
+import CBSE2025TypingContent from "./pages/contents/CbseJsa.jsx";
+import CbseBlog from "./pages/blogs/Blog7.jsx"; // Assuming this is CbseBlog.jsx
+import KannadaTypingTest from "./pages/contents/KannadaTyping.jsx";
+import Blog8 from "./pages/blogs/Blog8.jsx"; // Assuming this is Blog8.jsx
+import CsirDate from "./pages/contents/CsirDate.jsx"; // Assuming this is CsirDate.jsx
+import Blog9 from "./pages/blogs/Blog9.jsx"; // Assuming this is Blog9.jsx
+import CbseTest from "./pages/contents/CbseTest.jsx"; // Assuming this is CbseJsa.jsx
+import Blog10 from "./pages/blogs/Blog10.jsx"; // Assuming this is Blog10.jsx
+import SscCglTyping from "./pages/contents/SscCglTyping.jsx"; // Assuming this is SscCglTyping.jsx
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -64,6 +78,7 @@ const AppContent = () => {
             <Route path="/exam/:examId" element={<ExamTypingTest />} />
             <Route path="/verify" element={<CertificateVerify />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/help-section" element={<ChatApp />} />
             <Route path="/exams" element={<ExamPage />} />
             <Route path="/typing-test" element={<ExamTypingT />} />
             <Route path="/results" element={<Results />} />
@@ -94,19 +109,60 @@ const AppContent = () => {
               path="/blogs/dgafms-group-c-typing-test-2025"
               element={<Blog5 />}
             />
+            <Route
+              path="/blogs/csir-jsa-typing-stenography-test-2025"
+              element={<Blogcsir />}
+            />
+            <Route
+              path="/blogs/csir-jsa-typing-stenography-test-date-2025"
+              element={<Blog9 />}
+            />
+            <Route
+              path="/blogs/cbse-recruitment-2025-tier2-typing-test-guide"
+              element={<CbseBlog />}
+            />
+            <Route
+              path="/ssc-cgl-typing-test-2025"
+              element={<SscCglTyping />}
+            />
+            <Route
+              path="/blogs/kannada-typing-test-guide"
+              element={<Blog8 />}
+            />
             <Route path="/ssc-cgl-typing-test" element={<SscCgl />} />
             <Route
               path="/10-minute-typing-test-for-government-jobs"
               element={<Min />}
+            />
+            <Route
+              path="/kannada-typing-test"
+              element={<KannadaTypingTest />}
+            />
+            <Route
+              path="/csir-jsa-typing-stenography-test-rules"
+              element={<CsirTypingRules />}
+            />
+            <Route
+              path="/cbse-recruitment-2025-tier2-typing-test"
+              element={<CBSE2025TypingContent />}
             />
             <Route path="/English-typing-test" element={<Typingcon />} />
             <Route
               path="/CSIR-JSA-typing-test-practice"
               element={<CSIRJSATypingTest />}
             />
+            <Route path="/csir-jsa-typing-test-2025" element={<CsirDate />} />
             <Route
               path="/dgafms-group-c-2025-typing-test"
               element={<DGAFMSGroupCSyllabus />}
+            />
+            <Route
+              path="/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules"
+              element={<CbseTest />}
+            />
+            <Route
+              path="/blog/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules"
+              element={<Blog10 />}
             />
             <Route
               path="/report"
@@ -129,6 +185,16 @@ const AppContent = () => {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/live-tests" element={<LiveTests />} />
+            <Route path="/live-test/:testId" element={<LiveTestRunner />} />
+            <Route
+              path="/admin/live-tests"
+              element={
+                <PrivateRoute>
+                  <AdminLiveTests />
                 </PrivateRoute>
               }
             />

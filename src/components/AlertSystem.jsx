@@ -550,16 +550,16 @@ const AlertSystem = ({ darkMode, isLoading }) => {
               currentAlert.type === "new-paragraph"
                 ? "from-blue-600 to-indigo-900"
                 : currentAlert.type === "signup"
-                ? "from-green-600 to-teal-800"
-                : currentAlert.type === "motivation"
-                ? "from-pink-600 to-rose-800"
-                : currentAlert.type === "news"
-                ? "from-purple-600 to-violet-800"
-                : currentAlert.type === "achievement"
-                ? "from-yellow-600 to-amber-800"
-                : currentAlert.type === "challenge"
-                ? "from-red-600 to-orange-800"
-                : "from-orange-600 to-red-800" // rivalry
+                  ? "from-green-600 to-teal-800"
+                  : currentAlert.type === "motivation"
+                    ? "from-pink-600 to-rose-800"
+                    : currentAlert.type === "news"
+                      ? "from-purple-600 to-violet-800"
+                      : currentAlert.type === "achievement"
+                        ? "from-yellow-600 to-amber-800"
+                        : currentAlert.type === "challenge"
+                          ? "from-red-600 to-orange-800"
+                          : "from-orange-600 to-red-800" // rivalry
             } rounded-lg p-4 shadow-lg text-white flex items-center justify-between backdrop-blur-md border border-white/10`}
             initial={{ opacity: 0, x: -20, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}

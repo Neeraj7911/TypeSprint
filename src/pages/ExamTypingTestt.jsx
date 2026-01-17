@@ -1,6 +1,12 @@
-import React, { useState, useEffect, useCallback, Suspense, lazy } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  Suspense,
+  lazy,
+  useRef,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { auth, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -41,9 +47,9 @@ const InstructionsModal = ({ isOpen, onClose, language, onStart }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white p-6 rounded-lg max-w-lg w-full">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">Instructions</h2>
-        <ul className="list-disc pl-5 mb-4 text-gray-700">
+      <div className="bg-white border border-gray-300 p-6 max-w-lg w-full">
+        <h2 className="text-lg font-bold mb-4 text-black">Instructions</h2>
+        <ul className="list-disc pl-5 mb-4 text-black text-sm">
           <li>Type the given text as accurately and quickly as possible.</li>
           <li>Use the "Pause" button to take a break; timers will stop.</li>
           <li>Click "Submit Test" to end the test and view your results.</li>
@@ -70,7 +76,7 @@ const InstructionsModal = ({ isOpen, onClose, language, onStart }) => {
             onClose();
             onStart();
           }}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+          className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
         >
           Start Test
         </button>
@@ -86,7 +92,7 @@ InstructionsModal.propTypes = {
   onStart: PropTypes.func.isRequired,
 };
 
-const ExamTypingTestt = () => {
+const ExamTypingTest = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
@@ -95,6 +101,7 @@ const ExamTypingTestt = () => {
   const targetWPM = parseInt(query.get("wpm")) || 35;
   const font = query.get("font") || (language === "hindi" ? "Mangal" : "Arial");
   const duration = parseInt(query.get("duration")) || 10;
+  const incomingTestId = query.get("testId");
   const config = examConfigs[examName] || examConfigs["default"];
 
   const [inputText, setInputText] = useState("");
@@ -104,8 +111,10 @@ const ExamTypingTestt = () => {
   const [grossWpm, setGrossWpm] = useState(0);
   const [netWpm, setNetWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
-  const [errors, setErrors] = useState(0);
+  const [fullErrors, setFullErrors] = useState(0);
+  const [halfErrors, setHalfErrors] = useState(0);
   const [isTestActive, setIsTestActive] = useState(false);
+  const [durationState, setDurationState] = useState(duration);
   const [timeLeft, setTimeLeft] = useState(duration * 60);
   const [freeTimeLeft, setFreeTimeLeft] = useState(180);
   const [userStatus, setUserStatus] = useState(null);
@@ -116,7 +125,7 @@ const ExamTypingTestt = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [testId, setTestId] = useState(null);
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(14);
   const [keyboardSettings, setKeyboardSettings] = useState({
     disableBackspace: false,
     disableDelete: false,
@@ -127,7 +136,45 @@ const ExamTypingTestt = () => {
     disablePaste: false,
     disableCut: false,
     disableSelectAll: false,
+    disableColorFeedback: false,
   });
+  const [backspaceCount, setBackspaceCount] = useState(0);
+
+  const latestStateRef = useRef({
+    inputText: "",
+    sampleText: "",
+    backspaceCount: 0,
+    startTime: null,
+    grossWpm: 0,
+    netWpm: 0,
+    accuracy: 100,
+    fullErrors: 0,
+    halfErrors: 0,
+  });
+
+  useEffect(() => {
+    latestStateRef.current = {
+      inputText,
+      sampleText,
+      backspaceCount,
+      startTime,
+      grossWpm,
+      netWpm,
+      accuracy,
+      fullErrors,
+      halfErrors,
+    };
+  }, [
+    inputText,
+    sampleText,
+    backspaceCount,
+    startTime,
+    grossWpm,
+    netWpm,
+    accuracy,
+    fullErrors,
+    halfErrors,
+  ]);
 
   const languageFonts = {
     english: "Arial",
@@ -138,43 +185,91 @@ const ExamTypingTestt = () => {
 
   const currentFont = languageFonts[language] || font;
 
-  // Normalize apostrophes (straight ' and curly ’ to the same character)
   const normalizeText = (text) => {
-    return text.replace(/[\u2018\u2019]/g, "'"); // Replace curly apostrophes with straight
+    return text
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/\s+/g, " ")
+      .trim();
   };
+
+  useEffect(() => {
+    const progressKey = `typingProgress_${examName}_${language}`;
+    const lastCompleted = localStorage.getItem(progressKey);
+    if (lastCompleted !== null && paragraphs[language]?.length) {
+      const nextParagraph =
+        (parseInt(lastCompleted) + 1) % paragraphs[language].length;
+      setSelectedParagraph(nextParagraph);
+    }
+  }, [examName, language]);
 
   const handleSubmit = useCallback(() => {
     if (!isTestActive || hasSubmitted) return;
+    console.log("handleSubmit called");
     setHasSubmitted(true);
     setIsTestActive(false);
     if (isFullScreen) document.exitFullscreen();
+
+    const progressKey = `typingProgress_${examName}_${language}`;
+    localStorage.setItem(progressKey, selectedParagraph.toString());
+
+    const {
+      inputText,
+      sampleText,
+      backspaceCount,
+      startTime,
+      grossWpm,
+      netWpm,
+      accuracy,
+      fullErrors,
+      halfErrors,
+    } = latestStateRef.current;
+    const timeElapsed = startTime ? Date.now() - startTime : 60000;
+    console.log("Navigating to Results with state:", {
+      grossWpm,
+      netWpm,
+      accuracy,
+      fullErrors,
+      halfErrors,
+      targetWPM,
+      examName,
+      language,
+      font: currentFont,
+      testId,
+      backspaceCount,
+      inputText,
+      sampleText,
+      timeElapsed,
+    });
+
     navigate("/results", {
       state: {
         grossWpm,
         netWpm,
         accuracy,
-        errors,
+        fullErrors,
+        halfErrors,
         targetWPM,
         examName,
         language,
         font: currentFont,
         testId,
+        backspaceCount,
+        inputText,
+        sampleText,
+        timeElapsed,
       },
     });
   }, [
     isTestActive,
     hasSubmitted,
-    grossWpm,
-    netWpm,
-    accuracy,
-    errors,
-    targetWPM,
+    isFullScreen,
+    selectedParagraph,
+    navigate,
     examName,
     language,
+    targetWPM,
     currentFont,
     testId,
-    navigate,
-    isFullScreen,
   ]);
 
   useEffect(() => {
@@ -184,8 +279,8 @@ const ExamTypingTestt = () => {
       setSampleText(
         normalizeText(
           paragraphs[config.sampleTextKey][selectedParagraph] ||
-            "Default text if language not found."
-        )
+            "Default text if language not found.",
+        ),
       );
     }
   }, [language, selectedParagraph, config.sampleTextKey]);
@@ -200,7 +295,7 @@ const ExamTypingTestt = () => {
           setUserStatus(
             userDoc.exists() && userDoc.data().status === "paid"
               ? "paid"
-              : "not paid"
+              : "not paid",
           );
         } catch (error) {
           setUserStatus("not paid");
@@ -214,11 +309,43 @@ const ExamTypingTestt = () => {
     return () => unsubscribe();
   }, []);
 
+  // If opened with a live test id, load content and duration from firestore
+  useEffect(() => {
+    const loadLiveTest = async () => {
+      if (!incomingTestId) return;
+      try {
+        const ref = doc(db, "liveTests", incomingTestId);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.content) {
+            setSampleText(normalizeText(data.content));
+          }
+          if (data.durationMinutes) {
+            setDurationState(Number(data.durationMinutes));
+            setTimeLeft(Number(data.durationMinutes) * 60);
+          }
+          setTestId(incomingTestId);
+        }
+      } catch (e) {
+        console.error("Failed to load live test content", e);
+      }
+    };
+    loadLiveTest();
+  }, [incomingTestId]);
+
   useEffect(() => {
     let timer;
+    console.log("Main timer useEffect running:", {
+      isTestActive,
+      isPaused,
+      hasSubmitted,
+      startTime,
+    });
     if (isTestActive && !isPaused && !hasSubmitted && startTime) {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
+          console.log("Main timer tick, timeLeft:", prev);
           if (prev <= 1) {
             handleSubmit();
             return 0;
@@ -227,11 +354,22 @@ const ExamTypingTestt = () => {
         });
       }, 1000);
     }
-    return () => clearInterval(timer);
-  }, [isTestActive, isPaused, hasSubmitted, handleSubmit, startTime]);
+    return () => {
+      console.log("Main timer useEffect cleanup");
+      clearInterval(timer);
+    };
+  }, [isTestActive, isPaused, hasSubmitted, startTime]);
 
   useEffect(() => {
     let freeTimer;
+    console.log("Free timer useEffect running:", {
+      isTestActive,
+      isPaused,
+      hasSubmitted,
+      startTime,
+      language,
+      userStatus,
+    });
     if (
       language !== "english" &&
       userStatus === "not paid" &&
@@ -242,6 +380,7 @@ const ExamTypingTestt = () => {
     ) {
       freeTimer = setInterval(() => {
         setFreeTimeLeft((prev) => {
+          console.log("Free timer tick, freeTimeLeft:", prev);
           if (prev <= 1) {
             setIsTestActive(false);
             navigate("/payment");
@@ -251,7 +390,10 @@ const ExamTypingTestt = () => {
         });
       }, 1000);
     }
-    return () => clearInterval(freeTimer);
+    return () => {
+      console.log("Free timer useEffect cleanup");
+      clearInterval(freeTimer);
+    };
   }, [
     language,
     userStatus,
@@ -266,60 +408,80 @@ const ExamTypingTestt = () => {
     if (isTestActive && startTime && !isPaused && !hasSubmitted) {
       const interval = setInterval(() => {
         const timeElapsed = Math.max((Date.now() - startTime) / 60000, 0.0167);
-        // Normalize input and sample text
         const normalizedInput = normalizeText(inputText);
         const normalizedSample = normalizeText(sampleText);
-        // Split words while preserving punctuation
-        const inputWords = normalizedInput.trim().split(/\s+/).filter(Boolean);
-        const sampleWords = normalizedSample
-          .trim()
-          .split(/\s+/)
-          .filter(Boolean);
+        const inputWords = normalizedInput.split(" ");
+        const sampleWords = normalizedSample.split(" ");
 
-        // Count only correct words for WPM
         let correctChars = 0;
-        let errorCount = 0;
-        let correctWords = 0;
+        let fullErrors = 0;
+        let halfErrors = 0;
 
-        for (let i = 0; i < inputWords.length; i++) {
-          if (i < sampleWords.length) {
-            if (inputWords[i] === sampleWords[i]) {
-              correctWords++;
-              correctChars +=
-                inputWords[i].length + (i < inputWords.length - 1 ? 1 : 0); // Add space for non-last word
-            } else {
-              errorCount++;
-              console.log(
-                `Mismatch at word ${i}: Input="${inputWords[i]}" vs Sample="${sampleWords[i]}"`
-              );
-            }
+        const minLength = Math.min(inputWords.length, sampleWords.length);
+        for (let i = 0; i < minLength; i++) {
+          const inputWord = inputWords[i].trim();
+          const sampleWord = sampleWords[i].trim();
+          if (inputWord === sampleWord) {
+            correctChars += inputWord.length + (i < minLength - 1 ? 1 : 0); // Add space if not last word
+          } else if (
+            inputWord.replace(/[^\w]/g, "") === sampleWord.replace(/[^\w]/g, "")
+          ) {
+            correctChars += inputWord.length;
+            halfErrors += 1; // Spacing or punctuation difference
           } else {
-            errorCount++; // Extra words are errors
-            console.log(`Extra word at index ${i}: "${inputWords[i]}"`);
+            fullErrors += 1; // Spelling mismatch
           }
         }
 
-        // Calculate gross WPM based on correct characters only
+        // Handle extra words
+        if (inputWords.length > sampleWords.length) {
+          for (let i = minLength; i < inputWords.length; i++) {
+            fullErrors += 1; // Extra word penalty
+          }
+        }
+
+        // Handle incomplete last word
+        if (
+          inputWords.length > 0 &&
+          inputWords.length <= sampleWords.length &&
+          !inputText.endsWith(" ")
+        ) {
+          const lastInputWord = inputWords[inputWords.length - 1];
+          const nextSampleWord = sampleWords[inputWords.length] || "";
+          if (
+            lastInputWord.length < sampleWords[inputWords.length - 1].length &&
+            lastInputWord.replace(/[^\w]/g, "") ===
+              sampleWords[inputWords.length - 1].replace(/[^\w]/g, "")
+          ) {
+            // Do not count half error for incomplete word
+          } else if (
+            lastInputWord.replace(/[^\w]/g, "") ===
+            nextSampleWord.replace(/[^\w]/g, "")
+          ) {
+            halfErrors += 1; // Missing space after last word
+          }
+        }
+
         const gross = Math.round(correctChars / 5 / timeElapsed);
         setGrossWpm(isFinite(gross) ? gross : 0);
 
-        // Set errors
-        setErrors(errorCount);
+        setFullErrors(fullErrors);
+        setHalfErrors(halfErrors);
 
-        // Calculate net WPM (gross minus errors per minute)
-        const net = Math.max(0, gross - Math.round(errorCount / timeElapsed));
+        const net = Math.max(
+          0,
+          gross - Math.round((fullErrors + halfErrors / 2) / timeElapsed),
+        );
         setNetWpm(isFinite(net) ? net : 0);
 
-        // Calculate accuracy based on correct characters
         const totalCharsTyped = normalizedInput.length || 1;
         const accuracyPercentage = Math.round(
-          (correctChars / totalCharsTyped) * 100
+          (correctChars / totalCharsTyped) * 100,
         );
         setAccuracy(isFinite(accuracyPercentage) ? accuracyPercentage : 100);
 
-        // Auto-submit if all words are correctly typed
         if (
-          correctWords === sampleWords.length &&
+          correctChars === normalizedSample.length &&
           inputWords.length === sampleWords.length
         ) {
           handleSubmit();
@@ -344,13 +506,15 @@ const ExamTypingTestt = () => {
     setGrossWpm(0);
     setNetWpm(0);
     setAccuracy(100);
-    setErrors(0);
+    setFullErrors(0);
+    setHalfErrors(0);
     setInputText("");
-    setTimeLeft(duration * 60);
+    setTimeLeft(durationState * 60);
     setFreeTimeLeft(180);
     setHasSubmitted(false);
     setIsFullScreen(true);
     setShowInstructions(true);
+    setBackspaceCount(0);
     document.documentElement.requestFullscreen().catch((err) => {});
   }, [duration, examName]);
 
@@ -361,9 +525,16 @@ const ExamTypingTestt = () => {
   const handleKeyDown = useCallback(
     (e) => {
       if (!isTestActive || isPaused) return;
+      console.log("handleKeyDown called, key:", e.key);
 
       if (keyboardSettings.disableBackspace && e.key === "Backspace") {
         e.preventDefault();
+      } else if (e.key === "Backspace") {
+        setBackspaceCount((prev) => {
+          const newCount = prev + 1;
+          console.log("Backspace pressed, count:", newCount);
+          return newCount;
+        });
       }
       if (keyboardSettings.disableDelete && e.key === "Delete") {
         e.preventDefault();
@@ -403,16 +574,17 @@ const ExamTypingTestt = () => {
         e.preventDefault();
       }
     },
-    [isTestActive, isPaused, keyboardSettings]
+    [isTestActive, isPaused, keyboardSettings],
   );
 
   const handleInputChange = useCallback(
     (e) => {
       if (!isTestActive || isPaused) return;
+      console.log("handleInputChange called");
       const value = e.target.value;
       setInputText(value);
     },
-    [isTestActive, isPaused]
+    [isTestActive, isPaused],
   );
 
   const handleCheckboxChange = (key) => {
@@ -440,24 +612,41 @@ const ExamTypingTestt = () => {
   };
 
   const increaseFontSize = () => {
-    setFontSize((prev) => Math.min(prev + 2, 32));
+    setFontSize((prev) => Math.min(prev + 2, 18));
   };
 
   const decreaseFontSize = () => {
     setFontSize((prev) => Math.max(prev - 2, 12));
   };
 
-  const currentWordIndex =
-    normalizeText(inputText).trim().split(/\s+/).filter(Boolean).length - 1;
-  const sampleWords = normalizeText(sampleText)
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
+  const currentWordIndex = useCallback(() => {
+    const inputWords = normalizeText(inputText).split(" ");
+    const sampleWords = normalizeText(sampleText).split(" ");
+    let index = inputWords.length - 1;
+    if (
+      index >= 0 &&
+      !inputText.endsWith(" ") &&
+      index < sampleWords.length - 1
+    ) {
+      const lastInputWord = inputWords[index];
+      const nextSampleWord = sampleWords[index + 1] || "";
+      if (
+        lastInputWord.replace(/[^\w]/g, "") ===
+        nextSampleWord.replace(/[^\w]/g, "")
+      ) {
+        index++; // Move to next word if half error (missing space)
+      }
+    }
+    return Math.max(0, Math.min(index, sampleWords.length - 1));
+  }, [inputText, sampleText]);
+
+  const sampleWords = normalizeText(sampleText).split(" ");
+  const inputWords = normalizeText(inputText).split(" ");
 
   if (isLoading)
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-base font-bold text-black">Loading...</div>
       </div>
     );
 
@@ -465,18 +654,13 @@ const ExamTypingTestt = () => {
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <CustomCursor />
-        <div className="min-h-screen bg-gray-100 text-gray-800 flex flex-col items-center justify-center p-4">
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="text-2xl sm:text-3xl font-bold mb-6 text-center"
-          >
+        <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center p-4">
+          <h1 className="text-lg font-bold mb-4 text-center">
             Login to Continue
-          </motion.h1>
+          </h1>
           <button
             onClick={() => navigate("/login")}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+            className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
           >
             Go to Login
           </button>
@@ -491,7 +675,7 @@ const ExamTypingTestt = () => {
       <div
         className={`flex flex-col ${
           isFullScreen ? "fixed inset-0" : "min-h-screen"
-        } bg-gray-100`}
+        } bg-white`}
       >
         <header
           className={`flex flex-col sm:flex-row justify-between items-center p-4 ${config.headerColor} shadow-md z-10`}
@@ -507,19 +691,19 @@ const ExamTypingTestt = () => {
             {formatTime(
               language !== "english" && userStatus === "not paid"
                 ? freeTimeLeft
-                : timeLeft
+                : timeLeft,
             )}
           </div>
           <div className="flex space-x-3 mt-2 sm:mt-0">
             <button
               onClick={toggleFullScreen}
-              className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all text-sm sm:text-base"
+              className="px-3 py-1 bg-gray-200 text-gray-800 hover:bg-gray-300 text-sm sm:text-base"
             >
               {isFullScreen ? "Exit Full Screen" : "Enter Full Screen"}
             </button>
             <button
               onClick={togglePause}
-              className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50 text-sm sm:text-base"
+              className="px-3 py-1 bg-gray-200 text-gray-800 hover:bg-gray-300 disabled:opacity-50 text-sm sm:text-base"
               disabled={!isTestActive}
             >
               {isPaused ? "Resume" : "Pause"}
@@ -527,63 +711,71 @@ const ExamTypingTestt = () => {
           </div>
         </header>
 
-        <div className="flex flex-col flex-1 p-4 sm:p-6 max-w-7xl mx-auto w-full">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-3/4">
-              <h2 className="text-lg font-semibold mb-4 text-gray-800">
+        <div className="flex flex-col flex-1 p-4 max-w-7xl mx-auto w-full">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="w-full lg:w-3/4 border border-gray-300 p-4 bg-white">
+              <h2 className="text-base font-bold mb-2 text-black">
                 Typing Test (
                 {language.charAt(0).toUpperCase() + language.slice(1)})
               </h2>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-4">
-                <select
-                  value={selectedParagraph}
-                  onChange={(e) =>
-                    setSelectedParagraph(parseInt(e.target.value))
-                  }
-                  className="p-2 bg-gray-200 border border-gray-300 rounded-lg text-gray-800 w-full max-w-xs"
-                  disabled={isTestActive}
-                >
-                  {paragraphs[language]?.map((_, index) => (
-                    <option key={index} value={index}>
-                      Paragraph {index + 1}
-                    </option>
-                  )) || (
-                    <option value={0}>
-                      No {language} paragraphs available
-                    </option>
-                  )}
-                </select>
-                <div className="flex gap-2 mt-2 sm:mt-0">
-                  <button
-                    onClick={increaseFontSize}
-                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all text-sm"
+              {!isTestActive && (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-4">
+                  <select
+                    value={selectedParagraph}
+                    onChange={(e) =>
+                      setSelectedParagraph(parseInt(e.target.value))
+                    }
+                    className="w-full max-w-xs p-2 border border-gray-300 text-black text-sm disabled:opacity-50"
+                    disabled={isTestActive}
                   >
-                    Increase Font
-                  </button>
-                  <button
-                    onClick={decreaseFontSize}
-                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all text-sm"
-                  >
-                    Decrease Font
-                  </button>
+                    {paragraphs[language]?.map((_, index) => (
+                      <option key={index} value={index}>
+                        Paragraph {index + 1}
+                      </option>
+                    )) || (
+                      <option value={0}>
+                        No {language} paragraphs available
+                      </option>
+                    )}
+                  </select>
+                  <div className="flex gap-2 mt-2 sm:mt-0">
+                    <button
+                      onClick={increaseFontSize}
+                      className="text-blue-500 hover:underline text-sm"
+                    >
+                      +A
+                    </button>
+                    <button
+                      onClick={decreaseFontSize}
+                      className="text-blue-500 hover:underline text-sm"
+                    >
+                      -A
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
               <div
-                className="bg-gray-200 p-4 rounded-lg mb-4 h-40 sm:h-48 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-words border border-gray-300"
-                style={{ fontFamily: currentFont, fontSize: `${fontSize}px` }}
+                className="bg-white p-4 border border-gray-300 mb-4 h-48 overflow-y-auto whitespace-pre-wrap break-words"
+                style={{
+                  fontFamily: currentFont,
+                  fontSize: `${fontSize}px`,
+                  lineHeight: "1.5",
+                }}
               >
                 {sampleWords.map((word, index) => (
                   <span
                     key={index}
                     className={`mr-2 ${
-                      index === currentWordIndex &&
+                      index === currentWordIndex() &&
                       !keyboardSettings.disableHighlighting
-                        ? "bg-blue-500 text-white px-1 rounded"
-                        : index < currentWordIndex
-                        ? normalizeText(inputText).split(/\s+/)[index] === word
-                          ? "text-green-600"
-                          : "text-red-600"
-                        : "text-gray-800"
+                        ? "bg-blue-500 text-white px-1"
+                        : keyboardSettings.disableColorFeedback
+                          ? "text-black"
+                          : index < inputWords.length
+                            ? inputWords[index] === word
+                              ? "text-green-600"
+                              : "text-red-600"
+                            : "text-black"
                     }`}
                   >
                     {word}
@@ -591,27 +783,28 @@ const ExamTypingTestt = () => {
                 ))}
               </div>
               {!isTestActive && (
-                <div className="mb-4 flex flex-col space-y-4">
+                <div className="mb-4 flex flex-col space-y-2">
                   <div className="flex flex-wrap items-center gap-4">
                     <button
                       onClick={startTest}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                      className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
+                      disabled={isTestActive}
                     >
                       Start Test
                     </button>
-                    <div className="flex flex-wrap gap-2 sm:gap-4">
+                    <div className="flex flex-wrap gap-2">
                       {Object.keys(keyboardSettings).map((key) => (
                         <label
                           key={key}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-1"
                         >
                           <input
                             type="checkbox"
                             checked={keyboardSettings[key]}
                             onChange={() => handleCheckboxChange(key)}
-                            className="h-4 w-4 text-blue-500"
+                            className="h-4 w-4"
                           />
-                          <span className="text-gray-700 text-xs sm:text-sm">
+                          <span className="text-black text-xs">
                             Disable{" "}
                             {key
                               .replace(/([A-Z])/g, " $1")
@@ -630,48 +823,75 @@ const ExamTypingTestt = () => {
                 placeholder={`*Start Typing Here in ${
                   language.charAt(0).toUpperCase() + language.slice(1)
                 }*`}
-                className="w-full h-32 sm:h-40 p-4 bg-white border border-gray-300 rounded-lg text-gray-800 focus:outline-none resize-none"
+                className="w-full h-40 p-4 bg-white border border-gray-300 text-black disabled:opacity-50"
                 disabled={!isTestActive || isPaused}
-                style={{ fontFamily: currentFont, fontSize: `${fontSize}px` }}
+                style={{
+                  fontFamily: currentFont,
+                  fontSize: `${fontSize}px`,
+                  lineHeight: "1.5",
+                }}
                 lang={language}
                 inputMode="text"
               />
             </div>
 
             {config.rightPanel && (
-              <div className="w-full lg:w-1/4 p-4 sm:p-6 bg-gray-200 hidden lg:block">
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-gray-600">
-                    SECTION: Typing Test
-                  </h3>
-                  <button className="mt-2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center text-gray-800">
-                    1
-                  </button>
+              <div className="w-full lg:w-1/4 p-4 bg-gray-200 border border-gray-300">
+                <h3 className="text-sm font-bold text-black mb-2">
+                  Exam Progress
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">
+                      1
+                    </span>
+                    <span className="text-black text-sm">Typing Test</span>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
           {config.showStatsOverlay && isTestActive && (
-            <div className="fixed bottom-16 sm:bottom-20 left-4 bg-white p-4 rounded-lg shadow-lg z-10">
-              <p className="text-gray-800">Gross WPM: {grossWpm}</p>
-              <p className="text-gray-800">Net WPM: {netWpm}</p>
-              <p className="text-gray-800">Accuracy: {accuracy}%</p>
-              <p className="text-gray-800">Errors: {errors}</p>
+            <div className="fixed top-16 right-4 bg-gray-100 border border-gray-300 p-4 z-10">
+              <table className="text-sm text-black">
+                <tbody>
+                  <tr>
+                    <td className="font-bold pr-2">Gross WPM:</td>
+                    <td>{grossWpm}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-bold pr-2">Net WPM:</td>
+                    <td>{netWpm}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-bold pr-2">Accuracy:</td>
+                    <td>{accuracy}%</td>
+                  </tr>
+                  <tr>
+                    <td className="font-bold pr-2">Full Errors:</td>
+                    <td>{fullErrors}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-bold pr-2">Half Errors:</td>
+                    <td>{halfErrors}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           )}
         </div>
 
-        <footer className="fixed bottom-0 left-0 right-0 flex justify-end p-4 bg-white shadow-md z-10">
+        <footer className="fixed bottom-0 left-0 right-0 flex justify-end p-4 bg-white border-t border-gray-300 z-10">
           <button
             onClick={() => setShowInstructions(true)}
-            className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all mr-2 text-sm sm:text-base"
+            className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 mr-2"
           >
             Instructions
           </button>
           <button
             onClick={handleSubmit}
-            className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50 text-sm sm:text-base"
+            className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
             disabled={!isTestActive || hasSubmitted}
           >
             Submit Test
@@ -689,4 +909,4 @@ const ExamTypingTestt = () => {
   );
 };
 
-export default ExamTypingTestt;
+export default ExamTypingTest;

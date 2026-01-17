@@ -70,7 +70,7 @@ const TypingInterfaceSSCCHSL = () => {
   useEffect(() => {
     if (isTestActive && startTime && !isPaused) {
       const interval = setInterval(() => {
-        const timeElapsed = (Date.now() - startTime) / 60000; // minutes
+        const timeElapsed = Math.max((Date.now() - startTime) / 60000, 0.1); // minutes
         const inputChars = inputText.length;
         const sampleWords = sampleText.trim().split(/\s+/);
         const inputWords = inputText.trim().split(/\s+/);

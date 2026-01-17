@@ -215,8 +215,8 @@ const ExamTypingTest = ({ darkMode }) => {
                       userInput[index] === undefined
                         ? ""
                         : userInput[index] === char
-                        ? "text-green-500"
-                        : "text-red-500"
+                          ? "text-green-500"
+                          : "text-red-500"
                     }
                   >
                     {char}

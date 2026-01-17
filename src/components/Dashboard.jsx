@@ -58,6 +58,18 @@ const Dashboard = () => {
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState(null);
+
+  const openModal = (achievement) => {
+    setSelectedAchievement(achievement);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedAchievement(null);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -384,54 +396,72 @@ const Dashboard = () => {
       name: "Speed Demon",
       icon: "🏎️",
       desc: "50+ WPM",
+      earnedDesc: "You achieved 50+ WPM in one of your tests, showcasing your speed!",
+      unearnedDesc: "Achieve 50+ WPM in a single typing test to unlock this achievement.",
       condition: bestWPM >= 50,
     },
     {
       name: "Accuracy Master",
       icon: "🎯",
       desc: "90%+ Accuracy",
+      earnedDesc: "You scored 90%+ accuracy in one of your tests, proving your precision!",
+      unearnedDesc: "Score 90%+ accuracy in any typing test to earn this achievement.",
       condition: testResults.some((r) => (r.accuracy || 0) >= 90),
     },
     {
       name: "Test Veteran",
       icon: "🏅",
       desc: "10+ Tests",
+      earnedDesc: "You've completed 10+ typing tests, demonstrating your dedication!",
+      unearnedDesc: "Complete 10 typing tests to become a Test Veteran.",
       condition: testResults.length >= 10,
     },
     {
       name: "Typing Pro",
       icon: "💻",
       desc: "75+ WPM",
+      earnedDesc: "You reached 75+ WPM, marking you as a professional typist!",
+      unearnedDesc: "Achieve 75+ WPM in a single test to unlock this pro-level achievement.",
       condition: bestWPM >= 75,
     },
     {
       name: "Perfectionist",
       icon: "✅",
       desc: "100% Accuracy",
+      earnedDesc: "You achieved 100% accuracy in a test – perfect typing!",
+      unearnedDesc: "Score 100% accuracy in any typing test to earn perfection.",
       condition: testResults.some((r) => (r.accuracy || 0) === 100),
     },
     {
       name: "Marathon Typist",
       icon: "🏃‍♂️",
       desc: "25+ Tests",
+      earnedDesc: "You've completed 25+ tests, showing marathon-level endurance!",
+      unearnedDesc: "Complete 25 typing tests to become a Marathon Typist.",
       condition: testResults.length >= 25,
     },
     {
       name: "Lightning Fingers",
       icon: "⚡",
       desc: "100+ WPM",
+      earnedDesc: "You typed at 100+ WPM – lightning fast!",
+      unearnedDesc: "Achieve 100+ WPM in a single test to earn this elite achievement.",
       condition: bestWPM >= 100,
     },
     {
       name: "Error Slayer",
       icon: "🗡️",
       desc: "0 Errors",
+      earnedDesc: "You completed a test with 0 errors – flawless!",
+      unearnedDesc: "Complete a typing test with 0 errors to slay mistakes.",
       condition: testResults.some((r) => (r.errors || 0) === 0),
     },
     {
       name: "Night Owl",
       icon: "🦇",
       desc: "Typed at Midnight",
+      earnedDesc: "You typed late at night, earning the Night Owl badge!",
+      unearnedDesc: "Take a typing test between midnight and 1 AM to become a Night Owl.",
       condition: testResults.some((r) => {
         const hour = new Date(r.timestamp).getHours();
         return hour === 0 || hour === 1;
@@ -441,6 +471,8 @@ const Dashboard = () => {
       name: "Early Bird",
       icon: "🐦",
       desc: "Typed in Morning",
+      earnedDesc: "You typed early in the morning, catching the worm!",
+      unearnedDesc: "Take a typing test between 5 AM and 7 AM to earn the Early Bird badge.",
       condition: testResults.some((r) => {
         const hour = new Date(r.timestamp).getHours();
         return hour >= 5 && hour <= 7;
@@ -450,18 +482,24 @@ const Dashboard = () => {
       name: "Consistent Star",
       icon: "⭐",
       desc: "90%+ Consistency",
+      earnedDesc: "Your typing consistency is 90%+ across tests – stellar!",
+      unearnedDesc: "Maintain 90%+ consistency in your WPM across multiple tests.",
       condition: consistency !== "N/A" && consistency >= 90,
     },
     {
       name: "Exam Conqueror",
       icon: "🏰",
       desc: "5+ Exams",
+      earnedDesc: "You've conquered 5+ different exams – a true conqueror!",
+      unearnedDesc: "Complete typing tests for 5 different exams to conquer them all.",
       condition: new Set(testResults.map((r) => r.examName)).size >= 5,
     },
     {
       name: "Quick Learner",
       icon: "📚",
       desc: "WPM +20 in 2 Tests",
+      earnedDesc: "You improved your WPM by 20+ in just 2 tests – quick learner!",
+      unearnedDesc: "Increase your WPM by 20+ points in consecutive tests.",
       condition: testResults.some(
         (r, i) => i > 0 && (r.wpm || 0) - (testResults[i - 1].wpm || 0) >= 20
       ),
@@ -470,12 +508,16 @@ const Dashboard = () => {
       name: "Error Minimalist",
       icon: "🧹",
       desc: "Avg Errors < 2",
+      earnedDesc: "Your average errors per test are less than 2 – minimalist!",
+      unearnedDesc: "Keep your average errors below 2 per test across multiple attempts.",
       condition: avgErrors > 0 && avgErrors < 2,
     },
     {
       name: "Sprint Champion",
       icon: "🏆",
       desc: "60+ WPM, 95%+ Acc",
+      earnedDesc: "You achieved 60+ WPM with 95%+ accuracy – champion!",
+      unearnedDesc: "Score 60+ WPM and 95%+ accuracy in the same test.",
       condition: testResults.some(
         (r) => (r.wpm || 0) >= 60 && (r.accuracy || 0) >= 95
       ),
@@ -484,6 +526,8 @@ const Dashboard = () => {
       name: "Daily Grinder",
       icon: "🔧",
       desc: "5 Days in Row",
+      earnedDesc: "You typed for 5 days in a row – dedicated grinder!",
+      unearnedDesc: "Take typing tests for 5 consecutive days to grind daily.",
       condition: (() => {
         const dates = testResults
           .map((r) => new Date(r.timestamp).toDateString())
@@ -504,18 +548,24 @@ const Dashboard = () => {
       name: "Typing Titan",
       icon: "🦁",
       desc: "50+ Tests",
+      earnedDesc: "You've completed 50+ tests – you're a typing titan!",
+      unearnedDesc: "Complete 50 typing tests to become a Typing Titan.",
       condition: testResults.length >= 50,
     },
     {
       name: "Precision Sniper",
       icon: "🔍",
       desc: "5+ Tests 95%+ Acc",
+      earnedDesc: "You scored 95%+ accuracy in 5+ tests – precise sniper!",
+      unearnedDesc: "Achieve 95%+ accuracy in at least 5 typing tests.",
       condition: testResults.filter((r) => (r.accuracy || 0) >= 95).length >= 5,
     },
     {
       name: "Speed Surge",
       icon: "🚀",
       desc: "WPM +10 in 1 Day",
+      earnedDesc: "You surged your WPM by 10+ in a single day – rocket speed!",
+      unearnedDesc: "Increase your WPM by 10+ points in tests taken on the same day.",
       condition: (() => {
         const byDay = testResults.reduce((acc, r) => {
           const day = new Date(r.timestamp).toDateString();
@@ -532,6 +582,8 @@ const Dashboard = () => {
       name: "Master Typist",
       icon: "👑",
       desc: "80+ WPM, 0 Errors",
+      earnedDesc: "You achieved 80+ WPM with 0 errors – master typist!",
+      unearnedDesc: "Score 80+ WPM with 0 errors in a single test to master typing.",
       condition: testResults.some(
         (r) => (r.wpm || 0) >= 80 && (r.errors || 0) === 0
       ),
@@ -680,7 +732,8 @@ const Dashboard = () => {
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="flex-shrink-0 w-32 bg-gray-800 bg-opacity-80 p-3 rounded-lg shadow-lg hover:shadow-cyan-500/50 transition-shadow duration-300 relative group"
+                          className="flex-shrink-0 w-32 bg-gray-800 bg-opacity-80 p-3 rounded-lg shadow-lg hover:shadow-cyan-500/50 transition-shadow duration-300 relative group cursor-pointer"
+                          onClick={() => openModal(badge)}
                         >
                           <div className="w-12 h-12 mx-auto rounded-full bg-cyan-600 flex items-center justify-center text-2xl">
                             {badge.icon}
@@ -688,9 +741,6 @@ const Dashboard = () => {
                           <p className="text-sm font-semibold text-white text-center mt-2 truncate">
                             {badge.name}
                           </p>
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-xs text-gray-300 p-2 rounded shadow-lg z-10">
-                            {badge.desc}
-                          </div>
                         </motion.div>
                       ))}
                     </div>
@@ -709,7 +759,8 @@ const Dashboard = () => {
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="flex-shrink-0 w-32 bg-gray-800 bg-opacity-80 p-3 rounded-lg shadow-lg hover:shadow-yellow-500/50 transition-shadow duration-300 relative group grayscale"
+                          className="flex-shrink-0 w-32 bg-gray-800 bg-opacity-80 p-3 rounded-lg shadow-lg hover:shadow-yellow-500/50 transition-shadow duration-300 relative group grayscale cursor-pointer"
+                          onClick={() => openModal(achievement)}
                         >
                           <div className="w-12 h-12 mx-auto rounded-full bg-gray-600 flex items-center justify-center text-2xl relative">
                             {achievement.icon}
@@ -718,9 +769,6 @@ const Dashboard = () => {
                           <p className="text-sm font-semibold text-gray-300 text-center mt-2 truncate">
                             {achievement.name}
                           </p>
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-xs text-gray-300 p-2 rounded shadow-lg z-10">
-                            {achievement.desc}
-                          </div>
                         </motion.div>
                       ))}
                     </div>
@@ -960,6 +1008,78 @@ const Dashboard = () => {
           </section>
         </motion.div>
       </div>
+
+      {/* Achievement Modal */}
+      {modalOpen && selectedAchievement && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-cyan-400">{selectedAchievement.name}</h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">{selectedAchievement.icon}</div>
+              <p className="text-gray-300">
+                {selectedAchievement.condition ? selectedAchievement.earnedDesc : selectedAchievement.unearnedDesc}
+              </p>
+            </div>
+            {selectedAchievement.condition && (
+              <div>
+                <h4 className="text-lg font-semibold text-white mb-3">Share your achievement:</h4>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => {
+                      const text = `I earned the ${selectedAchievement.name} achievement on TypeSprint! ${selectedAchievement.earnedDesc}`;
+                      const url = window.location.origin;
+                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                    }}
+                    className="text-blue-400 hover:text-blue-300 transition-colors text-2xl"
+                    title="Share on Twitter"
+                  >
+                    <FaTwitter />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const text = `I earned the ${selectedAchievement.name} achievement on TypeSprint! ${selectedAchievement.earnedDesc}`;
+                      const url = window.location.origin;
+                      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`, '_blank');
+                    }}
+                    className="text-blue-600 hover:text-blue-500 transition-colors text-2xl"
+                    title="Share on LinkedIn"
+                  >
+                    <FaLinkedin />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const text = `I earned the ${selectedAchievement.name} achievement on TypeSprint! ${selectedAchievement.earnedDesc}`;
+                      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}&quote=${encodeURIComponent(text)}`, '_blank');
+                    }}
+                    className="text-blue-700 hover:text-blue-600 transition-colors text-2xl"
+                    title="Share on Facebook"
+                  >
+                    <FaFacebook />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const text = `I earned the ${selectedAchievement.name} achievement on TypeSprint! ${selectedAchievement.earnedDesc} ${window.location.origin}`;
+                      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                    }}
+                    className="text-green-500 hover:text-green-400 transition-colors text-2xl"
+                    title="Share on WhatsApp"
+                  >
+                    <FaWhatsapp />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

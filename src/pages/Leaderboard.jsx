@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -20,15 +20,24 @@ const Leaderboard = () => {
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem("darkMode");
+    return savedMode ? JSON.parse(savedMode) : true;
+  });
+  const [showNotification, setShowNotification] = useState(true);
   const navigate = useNavigate();
   const ENTRIES_PER_PAGE = 10;
   const CACHE_EXPIRY = 60 * 60 * 1000; // 1 hour
   const CACHE_KEY_FULL = "leaderboard_cache_full";
   const CACHE_KEY_TOTAL = "leaderboard_cache_total";
-  const CACHE_VERSION = "1.0"; // Increment if cache structure changes
+  const CACHE_VERSION = "1.0";
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log(
+        "Auth state changed:",
+        currentUser ? "Logged in" : "Logged out"
+      );
       setUser(currentUser);
       if (currentUser) {
         fetchLeaderboard(1);
@@ -40,7 +49,11 @@ const Leaderboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // Utility to validate and sanitize photoURL
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
+  }, [darkMode]);
+
   const sanitizePhotoURL = (url) => {
     if (!url || typeof url !== "string") {
       return "";
@@ -52,7 +65,6 @@ const Leaderboard = () => {
     return trimmed;
   };
 
-  // Load cached data
   const loadCachedData = async () => {
     try {
       const cachedFull = localStorage.getItem(CACHE_KEY_FULL);
@@ -61,11 +73,11 @@ const Leaderboard = () => {
         const { data, lastFetched, version } = JSON.parse(cachedFull);
         const { totalEntries } = JSON.parse(cachedTotal);
         if (version !== CACHE_VERSION) {
+          console.log("Cache version mismatch, clearing cache");
           localStorage.removeItem(CACHE_KEY_FULL);
           localStorage.removeItem(CACHE_KEY_TOTAL);
           return null;
         }
-        // Check server lastUpdated
         const metadataDoc = await getDoc(doc(db, "metadata", "leaderboard"));
         const serverLastUpdated = metadataDoc.exists()
           ? metadataDoc.data().lastUpdated
@@ -75,19 +87,21 @@ const Leaderboard = () => {
           lastFetched &&
           new Date(lastFetched) < new Date(serverLastUpdated)
         ) {
+          console.log("Cache outdated due to server update");
           return null;
         }
         if (Date.now() - new Date(lastFetched).getTime() < CACHE_EXPIRY) {
+          console.log("Using cached leaderboard data");
           return { data, lastFetched, totalEntries };
         }
       }
     } catch (err) {
+      console.error("Error loading cached data:", err);
       return null;
     }
     return null;
   };
 
-  // Save data to cache
   const saveCachedData = (data, lastFetched, totalEntries) => {
     try {
       localStorage.setItem(
@@ -95,15 +109,20 @@ const Leaderboard = () => {
         JSON.stringify({ data, lastFetched, version: CACHE_VERSION })
       );
       localStorage.setItem(CACHE_KEY_TOTAL, JSON.stringify({ totalEntries }));
-    } catch (err) {}
+      console.log("Cached leaderboard data saved");
+    } catch (err) {
+      console.error("Error saving cached data:", err);
+    }
   };
 
   const fetchLeaderboard = async (page, forceRefresh = false) => {
     setLoading(true);
     setError("");
+    console.log(
+      `Fetching leaderboard for page ${page}, forceRefresh: ${forceRefresh}`
+    );
     const startTime = performance.now();
 
-    // Load cached data unless forceRefresh
     let fullData = [];
     let lastFetched = null;
     let totalEntries = 0;
@@ -122,7 +141,10 @@ const Leaderboard = () => {
         setLeaderboardData(pageData);
         setTotalPages(Math.ceil(totalEntries / ENTRIES_PER_PAGE));
         setCurrentPage(page);
-        setLoading(false); // Show cached data immediately
+        setLoading(false);
+        console.log(
+          `Loaded ${pageData.length} entries from cache for page ${page}`
+        );
       }
     }
 
@@ -130,7 +152,6 @@ const Leaderboard = () => {
       const userMap = new Map();
       const emailToUidMap = new Map();
 
-      // Step 1: Fetch users
       const usersQuery =
         forceRefresh || !lastFetched
           ? collection(db, "users")
@@ -139,6 +160,7 @@ const Leaderboard = () => {
               where("timestamp", ">", lastFetched)
             );
       const usersSnapshot = await getDocs(usersQuery);
+      console.log(`Fetched ${usersSnapshot.docs.length} user documents`);
       const userProfiles = new Map();
       usersSnapshot.docs.forEach((userDoc) => {
         try {
@@ -152,10 +174,11 @@ const Leaderboard = () => {
           if (userData.email) {
             emailToUidMap.set(userData.email, uid);
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error("Error processing user document:", err);
+        }
       });
 
-      // Step 2: Fetch results
       const userIds = Array.from(userProfiles.keys());
       const resultPromises = userIds.map((userId) => {
         const resultsQuery =
@@ -168,6 +191,7 @@ const Leaderboard = () => {
         return getDocs(resultsQuery).then((snapshot) => ({ userId, snapshot }));
       });
       const resultsSnapshots = await Promise.all(resultPromises);
+      console.log(`Fetched results for ${resultsSnapshots.length} users`);
 
       for (const { userId, snapshot } of resultsSnapshots) {
         try {
@@ -183,7 +207,9 @@ const Leaderboard = () => {
                 highestNetWpm = netWpm;
                 bestResult = data;
               }
-            } catch (err) {}
+            } catch (err) {
+              console.error("Error processing result document:", err);
+            }
           });
 
           if (bestResult) {
@@ -196,12 +222,12 @@ const Leaderboard = () => {
             const name = isValidName(userProfile.displayName)
               ? userProfile.displayName
               : isValidName(bestResult.userName)
-              ? bestResult.userName
-              : userProfile.email
-              ? userProfile.email.split("@")[0]
-              : bestResult.userEmail
-              ? bestResult.userEmail.split("@")[0]
-              : "Guest";
+                ? bestResult.userName
+                : userProfile.email
+                  ? userProfile.email.split("@")[0]
+                  : bestResult.userEmail
+                    ? bestResult.userEmail.split("@")[0]
+                    : "Guest";
 
             const photoURL = sanitizePhotoURL(
               userProfile.photoURL || bestResult.photoURL
@@ -220,10 +246,11 @@ const Leaderboard = () => {
               source: "results",
             });
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error("Error processing user results:", err);
+        }
       }
 
-      // Step 3: Fetch certificates
       const certsQuery =
         forceRefresh || !lastFetched
           ? collection(db, "certificates")
@@ -232,6 +259,7 @@ const Leaderboard = () => {
               where("timestamp", ">", lastFetched)
             );
       const certsSnapshot = await getDocs(certsQuery);
+      console.log(`Fetched ${certsSnapshot.docs.length} certificate documents`);
       const certsByUser = new Map();
       certsSnapshot.forEach((doc) => {
         try {
@@ -262,7 +290,9 @@ const Leaderboard = () => {
             cert.photoURL = sanitizePhotoURL(data.photoURL) || cert.photoURL;
             cert.userEmail = data.userEmail || cert.userEmail;
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error("Error processing certificate document:", err);
+        }
       });
 
       for (const [userId, cert] of certsByUser) {
@@ -281,12 +311,12 @@ const Leaderboard = () => {
           const name = isValidName(userProfile.displayName)
             ? userProfile.displayName
             : isValidName(cert.userName)
-            ? cert.userName
-            : userProfile.email
-            ? userProfile.email.split("@")[0]
-            : cert.userEmail
-            ? cert.userEmail.split("@")[0]
-            : "Guest";
+              ? cert.userName
+              : userProfile.email
+                ? userProfile.email.split("@")[0]
+                : cert.userEmail
+                  ? cert.userEmail.split("@")[0]
+                  : "Guest";
 
           const photoURL = sanitizePhotoURL(
             userProfile.photoURL || cert.photoURL
@@ -327,10 +357,11 @@ const Leaderboard = () => {
               source: "certificates",
             });
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error("Error processing certificate:", err);
+        }
       }
 
-      // Step 4: Fetch leaderboard
       const leaderboardQuery =
         forceRefresh || !lastFetched
           ? collection(db, "leaderboard")
@@ -339,6 +370,9 @@ const Leaderboard = () => {
               where("timestamp", ">", lastFetched)
             );
       const leaderboardSnapshot = await getDocs(leaderboardQuery);
+      console.log(
+        `Fetched ${leaderboardSnapshot.docs.length} leaderboard documents`
+      );
       leaderboardSnapshot.forEach((doc) => {
         try {
           const data = doc.data();
@@ -358,12 +392,12 @@ const Leaderboard = () => {
           const name = isValidName(userProfile.displayName)
             ? userProfile.displayName
             : isValidName(data.userName)
-            ? data.userName
-            : userProfile.email
-            ? userProfile.email.split("@")[0]
-            : data.userEmail
-            ? data.userEmail.split("@")[0]
-            : "Guest";
+              ? data.userName
+              : userProfile.email
+                ? userProfile.email.split("@")[0]
+                : data.userEmail
+                  ? data.userEmail.split("@")[0]
+                  : "Guest";
 
           const photoURL = sanitizePhotoURL(
             userProfile.photoURL || data.photoURL
@@ -397,10 +431,11 @@ const Leaderboard = () => {
               source: "leaderboard",
             });
           }
-        } catch (err) {}
+        } catch (err) {
+          console.error("Error processing leaderboard document:", err);
+        }
       });
 
-      // Step 5: Merge with cached data
       if (!forceRefresh && fullData.length > 0) {
         const cachedMap = new Map(
           fullData.map((entry) => [entry.email, entry])
@@ -413,10 +448,12 @@ const Leaderboard = () => {
         fullData = Array.from(userMap.values());
       }
 
-      // Step 6: Sort and paginate
       const sortedData = fullData
-        .filter((entry) => entry.netWpm > 0 && entry.email)
-        .sort((a, b) => b.netWpm - a.netWpm);
+        .filter(
+          (entry) => entry.netWpm > 0 && entry.email && entry.netWpm < 200
+        )
+        .sort((a, b) => b.netWpm - a.netWpm)
+        .slice(0, 100);
       totalEntries = sortedData.length;
       setTotalPages(Math.ceil(totalEntries / ENTRIES_PER_PAGE));
       const startIndex = (page - 1) * ENTRIES_PER_PAGE;
@@ -436,46 +473,69 @@ const Leaderboard = () => {
       setLeaderboardData(pageData);
       setCurrentPage(page);
       saveCachedData(sortedData, new Date().toISOString(), totalEntries);
+      console.log(
+        `Loaded ${pageData.length} entries for page ${page}, total entries: ${totalEntries}`
+      );
     } catch (err) {
+      console.error("Error fetching leaderboard:", err);
       setError("Failed to load leaderboard. Please try again later.");
     } finally {
       setLoading(false);
+      console.log(
+        `Leaderboard fetch completed in ${(
+          performance.now() - startTime
+        ).toFixed(2)}ms`
+      );
     }
   };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
+      console.log(`Changing to page ${newPage}`);
       fetchLeaderboard(newPage);
     }
   };
 
   const handleRefresh = () => {
+    console.log("Refreshing leaderboard");
     localStorage.removeItem(CACHE_KEY_FULL);
     localStorage.removeItem(CACHE_KEY_TOTAL);
     fetchLeaderboard(currentPage, true);
   };
 
   const handleLoginRedirect = () => {
+    console.log("Redirecting to /login");
     navigate("/login");
   };
 
   const handleSignupRedirect = () => {
+    console.log("Redirecting to /login for signup");
     navigate("/login");
   };
 
-  // SVG fallback for profile picture
+  const handleGetCertified = () => {
+    console.log("Redirecting to /home#certification");
+    navigate("/#certification");
+  };
+
   const defaultProfileSVG = `
     data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8a3 3 0 0 0-3 3v2a3 3 0 0 0 6 0v-2a3 3 0 0 0-3-3z'/%3E%3Cpath d='M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2'/%3E%3C/svg%3E
   `;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white flex items-center justify-center p-4 relative">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        darkMode
+          ? "bg-gradient-to-br from-gray-900 via-blue-900 to-black"
+          : "bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100"
+      } text-white flex items-center justify-center p-4 relative`}
+    >
       <CustomCursor />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-4xl bg-gray-800 bg-opacity-80 backdrop-blur-lg rounded-xl shadow-2xl p-8 border border-blue-500 relative overflow-hidden z-10 mt-14"
+        className="w-full max-w-4xl bg-gray-800 bg-opacity-80 backdrop-blur-lg rounded-xl shadow-2xl p-8 border border-blue-500 relative z-10 mt-14"
       >
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500 opacity-10 rounded-full blur-3xl animate-pulse"></div>
@@ -487,7 +547,8 @@ const Leaderboard = () => {
         </h1>
 
         <p className="text-center text-gray-300 mb-8">
-          Top typists ranked by their highest Net Words Per Minute (Net WPM).
+          Top 100 typists ranked by their highest Net Words Per Minute (Net
+          WPM).
         </p>
 
         {!user && !loading && (
@@ -558,7 +619,7 @@ const Leaderboard = () => {
 
         {user && !loading && !error && leaderboardData.length > 0 && (
           <>
-            <div className="flex justify-end mb-4">
+            <div className="flex flex-col items-end mb-4">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -567,6 +628,9 @@ const Leaderboard = () => {
               >
                 Refresh Leaderboard
               </motion.button>
+              <div className="mt-2 text-right text-xs text-gray-400">
+                * use the refresh button to get the latest results
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -679,6 +743,55 @@ const Leaderboard = () => {
           </p>
         )}
       </motion.div>
+
+      {user && (
+        <AnimatePresence>
+          {showNotification && (
+            <motion.div
+              className={`fixed bottom-4 left-4 p-4 rounded-lg shadow-xl z-[100] ${
+                darkMode
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                  : "bg-gradient-to-r from-blue-300 to-purple-400 text-gray-800"
+              } backdrop-blur-lg bg-opacity-80 max-w-sm`}
+              style={{ position: "fixed" }}
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-lg">Get Certified!</p>
+                  <p className="text-sm">
+                    Boost your typing skills with our certification program.
+                  </p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleGetCertified}
+                  className="ml-4 px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-100 transition-all duration-300 font-semibold"
+                  aria-label="Get Certified"
+                >
+                  Click Here
+                </motion.button>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                  console.log("Closing notification");
+                  setShowNotification(false);
+                }}
+                className="absolute top-2 right-2 text-xl"
+                aria-label="Close notification"
+              >
+                ×
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 };

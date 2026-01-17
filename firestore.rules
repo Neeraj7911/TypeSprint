@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // helper to check admin emails
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'kumarrneeraj791@gmail.com' ||
+        request.auth.token.email == 'liveproject072@gmail.com'
+      );
+    }
+
+    // Public read access to live tests; writes restricted
+    match /liveTests/{testId} {
+      allow read: if true;
+
+      // Admins may create, update or delete tests
+      allow create, delete: if isAdmin();
+
+      // Allow admins to perform any update. Allow authenticated users to
+      // register/unregister themselves by only modifying `registeredUsers`
+      // and `registrationCount` fields in a controlled way.
+      allow update: if isAdmin() || (
+        request.auth != null
+        && request.resource.data.keys().hasOnly(['registeredUsers','registrationCount'])
+        && request.resource.data.registeredUsers is list
+        && (
+          // Registering: new list size == old size + 1, contains previous entries,
+          // includes auth.uid, and registrationCount incremented by 1
+          (
+            request.resource.data.registeredUsers.size() == resource.data.registeredUsers.size() + 1
+            && request.resource.data.registeredUsers.hasAll(resource.data.registeredUsers)
+            && request.resource.data.registeredUsers.hasAny([request.auth.uid])
+            && request.resource.data.registrationCount == resource.data.registrationCount + 1
+          )
+          ||
+          // Unregistering: new list size == old size - 1, previous list contains new list,
+          // does not include auth.uid, and registrationCount decremented by 1
+          (
+            request.resource.data.registeredUsers.size() == resource.data.registeredUsers.size() - 1
+            && resource.data.registeredUsers.hasAll(request.resource.data.registeredUsers)
+            && !request.resource.data.registeredUsers.hasAny([request.auth.uid])
+            && request.resource.data.registrationCount == resource.data.registrationCount - 1
+          )
+        )
+      );
+    }
+
+    // Users: allow users to create and update their own profile documents.
+    // Restrict sensitive field `isPremium` so only admins may modify it.
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.email is string
+        && request.resource.data.displayName is string;
+
+      allow update: if isAdmin() || (
+        request.auth != null
+        && request.auth.uid == userId
+        && !request.resource.data.keys().hasAny(['isPremium'])
+      );
+    }
+
+    // Allow users to post reviews (must be authenticated)
+    match /reviews/{reviewId} {
+      allow create: if request.auth != null
+        && request.resource.data.userId is string
+        && request.resource.data.reviewText is string
+        && request.resource.data.rating is int;
+      allow read: if true;
+      allow delete, update: if isAdmin();
+    }
+
+    // Website feedback: allow anyone to submit feedback but validate fields
+    match /website_feedback/{fbId} {
+      allow create: if (
+        request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.message is string
+        && request.resource.data.page is string
+      );
+      allow read: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Chat messages: authenticated users can create. Updates allowed only for
+    // limited fields; pinning must be done by admin.
+    match /messages/{msgId} {
+      allow create: if request.auth != null
+        && request.resource.data.text is string
+        && request.resource.data.date is string
+        && request.resource.data.createdAt is timestamp;
+
+      allow read: if request.auth != null;
+
+      allow update: if request.auth != null && (
+        // Admins may update any field (pin/unpin etc.)
+        isAdmin()
+        || (
+          // Non-admins may only modify `reactions` and `deletedFor` arrays
+          request.resource.data.keys().hasOnly(['reactions','deletedFor'])
+          && (request.resource.data.reactions is map || !request.resource.data.keys().hasAny(['reactions']))
+          && (request.resource.data.deletedFor is list || !request.resource.data.keys().hasAny(['deletedFor']))
+        )
+      );
+
+      // Only admins may delete messages
+      allow delete: if isAdmin();
+    }
+
+    // Default: no access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
