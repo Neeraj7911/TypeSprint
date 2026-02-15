@@ -50,10 +50,17 @@ const quickLinks = [
   { name: "Home", path: "/" },
   { name: "Blogs", path: "/blogs" },
   { name: "About", path: "/about" },
-  { name: "Privacy Policy", path: "/PrivacyPolicy" },
-  { name: "Terms & Conditions", path: "/t&c" },
   { name: "No Refund & Shipping Policy", path: "/norefundandshippingpolicy" },
   { name: "Verify Certificate", path: "/verify" },
+];
+
+// Compliance links served as static HTML for crawlers
+const complianceLinks = [
+  { name: "Privacy Policy", href: "/privacy-policy.html" },
+  { name: "Terms & Conditions", href: "/terms-and-conditions.html" },
+  { name: "Disclaimer", href: "/disclaimer.html" },
+  { name: "Cookie Policy", href: "/cookie-policy.html" },
+  { name: "Contact Information", href: "/contact.html" },
 ];
 
 // Page options for feedback dropdown
@@ -264,6 +271,43 @@ const Footer = ({ darkMode }) => {
                     />
                     {link.name}
                   </Link>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Compliance Links Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="col-span-1"
+          >
+            <h3 className="text-xl font-semibold mb-6">Policies</h3>
+            <ul className="space-y-3">
+              {complianceLinks.map((link) => (
+                <motion.li
+                  key={link.name}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <motion.a
+                    href={link.href}
+                    className={`group flex items-center text-sm font-medium ${
+                      darkMode
+                        ? "text-gray-300 hover:text-blue-400"
+                        : "text-gray-300 hover:text-blue-600"
+                    } transition-colors duration-200`}
+                    whileHover={{ x: 5 }}
+                  >
+                    <FaArrowRight
+                      className={`mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+                        darkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
+                    />
+                    {link.name}
+                  </motion.a>
                 </motion.li>
               ))}
             </ul>

@@ -1,8 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { doc, onSnapshot } from "firebase/firestore";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  arrayUnion,
+  doc,
+  onSnapshot,
+  runTransaction,
+} from "firebase/firestore";
 import { db } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import LiveTestLeaderboard from "../components/LiveTestLeaderboard";
 
 export default function LiveTestRunner() {
@@ -10,7 +15,9 @@ export default function LiveTestRunner() {
   const [test, setTest] = useState(null);
   const [collectionName, setCollectionName] = useState(null);
   const [now, setNow] = useState(Date.now());
+  const [registering, setRegistering] = useState(false);
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     // Prefer document from `liveTests1` but fall back to `liveTests` if not present.
@@ -20,7 +27,7 @@ export default function LiveTestRunner() {
     const unsub1 = onSnapshot(ref1, (snap) => {
       if (snap.exists()) {
         setCollectionName("liveTests1");
-        setTest({ id: snap.id, ...snap.data() });
+        setTest({ id: snap.id, _collection: "liveTests1", ...snap.data() });
       } else {
         // if not present in first collection, leave to ref2 handler
         // (we don't clear here to avoid flicker)
@@ -30,10 +37,11 @@ export default function LiveTestRunner() {
     const unsub2 = onSnapshot(ref2, (snap) => {
       if (snap.exists()) {
         // only set if we don't already have data from ref1
-        setCollectionName("liveTests");
-        setTest((cur) =>
-          cur && cur.id === snap.id ? cur : { id: snap.id, ...snap.data() },
-        );
+        setCollectionName((prev) => prev || "liveTests");
+        setTest((cur) => {
+          if (cur && cur._collection === "liveTests1") return cur;
+          return { id: snap.id, _collection: "liveTests", ...snap.data() };
+        });
       }
     });
 
@@ -87,14 +95,22 @@ export default function LiveTestRunner() {
   }, [startTimeMs, now]);
 
   const windowEnd = startTimeMs ? startTimeMs + GRACE_MS : null;
-  const canLaunch = startTimeMs
+  const registrationOpen = startTimeMs ? now < startTimeMs : true;
+  const registeredUsers = Array.isArray(test?.registeredUsers)
+    ? test.registeredUsers
+    : [];
+  const isRegistered = currentUser
+    ? registeredUsers.includes(currentUser.uid)
+    : false;
+  const hasLaunchWindow = startTimeMs
     ? now >= startTimeMs && (!windowEnd || now <= windowEnd)
     : true;
+  const canLaunch = hasLaunchWindow && isRegistered;
   const windowClosed = !!windowEnd && now > windowEnd;
   const warmupTime = startTimeMs ? Math.max(0, startTimeMs - now) : 0;
 
   const launchTyping = useCallback(() => {
-    if (!test) return;
+    if (!test || !isRegistered) return;
     const params = new URLSearchParams({
       testId: test.id,
       duration: String(test.durationMinutes || 10),
@@ -106,7 +122,58 @@ export default function LiveTestRunner() {
     params.set("autoStart", "true");
     params.set("skipInstructions", "true");
     navigate(`/typing-test?${params.toString()}`);
-  }, [collectionName, navigate, test]);
+  }, [collectionName, isRegistered, navigate, test]);
+
+  const registerForLiveTest = useCallback(async () => {
+    if (!test || registering || !registrationOpen) return;
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+    setRegistering(true);
+    try {
+      const collections = collectionName
+        ? [collectionName]
+        : ["liveTests1", "liveTests"];
+      await runTransaction(db, async (transaction) => {
+        let foundSnapshot = null;
+        let ref = null;
+        for (const col of collections) {
+          const docRef = doc(db, col, test.id);
+          const snap = await transaction.get(docRef);
+          if (snap.exists()) {
+            foundSnapshot = snap;
+            ref = docRef;
+            break;
+          }
+        }
+        if (!foundSnapshot || !ref) {
+          throw new Error("Test not found");
+        }
+        const data = foundSnapshot.data();
+        const registrations = data.registeredUsers || [];
+        if (registrations.includes(currentUser.uid)) {
+          return;
+        }
+        transaction.update(ref, {
+          registeredUsers: arrayUnion(currentUser.uid),
+          registrationCount: (data.registrationCount || 0) + 1,
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Registration failed");
+    } finally {
+      setRegistering(false);
+    }
+  }, [
+    collectionName,
+    currentUser,
+    navigate,
+    registering,
+    registrationOpen,
+    test,
+  ]);
 
   if (!test) return <div className="p-8">Loading test...</div>;
 
@@ -222,6 +289,36 @@ export default function LiveTestRunner() {
                 <h3 className="text-lg font-semibold text-white mb-4">
                   Start when the timer hits zero
                 </h3>
+                {!isRegistered && (
+                  <div className="mb-4 rounded-md border border-cyan-700 bg-gray-950/60 p-4">
+                    <p className="text-sm text-cyan-200">
+                      Registration is required to participate once the countdown
+                      ends.
+                    </p>
+                    {registrationOpen ? (
+                      <button
+                        type="button"
+                        onClick={registerForLiveTest}
+                        disabled={registering}
+                        className={`mt-3 w-full rounded-md px-4 py-2 font-semibold transition ${
+                          registering
+                            ? "bg-cyan-800 text-gray-300 cursor-wait"
+                            : "bg-cyan-500 text-gray-900 hover:bg-cyan-400"
+                        }`}
+                      >
+                        {currentUser
+                          ? registering
+                            ? "Registering..."
+                            : "Register now"
+                          : "Login to register"}
+                      </button>
+                    ) : (
+                      <p className="mt-3 text-xs text-red-400">
+                        Registration is closed for this test.
+                      </p>
+                    )}
+                  </div>
+                )}
                 <button
                   disabled={!canLaunch}
                   onClick={launchTyping}
@@ -231,13 +328,17 @@ export default function LiveTestRunner() {
                       : "bg-gray-700 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {canLaunch
-                    ? "Start Typing"
-                    : windowClosed
-                      ? "Entry window closed"
-                      : `Opens in ${Math.max(0, Math.ceil(warmupTime / 1000))}s`}
+                  {isRegistered
+                    ? canLaunch
+                      ? "Start Typing"
+                      : windowClosed
+                        ? "Entry window closed"
+                        : `Opens in ${Math.max(0, Math.ceil(warmupTime / 1000))}s`
+                    : registrationOpen
+                      ? "Register to unlock"
+                      : "Registration required"}
                 </button>
-                {!canLaunch && !windowClosed && (
+                {!canLaunch && !windowClosed && isRegistered && (
                   <p className="text-xs text-gray-500 mt-2">
                     This unlocks at the scheduled start so everyone begins
                     together.
@@ -246,6 +347,12 @@ export default function LiveTestRunner() {
                 {windowClosed && (
                   <p className="text-xs text-red-500 mt-2">
                     The live test locked after the 1 minute grace window.
+                  </p>
+                )}
+                {isRegistered && !windowClosed && (
+                  <p className="text-xs text-emerald-400 mt-2">
+                    You are registered. Stay ready and the button will unlock
+                    right on time.
                   </p>
                 )}
               </div>

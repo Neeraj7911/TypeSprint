@@ -235,6 +235,27 @@ const ExamTypingTest = () => {
       .trim();
   }, []);
 
+  const splitIntoWords = useCallback(
+    (text) => {
+      const normalized = normalizeText(text);
+      if (!normalized) {
+        return [];
+      }
+      return normalized.split(" ");
+    },
+    [normalizeText],
+  );
+
+  const sanitizeWord = useCallback((word) => {
+    if (!word) {
+      return "";
+    }
+    return word
+      .normalize("NFC")
+      .replace(/[\u200B-\u200D\uFEFF]/g, "")
+      .replace(/[^\p{L}\p{N}]/gu, "");
+  }, []);
+
   useEffect(() => {
     const progressKey = `typingProgress_${examName}_${language}`;
     const lastCompleted = localStorage.getItem(progressKey);
@@ -573,9 +594,8 @@ const ExamTypingTest = () => {
       const interval = setInterval(() => {
         const timeElapsed = Math.max((Date.now() - startTime) / 60000, 0.0167);
         const normalizedInput = normalizeText(inputText);
-        const normalizedSample = normalizeText(sampleText);
-        const inputWords = normalizedInput.split(" ");
-        const sampleWords = normalizedSample.split(" ");
+        const inputWords = splitIntoWords(inputText);
+        const sampleWords = splitIntoWords(sampleText);
 
         let correctChars = 0;
         let fullErrors = 0;
@@ -585,10 +605,13 @@ const ExamTypingTest = () => {
         for (let i = 0; i < minLength; i++) {
           const inputWord = inputWords[i].trim();
           const sampleWord = sampleWords[i].trim();
+          const sanitizedInputWord = sanitizeWord(inputWord);
+          const sanitizedSampleWord = sanitizeWord(sampleWord);
           if (inputWord === sampleWord) {
             correctChars += inputWord.length + (i < minLength - 1 ? 1 : 0); // Add space if not last word
           } else if (
-            inputWord.replace(/[^\w]/g, "") === sampleWord.replace(/[^\w]/g, "")
+            sanitizedInputWord &&
+            sanitizedInputWord === sanitizedSampleWord
           ) {
             correctChars += inputWord.length;
             halfErrors += 1; // Spacing or punctuation difference
@@ -612,15 +635,20 @@ const ExamTypingTest = () => {
         ) {
           const lastInputWord = inputWords[inputWords.length - 1];
           const nextSampleWord = sampleWords[inputWords.length] || "";
+          const sanitizedLastInput = sanitizeWord(lastInputWord);
+          const sanitizedPrevSample = sanitizeWord(
+            sampleWords[inputWords.length - 1],
+          );
+          const sanitizedNextSample = sanitizeWord(nextSampleWord);
           if (
             lastInputWord.length < sampleWords[inputWords.length - 1].length &&
-            lastInputWord.replace(/[^\w]/g, "") ===
-              sampleWords[inputWords.length - 1].replace(/[^\w]/g, "")
+            sanitizedLastInput &&
+            sanitizedLastInput === sanitizedPrevSample
           ) {
             // Do not count half error for incomplete word
           } else if (
-            lastInputWord.replace(/[^\w]/g, "") ===
-            nextSampleWord.replace(/[^\w]/g, "")
+            sanitizedLastInput &&
+            sanitizedLastInput === sanitizedNextSample
           ) {
             halfErrors += 1; // Missing space after last word
           }
@@ -654,6 +682,9 @@ const ExamTypingTest = () => {
     isPaused,
     hasSubmitted,
     handleSubmit,
+    splitIntoWords,
+    sanitizeWord,
+    normalizeText,
   ]);
 
   const handleStartAfterInstructions = useCallback(() => {
@@ -758,28 +789,26 @@ const ExamTypingTest = () => {
   };
 
   const currentWordIndex = useCallback(() => {
-    const inputWords = normalizeText(inputText).split(" ");
-    const sampleWords = normalizeText(sampleText).split(" ");
-    let index = inputWords.length - 1;
-    if (
-      index >= 0 &&
-      !inputText.endsWith(" ") &&
-      index < sampleWords.length - 1
-    ) {
-      const lastInputWord = inputWords[index];
-      const nextSampleWord = sampleWords[index + 1] || "";
-      if (
-        lastInputWord.replace(/[^\w]/g, "") ===
-        nextSampleWord.replace(/[^\w]/g, "")
-      ) {
-        index++; // Move to next word if half error (missing space)
-      }
-    }
-    return Math.max(0, Math.min(index, sampleWords.length - 1));
-  }, [inputText, sampleText]);
+    const inputWords = splitIntoWords(inputText);
+    const sampleWords = splitIntoWords(sampleText);
 
-  const sampleWords = normalizeText(sampleText).split(" ");
-  const inputWords = normalizeText(inputText).split(" ");
+    if (sampleWords.length === 0) {
+      return 0;
+    }
+
+    if (inputWords.length === 0) {
+      return 0;
+    }
+
+    if (inputText.endsWith(" ")) {
+      return Math.min(inputWords.length, sampleWords.length - 1);
+    }
+
+    return Math.min(inputWords.length - 1, Math.max(sampleWords.length - 1, 0));
+  }, [inputText, sampleText, splitIntoWords]);
+
+  const sampleWords = splitIntoWords(sampleText);
+  const inputWords = splitIntoWords(inputText);
 
   if (isLoading)
     return (
