@@ -7,4 +7,4 @@ google.com, pub-1234512945091265, DIRECT, f08c47fec0942fa0
 # Add other authorized sellers below using the format:
 # domain.com, publisher-account-id, DIRECT|RESELLER, certification-authority-id
 
-# Contact: admin@typesprint.live
+# Contact: liveproject072@gmail.com
