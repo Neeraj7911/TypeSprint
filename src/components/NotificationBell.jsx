@@ -40,6 +40,7 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
   const [tests, setTests] = useState([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [seenIds, setSeenIds] = useState({});
+  const [nowMs, setNowMs] = useState(Date.now());
 
   useEffect(() => {
     let latest1 = [];
@@ -83,8 +84,12 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const notifications = useMemo(() => {
-    const now = Date.now();
     const items = [];
 
     tests.forEach((test) => {
@@ -92,14 +97,20 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
       const startMs = toMillis(test.startTime);
       if (!startMs) return;
       if (
-        startMs + STALE_WINDOW_MS < now &&
+        startMs + STALE_WINDOW_MS < nowMs &&
         (!test.completedUsers || !currentUser)
       )
         return;
       const title = test.title || "Live Test";
       const basePath = `/live-test/${test.id}`;
+      const registeredUsers = Array.isArray(test.registeredUsers)
+        ? test.registeredUsers
+        : [];
+      const userRegistered = currentUser
+        ? registeredUsers.includes(currentUser.uid)
+        : false;
 
-      if (startMs > now) {
+      if (startMs > nowMs) {
         items.push({
           id: `${test.id}-scheduled`,
           title: "Live test scheduled",
@@ -108,7 +119,7 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
           path: basePath,
           timestamp: startMs,
         });
-        if (startMs - now <= STARTING_SOON_MS) {
+        if (startMs - nowMs <= STARTING_SOON_MS) {
           items.push({
             id: `${test.id}-starting`,
             title: "Starting soon",
@@ -120,7 +131,11 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
         }
       }
 
-      if (now >= startMs && now <= startMs + LIVE_GRACE_MS) {
+      if (
+        userRegistered &&
+        nowMs >= startMs &&
+        nowMs <= startMs + LIVE_GRACE_MS
+      ) {
         const params = new URLSearchParams({
           testId: test.id,
           duration: String(test.durationMinutes || 10),
@@ -137,7 +152,7 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
           message: `${title} is live now. Join before the grace window closes.`,
           actionLabel: "Start now",
           path: `/typing-test?${params.toString()}`,
-          timestamp: now,
+          timestamp: nowMs,
         });
       }
 
@@ -145,7 +160,7 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
         currentUser &&
         Array.isArray(test.completedUsers) &&
         test.completedUsers.includes(currentUser.uid) &&
-        now >= startMs
+        nowMs >= startMs
       ) {
         items.push({
           id: `${test.id}-leaderboard-${currentUser.uid}`,
@@ -153,14 +168,14 @@ const NotificationBell = ({ currentUser, variant = "desktop", onNavigate }) => {
           message: `See how you rank for ${title}.`,
           actionLabel: "View leaderboard",
           path: basePath,
-          timestamp: now,
+          timestamp: nowMs,
         });
       }
     });
 
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     return items;
-  }, [tests, currentUser]);
+  }, [tests, currentUser, nowMs]);
 
   const unreadCount = notifications.filter((n) => !seenIds[n.id]).length;
 

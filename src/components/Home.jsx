@@ -20,6 +20,7 @@ const ReportGenerator = lazy(() => import("./ReportGenerator"));
 import FeatureCards from "./FeatureCards";
 import AlertSystem from "./AlertSystem";
 import LiveStats from "./LiveStats";
+import LiveTestSpotlight from "./LiveTestSpotlight";
 
 import LogoSvg from "../assets/react.svg";
 import clickSound from "../assets/click.mp3";
@@ -116,7 +117,7 @@ function Home() {
 
   const toggleDarkMode = useCallback(
     () => setDarkMode((prevMode) => !prevMode),
-    []
+    [],
   );
   const handleTestComplete = useCallback((results) => {
     setTestResults(results);
@@ -125,7 +126,7 @@ function Home() {
   }, []);
   const scrollToContent = useCallback(
     () => window.scrollTo({ top: window.innerHeight, behavior: "smooth" }),
-    []
+    [],
   );
   const playSound = useCallback(() => {
     if (audioRef.current) {
@@ -135,7 +136,7 @@ function Home() {
   }, []);
   const handleExamClick = useCallback(
     (examName) => navigate(`/exams?search=${encodeURIComponent(examName)}`),
-    [navigate]
+    [navigate],
   );
 
   const examCards = useMemo(
@@ -176,7 +177,7 @@ function Home() {
           </motion.div>
         </Tilt>
       )),
-    [inView, handleExamClick]
+    [inView, handleExamClick],
   );
 
   const premiumPlanCards = useMemo(
@@ -210,7 +211,7 @@ function Home() {
           </motion.button>
         </motion.div>
       )),
-    []
+    [],
   );
 
   return (
@@ -325,6 +326,9 @@ function Home() {
             />
           </motion.div>
         </section>
+        <section className="py-12 flex justify-center">
+          <LiveTestSpotlight darkMode={darkMode} />
+        </section>
         <div className="absolute  right-2 sm:right-4">
           <LiveStats darkMode={darkMode} />
         </div>
@@ -408,11 +412,24 @@ function Home() {
             <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg p-8 shadow-lg flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
               <div className="text-center md:text-left">
                 <h2 className="text-2xl font-bold">All-India Live Test</h2>
-                <p className="text-sm text-cyan-100 mt-1">Register for upcoming nationwide live typing tests — starts simultaneously for all participants.</p>
+                <p className="text-sm text-cyan-100 mt-1">
+                  Register for upcoming nationwide live typing tests — starts
+                  simultaneously for all participants.
+                </p>
               </div>
               <div className="flex items-center space-x-3">
-                <Link to="/live-tests" className="bg-white text-blue-600 px-4 py-2 rounded font-semibold">View & Register</Link>
-                <Link to="/live-tests" className="border border-white text-white px-3 py-2 rounded">See Details</Link>
+                <Link
+                  to="/live-tests"
+                  className="bg-white text-blue-600 px-4 py-2 rounded font-semibold"
+                >
+                  View & Register
+                </Link>
+                <Link
+                  to="/live-tests"
+                  className="border border-white text-white px-3 py-2 rounded"
+                >
+                  See Details
+                </Link>
               </div>
             </div>
           </div>

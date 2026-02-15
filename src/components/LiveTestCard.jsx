@@ -8,7 +8,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { db, PROJECT_ID } from "../firebase";
+import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
 export default function LiveTestCard({ test }) {
@@ -186,17 +186,7 @@ export default function LiveTestCard({ test }) {
       animate={{ opacity: 1, y: 0 }}
     >
       <div className="text-4xl mb-2">{test.icon || "🏁"}</div>
-      <div className="flex items-center space-x-2">
-        <h4 className="font-semibold text-white">{test.title}</h4>
-        <a
-          className="text-xs text-gray-400 underline"
-          href={`https://console.firebase.google.com/project/${PROJECT_ID}/firestore/data/~2F${test._collection || "liveTests1"}~2F${encodeURIComponent(test.id)}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Open in Firebase
-        </a>
-      </div>
+      <h4 className="font-semibold text-white">{test.title}</h4>
       <p className="text-xs text-gray-300 mt-1">
         Starts:{" "}
         {new Date(

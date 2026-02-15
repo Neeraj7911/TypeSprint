@@ -56,6 +56,7 @@ import CbseTest from "./pages/contents/CbseTest.jsx"; // Assuming this is CbseJs
 import Blog10 from "./pages/blogs/Blog10.jsx"; // Assuming this is Blog10.jsx
 import SscCglTyping from "./pages/contents/SscCglTyping.jsx"; // Assuming this is SscCglTyping.jsx
 import LiveTestResults from "./pages/LiveTestResults";
+import NotFound from "./pages/NotFound.jsx";
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -200,6 +201,7 @@ const AppContent = () => {
                 </PrivateRoute>
               }
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <div>{!hideHeader && <Footer />}</div>
         </main>

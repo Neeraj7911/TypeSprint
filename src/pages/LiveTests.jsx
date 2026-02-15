@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function LiveTests() {
   const [tests, setTests] = useState([]);
-  const [showRaw, setShowRaw] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,7 +78,7 @@ export default function LiveTests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 text-white py-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 text-white pt-28 pb-16">
       <div className="container mx-auto px-4">
         <motion.h1
           initial={{ opacity: 0 }}
@@ -98,20 +97,6 @@ export default function LiveTests() {
           {tests.map((t) => (
             <LiveTestCard key={t.id} test={t} />
           ))}
-        </div>
-
-        <div className="mt-6 text-sm text-gray-300">
-          <button
-            className="underline mr-4"
-            onClick={() => setShowRaw((s) => !s)}
-          >
-            {showRaw ? "Hide" : "Show"} raw liveTests
-          </button>
-          {showRaw && (
-            <pre className="max-h-64 overflow-auto bg-gray-800 p-3 rounded mt-2 text-xs text-left text-white">
-              {JSON.stringify(tests, null, 2)}
-            </pre>
-          )}
         </div>
 
         <div className="mt-8 text-center">
