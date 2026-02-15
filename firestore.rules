@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     // Public read access to live tests; writes restricted
-    match /liveTests/{testId} {
+    match /liveTests1/{testId} {
       allow read: if true;
 
       // Admins may create, update or delete tests

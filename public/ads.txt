@@ -1,0 +1,14 @@
+# ads.txt file for TypeSprint
+# This file is used to verify authorized sellers for programmatic advertising
+
+# Google AdSense
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+
+# If you have other ad networks, add them here in the format:
+# domain.com, publisher-id, DIRECT|RESELLER, TAG-ID
+
+# Example for other networks:
+# facebook.com, 0000000000000000, RESELLER, c3e20eee3f780d68
+# amazon-adsystem.com, 0000-0000-0000-0000, DIRECT
+
+# Contact: admin@typesprint.live

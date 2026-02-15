@@ -55,6 +55,7 @@ import Blog9 from "./pages/blogs/Blog9.jsx"; // Assuming this is Blog9.jsx
 import CbseTest from "./pages/contents/CbseTest.jsx"; // Assuming this is CbseJsa.jsx
 import Blog10 from "./pages/blogs/Blog10.jsx"; // Assuming this is Blog10.jsx
 import SscCglTyping from "./pages/contents/SscCglTyping.jsx"; // Assuming this is SscCglTyping.jsx
+import LiveTestResults from "./pages/LiveTestResults";
 const AppContent = () => {
   const location = useLocation();
   const hideHeader = location.pathname === "/typing-test"; // Hide Header on /typing-test
@@ -81,6 +82,7 @@ const AppContent = () => {
             <Route path="/help-section" element={<ChatApp />} />
             <Route path="/exams" element={<ExamPage />} />
             <Route path="/typing-test" element={<ExamTypingT />} />
+            <Route path="/live-results" element={<LiveTestResults />} />
             <Route path="/results" element={<Results />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/about" element={<Aboutus />} />

@@ -22,6 +22,7 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const provider = new GoogleAuthProvider();
 export const functions = getFunctions(app);
+export const PROJECT_ID = firebaseConfig.projectId;
 
 export async function getDailyAttempts(userId) {
   const userRef = doc(db, "users", userId);

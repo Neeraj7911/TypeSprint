@@ -6,7 +6,7 @@ const db = admin.firestore();
 // Scheduled function to mark tests as live when their startTime <= now and status isn't live
 exports.startScheduledLiveTests = functions.pubsub.schedule('every 1 minutes').onRun(async (context) => {
   const now = admin.firestore.Timestamp.now();
-  const q = db.collection('liveTests').where('startTime', '<=', now).where('isLive', '==', false);
+  const q = db.collection('liveTests1').where('startTime', '<=', now).where('isLive', '==', false);
   const snap = await q.get();
   const batch = db.batch();
   snap.forEach(doc => {
@@ -23,15 +23,40 @@ exports.createLiveTest = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Request has no auth context');
   }
-  const { title, description, content, startTime, durationMinutes, isPrivate } = data;
+  const {
+    title,
+    description,
+    content,
+    startTime,
+    durationMinutes,
+    isPrivate,
+    examType,
+    font,
+    language,
+    slots,
+    targetWPM,
+    keyboardSettings,
+  } = data;
   if (!title || !startTime) throw new functions.https.HttpsError('invalid-argument', 'Missing title or startTime');
 
-  const docRef = await db.collection('liveTests').add({
+  const start = new Date(startTime);
+  const dateStr = start.toLocaleDateString('en-CA'); // YYYY-MM-DD
+  const timeStr = start.toTimeString().slice(0,5); // HH:MM
+
+  const docRef = await db.collection('liveTests1').add({
     title,
     description: description || '',
     content: content || '',
-    startTime: admin.firestore.Timestamp.fromMillis(new Date(startTime).getTime()),
+    startTime: admin.firestore.Timestamp.fromMillis(start.getTime()),
+    date: dateStr,
+    time: timeStr,
     durationMinutes: durationMinutes || 30,
+    examType: examType || '',
+    font: font || '',
+    language: language || 'english',
+    slots: Number(slots) || 0,
+    targetWPM: Number(targetWPM) || 0,
+    keyboardSettings: keyboardSettings || {},
     createdBy: context.auth.uid,
     createdAt: admin.firestore.Timestamp.now(),
     isLive: false,
@@ -40,6 +65,9 @@ exports.createLiveTest = functions.https.onCall(async (data, context) => {
     registeredUsers: [],
     isPrivate: !!isPrivate,
   });
+
+  // Store the generated id on the document for easy client access
+  await docRef.update({ id: docRef.id });
 
   return { id: docRef.id };
 });
@@ -78,15 +106,40 @@ exports.createLiveTestHttp = functions.https.onRequest((req, res) => {
       const userRecord = await admin.auth().getUser(decoded.uid);
       if (!adminEmails.includes(userRecord.email)) return res.status(403).json({ error: 'Forbidden' });
 
-      const { title, description, content, startTime, durationMinutes, isPrivate } = req.body || {};
+      const {
+        title,
+        description,
+        content,
+        startTime,
+        durationMinutes,
+        isPrivate,
+        examType,
+        font,
+        language,
+        slots,
+        targetWPM,
+        keyboardSettings,
+      } = req.body || {};
       if (!title || !startTime) return res.status(400).json({ error: 'Missing title or startTime' });
 
-      const docRef = await db.collection('liveTests').add({
+      const start = new Date(startTime);
+      const dateStr = start.toLocaleDateString('en-CA');
+      const timeStr = start.toTimeString().slice(0,5);
+
+      const docRef = await db.collection('liveTests1').add({
         title,
         description: description || '',
         content: content || '',
-        startTime: admin.firestore.Timestamp.fromMillis(new Date(startTime).getTime()),
+        startTime: admin.firestore.Timestamp.fromMillis(start.getTime()),
+        date: dateStr,
+        time: timeStr,
         durationMinutes: durationMinutes || 30,
+        examType: examType || '',
+        font: font || '',
+        language: language || 'english',
+        slots: Number(slots) || 0,
+        targetWPM: Number(targetWPM) || 0,
+        keyboardSettings: keyboardSettings || {},
         createdBy: decoded.uid,
         createdAt: admin.firestore.Timestamp.now(),
         isLive: false,
@@ -95,6 +148,8 @@ exports.createLiveTestHttp = functions.https.onRequest((req, res) => {
         registeredUsers: [],
         isPrivate: !!isPrivate,
       });
+
+      await docRef.update({ id: docRef.id });
 
       return res.json({ id: docRef.id });
     } catch (err) {

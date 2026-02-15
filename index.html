@@ -1,6 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" itemscope itemtype="https://schema.org/WebSite">
   <head>
+    <!-- Advanced Performance Optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://www.googletagmanager.com"
+      crossorigin
+    />
+    <link rel="dns-prefetch" href="//www.google-analytics.com" />
+    <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+
+    <!-- Critical Resource Hints -->
+    <link rel="preload" href="/src/main.jsx" as="script" crossorigin />
+    <link rel="preload" href="/src/index.css" as="style" />
+    <link rel="modulepreload" href="/src/App.jsx" />
+
     <!-- Google tag (gtag.js) -->
     <script
       async
@@ -12,64 +28,405 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
-      gtag("config", "G-89YFKM43TH");
+      gtag("config", "G-89YFKM43TH", {
+        custom_map: { dimension1: "page_type" },
+        send_page_view: true,
+      });
     </script>
+
+    <!-- Advanced Meta Tags -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TypeSprint | Typing Platform for Government Exams</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Enhanced SEO Meta Tags -->
+    <title>
+      TypeSprint: Free Online Typing Tests for Government Exams | SSC CGL, CSIR,
+      UPPSC
+    </title>
     <meta
       name="description"
-      content="Practice typing tests for SSC CGL, CSIR, UPPSC RO/ARO, and other government typing exams with real exam formats, instant accuracy feedback, and support for Hindi, English, and other regional languages."
+      content="Free online typing test practice for SSC CGL, CSIR JSA, UPPSC RO/ARO, DGAFMS exams. Master 35 WPM in English & 30 WPM in Hindi with real exam simulations. Improve typing speed & accuracy for government jobs. Instant certificates."
     />
     <meta
       name="keywords"
-      content="typing test, government exams typing, SSC CGL typing, CSIR JSA typing, Hindi typing practice, English typing speed, online typing certificate"
+      content="typing test practice online free, ssc cgl typing test practice, csir jsa typing test online, government exam typing practice, hindi typing test online free, english typing speed test, competitive exam typing preparation, ssc typing test 15 minutes, typing certificate online free, wpm improvement test, accuracy typing practice, government job typing test, uppsc ro aro typing test, dgafms typing test practice, typing speed test for jobs, free typing test for competitive exams, online typing practice for exams, government typing test preparation, ssc cgl hindi typing test, csir typing speed criteria, typing test for ssc chsl, railway typing test practice, banking exam typing practice, defense typing test online, police exam typing test, judicial typing test practice, stenographer typing test, data entry typing practice, typing speed calculator online, improve typing speed in hindi, english typing test for government jobs, typing accuracy test online, fast typing practice for exams, typing test simulator online, government recruitment typing test, typing speed requirements for jobs, online typing exam practice, free typing speed test with certificate"
     />
-    <meta name="author" content="TypeSprint" />
-    <meta name="robots" content="index, follow" />
+    <meta name="author" content="TypeSprint Team" />
+    <meta name="publisher" content="TypeSprint" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <meta name="theme-color" content="#0f172a" />
+    <meta name="msapplication-TileColor" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Canonical and Alternate URLs -->
     <link rel="canonical" href="https://typesprint.live/" />
+    <link rel="alternate" hreflang="en" href="https://typesprint.live/" />
+    <link rel="alternate" hreflang="hi" href="https://typesprint.live/hindi" />
+
+    <!-- Advanced Open Graph -->
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TypeSprint" />
     <meta
       property="og:title"
-      content="TypeSprint | Typing Platform for Government Exams"
+      content="TypeSprint: Free Online Typing Tests for Government Exams | SSC CGL, CSIR, UPPSC"
     />
     <meta
       property="og:description"
-      content="AI-assisted typing drills, mock tests, and multilingual practice for SSC, CSIR, UPPSC, and other competitive exams."
+      content="AI-powered typing practice platform for government exams. Master SSC CGL, CSIR JSA, UPPSC typing tests with real-time feedback. Hindi & English support with certificates."
     />
-    <meta property="og:type" content="website" />
     <meta property="og:url" content="https://typesprint.live/" />
     <meta property="og:image" content="https://typesprint.live/og-banner.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta
+      property="og:image:alt"
+      content="TypeSprint - Government Exam Typing Practice Platform"
+    />
+
+    <!-- Advanced Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@typesprint" />
+    <meta name="twitter:creator" content="@typesprint" />
     <meta
       name="twitter:title"
-      content="TypeSprint | Government Typing Practice"
+      content="TypeSprint: Free Online Typing Tests for Government Exams"
     />
     <meta
       name="twitter:description"
-      content="Boost your typing accuracy and WPM for SSC, CSIR, DGAFMS, and other govt exams with adaptive tests."
+      content="Master government exam typing tests with AI-powered practice. SSC CGL, CSIR, UPPSC preparation with real-time feedback."
     />
     <meta
       name="twitter:image"
       content="https://typesprint.live/og-banner.jpg"
     />
+    <meta name="twitter:image:alt" content="TypeSprint Typing Test Platform" />
+
+    <!-- LinkedIn Optimization -->
+    <meta
+      property="og:image:secure_url"
+      content="https://typesprint.live/og-banner.jpg"
+    />
+
+    <!-- Pinterest Optimization -->
+    <meta name="pinterest" content="nopin" />
+    <meta name="pinterest-rich-pin" content="true" />
+
+    <!-- Advanced Structured Data - Organization -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
+        "@id": "https://typesprint.live/#organization",
         "name": "TypeSprint",
+        "alternateName": "Type Sprint",
         "url": "https://typesprint.live",
-        "logo": "https://typesprint.live/logo.png",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://typesprint.live/logo.png",
+          "width": 512,
+          "height": 512
+        },
+        "description": "Leading online typing test platform specializing in government exam preparation including SSC CGL, CSIR JSA, UPPSC RO/ARO, and DGAFMS typing tests.",
+        "foundingDate": "2024",
+        "founders": [
+          {
+            "@type": "Person",
+            "name": "TypeSprint Team"
+          }
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91-XXXXXXXXXX",
+          "contactType": "customer service",
+          "availableLanguage": ["English", "Hindi"]
+        },
         "sameAs": [
           "https://www.youtube.com/@typesprint",
           "https://www.linkedin.com/company/typesprint",
-          "https://x.com/typesprint"
+          "https://x.com/typesprint",
+          "https://www.instagram.com/typesprint"
         ],
-        "description": "Typing preparation suite for SSC, CSIR, DGAFMS, and other Indian government recruitment exams."
+        "areaServed": {
+          "@type": "Country",
+          "name": "India"
+        },
+        "knowsAbout": [
+          "Typing Tests",
+          "Government Exams",
+          "SSC CGL",
+          "CSIR JSA",
+          "Competitive Exam Preparation",
+          "Typing Speed Training"
+        ]
       }
     </script>
+
+    <!-- WebSite Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://typesprint.live/#website",
+        "url": "https://typesprint.live",
+        "name": "TypeSprint",
+        "description": "Free online typing test platform for government exam preparation",
+        "publisher": {
+          "@id": "https://typesprint.live/#organization"
+        },
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://typesprint.live/search?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ],
+        "inLanguage": ["en", "hi"]
+      }
+    </script>
+
+    <!-- WebApplication Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "TypeSprint",
+        "description": "AI-powered typing test platform for government exam preparation",
+        "url": "https://typesprint.live",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        },
+        "featureList": [
+          "Real-time typing speed tracking",
+          "Accuracy measurement",
+          "Multi-language support",
+          "Certificate generation",
+          "Progress analytics",
+          "AI-powered feedback"
+        ],
+        "screenshot": "https://typesprint.live/screenshot.jpg"
+      }
+    </script>
+
+    <!-- Course Schema for Exam Preparation -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": "Government Exam Typing Test Preparation",
+        "description": "Comprehensive typing test preparation course for SSC CGL, CSIR JSA, UPPSC, and other government recruitment exams",
+        "provider": {
+          "@id": "https://typesprint.live/#organization"
+        },
+        "courseMode": "online",
+        "educationalLevel": "Intermediate",
+        "teaches": [
+          "Typing speed improvement",
+          "Accuracy enhancement",
+          "Exam-specific typing techniques",
+          "Time management skills"
+        ],
+        "hasCourseInstance": {
+          "@type": "CourseInstance",
+          "courseMode": "online",
+          "instructor": {
+            "@type": "Organization",
+            "name": "TypeSprint AI"
+          }
+        }
+      }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the required typing speed for SSC CGL?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SSC CGL requires 35 words per minute (WPM) in English or 30 WPM in Hindi with at least 80% accuracy for the typing test."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I improve my typing speed for government exams?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Practice regularly with TypeSprint's AI-powered platform, focus on accuracy first, use proper finger placement, and take timed mock tests to simulate exam conditions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does TypeSprint support Hindi typing practice?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, TypeSprint supports both English and Hindi typing practice with Mangal font support and transliteration features for comprehensive exam preparation."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Prepare for Government Exam Typing Tests",
+        "description": "Step-by-step guide to master typing tests for SSC CGL, CSIR, and other government exams",
+        "totalTime": "P30D",
+        "supply": [
+          {
+            "@type": "HowToSupply",
+            "name": "Computer or Laptop"
+          },
+          {
+            "@type": "HowToSupply",
+            "name": "Internet Connection"
+          }
+        ],
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Learn Proper Finger Placement",
+            "text": "Master the QWERTY keyboard layout with correct finger positioning on home row keys.",
+            "position": 1
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Practice Daily",
+            "text": "Spend 15-30 minutes daily practicing with TypeSprint's adaptive exercises.",
+            "position": 2
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Focus on Accuracy",
+            "text": "Aim for 95%+ accuracy before increasing speed to build good habits.",
+            "position": 3
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Take Mock Tests",
+            "text": "Simulate real exam conditions with timed 15-minute typing tests.",
+            "position": 4
+          }
+        ]
+      }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://typesprint.live/"
+          }
+        ]
+      }
+    </script>
+
+    <!-- Speakable Schema for Voice Search -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "TypeSprint - Government Exam Typing Tests",
+        "speakable": {
+          "@type": "SpeakableSpecification",
+          "cssSelector": [".hero-title", ".hero-description"]
+        }
+      }
+    </script>
+
+    <!-- Security Headers -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Font Optimization -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    /></noscript>
+
+    <!-- Critical CSS (Inline for above-the-fold content) -->
+    <style>
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      .hero-section {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        min-height: 100vh;
+      }
+      .hero-title {
+        font-size: clamp(2rem, 5vw, 4rem);
+        font-weight: 700;
+        color: white;
+      }
+      .hero-subtitle {
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        color: #e2e8f0;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

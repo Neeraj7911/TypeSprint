@@ -10,6 +10,7 @@ import {
   collection,
   updateDoc,
   increment,
+  Timestamp,
 } from "firebase/firestore";
 import { gsap } from "gsap";
 import { jsPDF } from "jspdf";
@@ -56,6 +57,7 @@ const Results = () => {
     testId,
     fullErrors = 0,
     halfErrors = 0,
+    testCollection,
   } = location.state || {};
 
   // Helper function to normalize text (remove extra spaces and standardize)
@@ -239,6 +241,44 @@ const Results = () => {
         await setDoc(resultRef, resultData);
         setHasSaved(true);
 
+        if (testId) {
+          const liveResultPayload = {
+            ...resultData,
+            userId: user.uid,
+            displayName: user.displayName || user.email.split("@")[0],
+            email: user.email,
+            testId,
+            examName,
+            language,
+            createdAt: Timestamp.now(),
+          };
+          const collectionsToTry = testCollection
+            ? [
+                testCollection,
+                testCollection === "liveTests1" ? "liveTests" : "liveTests1",
+              ]
+            : ["liveTests1", "liveTests"];
+
+          for (const col of collectionsToTry) {
+            try {
+              const testRef = doc(db, col, testId);
+              const testSnap = await getDoc(testRef);
+              if (!testSnap.exists()) continue;
+              const liveResultRef = doc(db, col, testId, "results", user.uid);
+              const existingLive = await getDoc(liveResultRef);
+              const existingNet = existingLive.exists()
+                ? existingLive.data().netWpm || 0
+                : 0;
+              if (!existingLive.exists() || (netWpm || 0) > existingNet) {
+                await setDoc(liveResultRef, liveResultPayload, { merge: true });
+              }
+              break;
+            } catch (liveErr) {
+              console.warn("Failed to write live leaderboard entry", liveErr);
+            }
+          }
+        }
+
         const resultsSnapshot = await getDocs(
           collection(db, "users", user.uid, "results"),
         );
@@ -313,6 +353,7 @@ const Results = () => {
     testDuration,
     hasSaved,
     location.state,
+    testCollection,
   ]);
 
   useEffect(() => {

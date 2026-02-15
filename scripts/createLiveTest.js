@@ -15,7 +15,7 @@ try {
 const db = admin.firestore();
 
 async function createLiveTest() {
-  const docRef = db.collection("liveTests").doc();
+  const docRef = db.collection("liveTests1").doc();
   const content = [
     "This is the first paragraph of the live typing test. Formatting such as line breaks and paragraph separation matters for readability.",
     "Second paragraph: keep punctuation, quotes, and uncommon sequences to make the test realistic.",

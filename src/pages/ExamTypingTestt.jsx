@@ -5,6 +5,7 @@ import React, {
   Suspense,
   lazy,
   useRef,
+  useMemo,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
@@ -102,6 +103,8 @@ const ExamTypingTest = () => {
   const font = query.get("font") || (language === "hindi" ? "Mangal" : "Arial");
   const duration = parseInt(query.get("duration")) || 10;
   const incomingTestId = query.get("testId");
+  const incomingCollection = query.get("collection");
+  const autoStartParam = query.get("autoStart") === "true";
   const config = examConfigs[examName] || examConfigs["default"];
 
   const [inputText, setInputText] = useState("");
@@ -139,6 +142,45 @@ const ExamTypingTest = () => {
     disableColorFeedback: false,
   });
   const [backspaceCount, setBackspaceCount] = useState(0);
+  const [testCollection, setTestCollection] = useState(
+    incomingCollection || null,
+  );
+  const [liveStartTime, setLiveStartTime] = useState(null);
+  const [completedUsers, setCompletedUsers] = useState([]);
+  const [currentUid, setCurrentUid] = useState(null);
+  const [now, setNow] = useState(Date.now());
+  const LIVE_GRACE_MS = 60 * 1000;
+  const isLiveLocked = useMemo(
+    () => incomingTestId && liveStartTime && now < liveStartTime,
+    [incomingTestId, liveStartTime, now],
+  );
+  const isLiveExpired = useMemo(
+    () =>
+      incomingTestId && liveStartTime && now > liveStartTime + LIVE_GRACE_MS,
+    [incomingTestId, liveStartTime, now],
+  );
+  const hasCompleted = useMemo(
+    () => incomingTestId && currentUid && completedUsers.includes(currentUid),
+    [incomingTestId, currentUid, completedUsers],
+  );
+  const liveCountdown = useMemo(() => {
+    if (!incomingTestId || !liveStartTime) return null;
+    const diff = liveStartTime - now;
+    if (diff <= 0) return "Live";
+    const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const hours = Math.floor(minutes / 60);
+    const remMinutes = minutes % 60;
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, "0")}:${remMinutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+    return `${remMinutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  }, [incomingTestId, liveStartTime, now]);
 
   const latestStateRef = useRef({
     inputText: "",
@@ -151,6 +193,7 @@ const ExamTypingTest = () => {
     fullErrors: 0,
     halfErrors: 0,
   });
+  const autoStartTriggeredRef = useRef(false);
 
   useEffect(() => {
     latestStateRef.current = {
@@ -185,12 +228,12 @@ const ExamTypingTest = () => {
 
   const currentFont = languageFonts[language] || font;
 
-  const normalizeText = (text) => {
+  const normalizeText = useCallback((text) => {
     return text
       .replace(/[\u2018\u2019]/g, "'")
       .replace(/\s+/g, " ")
       .trim();
-  };
+  }, []);
 
   useEffect(() => {
     const progressKey = `typingProgress_${examName}_${language}`;
@@ -241,7 +284,8 @@ const ExamTypingTest = () => {
       timeElapsed,
     });
 
-    navigate("/results", {
+    const destination = incomingTestId ? "/live-results" : "/results";
+    navigate(destination, {
       state: {
         grossWpm,
         netWpm,
@@ -257,6 +301,7 @@ const ExamTypingTest = () => {
         inputText,
         sampleText,
         timeElapsed,
+        testCollection,
       },
     });
   }, [
@@ -270,6 +315,7 @@ const ExamTypingTest = () => {
     targetWPM,
     currentFont,
     testId,
+    testCollection,
   ]);
 
   useEffect(() => {
@@ -290,6 +336,7 @@ const ExamTypingTest = () => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsLoggedIn(true);
+        setCurrentUid(user.uid);
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           setUserStatus(
@@ -303,6 +350,7 @@ const ExamTypingTest = () => {
       } else {
         setIsLoggedIn(false);
         setUserStatus(null);
+        setCurrentUid(null);
       }
       setIsLoading(false);
     });
@@ -314,25 +362,141 @@ const ExamTypingTest = () => {
     const loadLiveTest = async () => {
       if (!incomingTestId) return;
       try {
-        const ref = doc(db, "liveTests", incomingTestId);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data.content) {
-            setSampleText(normalizeText(data.content));
+        const collectionsToTry = incomingCollection
+          ? [
+              incomingCollection,
+              incomingCollection === "liveTests1" ? "liveTests" : "liveTests1",
+            ]
+          : ["liveTests1", "liveTests"];
+
+        for (const col of collectionsToTry) {
+          const ref = doc(db, col, incomingTestId);
+          const snap = await getDoc(ref);
+          if (snap.exists()) {
+            const data = snap.data();
+            if (data.content) {
+              setSampleText(normalizeText(data.content));
+            }
+            if (data.durationMinutes) {
+              setDurationState(Number(data.durationMinutes));
+              setTimeLeft(Number(data.durationMinutes) * 60);
+            }
+            if (data.keyboardSettings) {
+              setKeyboardSettings((prev) => ({
+                ...prev,
+                ...data.keyboardSettings,
+              }));
+            }
+            if (data.startTime) {
+              if (data.startTime.seconds) {
+                setLiveStartTime(data.startTime.seconds * 1000);
+              } else {
+                const parsed = Date.parse(data.startTime);
+                if (!Number.isNaN(parsed)) setLiveStartTime(parsed);
+              }
+            }
+            setCompletedUsers(
+              Array.isArray(data.completedUsers) ? data.completedUsers : [],
+            );
+            setTestId(incomingTestId);
+            setTestCollection(col);
+            return;
           }
-          if (data.durationMinutes) {
-            setDurationState(Number(data.durationMinutes));
-            setTimeLeft(Number(data.durationMinutes) * 60);
-          }
-          setTestId(incomingTestId);
         }
       } catch (e) {
         console.error("Failed to load live test content", e);
       }
     };
     loadLiveTest();
-  }, [incomingTestId]);
+  }, [incomingTestId, incomingCollection, normalizeText]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const startTest = useCallback(
+    (options = {}) => {
+      if (hasCompleted) {
+        alert(
+          "You have already submitted this live test. Please review your results instead of reattempting.",
+        );
+        if (incomingTestId) navigate(`/live-test/${incomingTestId}`);
+        return;
+      }
+      const autoLaunch = options.autoStart || false;
+      const current = Date.now();
+      if (incomingTestId && liveStartTime && current < liveStartTime) {
+        alert(
+          "This live test unlocks at the scheduled start time. Please wait for the countdown to finish.",
+        );
+        return;
+      }
+      if (
+        incomingTestId &&
+        liveStartTime &&
+        current > liveStartTime + LIVE_GRACE_MS
+      ) {
+        alert("This live test is closed. The 1 minute grace period has ended.");
+        return;
+      }
+      const newTestId = incomingTestId || `${examName}-${Date.now()}`;
+      setTestId(newTestId);
+      setIsTestActive(true);
+      setGrossWpm(0);
+      setNetWpm(0);
+      setAccuracy(100);
+      setFullErrors(0);
+      setHalfErrors(0);
+      setInputText("");
+      setTimeLeft(durationState * 60);
+      setFreeTimeLeft(180);
+      setHasSubmitted(false);
+      setBackspaceCount(0);
+      if (autoLaunch) {
+        setIsFullScreen(false);
+        setShowInstructions(false);
+        setStartTime(Date.now());
+      } else {
+        setIsFullScreen(true);
+        setShowInstructions(true);
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    },
+    [
+      examName,
+      hasCompleted,
+      incomingTestId,
+      liveStartTime,
+      durationState,
+      navigate,
+    ],
+  );
+
+  useEffect(() => {
+    if (
+      autoStartParam &&
+      incomingTestId &&
+      !isLiveLocked &&
+      !isLiveExpired &&
+      !isTestActive &&
+      sampleText &&
+      !autoStartTriggeredRef.current &&
+      !hasCompleted
+    ) {
+      autoStartTriggeredRef.current = true;
+      startTest({ autoStart: true });
+    }
+  }, [
+    autoStartParam,
+    incomingTestId,
+    isLiveLocked,
+    isLiveExpired,
+    isTestActive,
+    sampleText,
+    startTest,
+    hasCompleted,
+  ]);
 
   useEffect(() => {
     let timer;
@@ -479,13 +643,6 @@ const ExamTypingTest = () => {
           (correctChars / totalCharsTyped) * 100,
         );
         setAccuracy(isFinite(accuracyPercentage) ? accuracyPercentage : 100);
-
-        if (
-          correctChars === normalizedSample.length &&
-          inputWords.length === sampleWords.length
-        ) {
-          handleSubmit();
-        }
       }, 500);
       return () => clearInterval(interval);
     }
@@ -498,25 +655,6 @@ const ExamTypingTest = () => {
     hasSubmitted,
     handleSubmit,
   ]);
-
-  const startTest = useCallback(() => {
-    const newTestId = `${examName}-${Date.now()}`;
-    setTestId(newTestId);
-    setIsTestActive(true);
-    setGrossWpm(0);
-    setNetWpm(0);
-    setAccuracy(100);
-    setFullErrors(0);
-    setHalfErrors(0);
-    setInputText("");
-    setTimeLeft(durationState * 60);
-    setFreeTimeLeft(180);
-    setHasSubmitted(false);
-    setIsFullScreen(true);
-    setShowInstructions(true);
-    setBackspaceCount(0);
-    document.documentElement.requestFullscreen().catch((err) => {});
-  }, [duration, examName]);
 
   const handleStartAfterInstructions = useCallback(() => {
     setStartTime(Date.now());
@@ -786,12 +924,42 @@ const ExamTypingTest = () => {
                 <div className="mb-4 flex flex-col space-y-2">
                   <div className="flex flex-wrap items-center gap-4">
                     <button
-                      onClick={startTest}
+                      onClick={() => startTest({ autoStart: false })}
                       className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
-                      disabled={isTestActive}
+                      disabled={
+                        isTestActive ||
+                        isLiveLocked ||
+                        isLiveExpired ||
+                        hasCompleted
+                      }
                     >
-                      Start Test
+                      {hasCompleted
+                        ? "Test already submitted"
+                        : isLiveLocked
+                          ? `Opens in ${liveCountdown || "soon"}`
+                          : isLiveExpired
+                            ? "Entry window closed"
+                            : "Start Test"}
                     </button>
+                    {isLiveLocked && (
+                      <p className="text-xs text-gray-600">
+                        Scheduled start:{" "}
+                        {liveStartTime
+                          ? new Date(liveStartTime).toLocaleTimeString()
+                          : ""}
+                      </p>
+                    )}
+                    {isLiveExpired && (
+                      <p className="text-xs text-red-600">
+                        The live session locked after the 1 minute grace window.
+                      </p>
+                    )}
+                    {hasCompleted && (
+                      <p className="text-xs text-emerald-600">
+                        You already submitted this live session. Visit Live
+                        Results to review your score.
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       {Object.keys(keyboardSettings).map((key) => (
                         <label

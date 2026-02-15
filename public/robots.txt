@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+
+# Allow important pages
 Allow: /exams
 Allow: /ssc-cgl-typing-test
 Allow: /10-minute-typing-test-for-government-jobs
@@ -13,9 +15,44 @@ Allow: /blogs/prepare-csir-jsa-typing-test
 Allow: /blog/csir-jsa-eligiblity-and-typing-speed-criteria
 Allow: /blogs/full-paragraph-typing-tests-ssc-chsl
 Allow: /blogs/dgafms-group-c-typing-test-2025
+
+# Disallow sensitive areas
 Disallow: /login
 Disallow: /signup
 Disallow: /dashboard
 Disallow: /admin/
 Disallow: /api/
+Disallow: /_next/
+Disallow: /search?
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# Sitemap
 Sitemap: https://typesprint.live/sitemap.xml
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Block unwanted bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
