@@ -11,6 +11,66 @@ import {
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
+const toMillis = (value) => {
+  if (!value) return 0;
+  if (value.seconds) return value.seconds * 1000;
+  if (value._seconds) return value._seconds * 1000;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const fromDateTimeFields = (item) => {
+  if (!item) return 0;
+  const dateLike = item.date || item.startDate || item.scheduleDate;
+  const timeLike =
+    item.time ||
+    item.startTimeString ||
+    item.startTimeText ||
+    item.scheduleTime;
+  if (dateLike) {
+    const candidates = [];
+    if (timeLike) {
+      candidates.push(`${dateLike}T${timeLike}`);
+      candidates.push(`${dateLike} ${timeLike}`);
+    }
+    candidates.push(`${dateLike}`);
+    for (const candidate of candidates) {
+      const parsed = Date.parse(candidate);
+      if (!Number.isNaN(parsed)) return parsed;
+    }
+  }
+  return 0;
+};
+
+const resolveStartMs = (test) => {
+  if (!test) return 0;
+  const directCandidates = [
+    test.startTime,
+    test.start,
+    test.startTimestamp,
+    test.startDateTime,
+    test.startDateTimeUtc,
+    test.startDateTimeISO,
+    test.scheduledAt,
+    test.startAt,
+  ];
+  for (const candidate of directCandidates) {
+    const value = toMillis(candidate);
+    if (value) return value;
+  }
+  const fromFields = fromDateTimeFields(test);
+  if (fromFields) return fromFields;
+  return 0;
+};
+
+const resolveDurationMs = (test) => {
+  if (!test) return 0;
+  if (test.durationMinutes) return Number(test.durationMinutes) * 60 * 1000;
+  if (test.durationSeconds) return Number(test.durationSeconds) * 1000;
+  if (test.duration) return Number(test.duration) * 60 * 1000;
+  return 0;
+};
+
 export default function LiveTestCard({ test }) {
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -23,16 +83,17 @@ export default function LiveTestCard({ test }) {
     currentUser && (test.completedUsers || []).includes(currentUser.uid);
 
   const startTimeMs = useMemo(() => {
-    if (!test || !test.startTime) return null;
-    if (test.startTime.seconds) return test.startTime.seconds * 1000;
-    const parsed = Date.parse(test.startTime);
-    return Number.isNaN(parsed) ? null : parsed;
+    const value = resolveStartMs(test);
+    return value || null;
   }, [test]);
+
+  const durationMs = useMemo(() => resolveDurationMs(test), [test]);
 
   const windowClosed = useMemo(() => {
     if (!startTimeMs) return false;
-    return nowMs > startTimeMs + 60 * 1000; // 1 minute window
-  }, [nowMs, startTimeMs]);
+    const activeWindow = durationMs || 60 * 1000;
+    return nowMs > startTimeMs + activeWindow;
+  }, [nowMs, startTimeMs, durationMs]);
 
   const registrationOpen = useMemo(() => {
     if (!startTimeMs) return true;
@@ -54,7 +115,8 @@ export default function LiveTestCard({ test }) {
         const current = Date.now();
         setNowMs(current);
         if (startTimeMs) {
-          const closed = current > startTimeMs + 60 * 1000;
+          const activeWindow = durationMs || 60 * 1000;
+          const closed = current > startTimeMs + activeWindow;
           if (closed) {
             setCountdown("Closed");
             return;
@@ -74,7 +136,9 @@ export default function LiveTestCard({ test }) {
           );
           return;
         }
-        const diff = new Date(test.startTime || current) - current;
+        const fallbackStart =
+          resolveStartMs(test) || new Date(test.date || Date.now()).getTime();
+        const diff = fallbackStart - current;
         const s = Math.max(0, Math.floor(diff / 1000));
         const m = Math.floor(s / 60);
         const sec = s % 60;
@@ -179,6 +243,13 @@ export default function LiveTestCard({ test }) {
     navigate(`/typing-test?${params.toString()}`);
   };
 
+  const displayStart = useMemo(() => {
+    if (startTimeMs) return new Date(startTimeMs).toLocaleString();
+    if (test?.date && test?.time) return `${test.date} ${test.time}`;
+    if (test?.date) return String(test.date);
+    return "Schedule pending";
+  }, [startTimeMs, test]);
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-80 p-4 rounded-lg shadow-md flex flex-col items-center text-center"
@@ -187,14 +258,7 @@ export default function LiveTestCard({ test }) {
     >
       <div className="text-4xl mb-2">{test.icon || "🏁"}</div>
       <h4 className="font-semibold text-white">{test.title}</h4>
-      <p className="text-xs text-gray-300 mt-1">
-        Starts:{" "}
-        {new Date(
-          test.startTime && test.startTime.seconds
-            ? test.startTime.seconds * 1000
-            : test.startTime || Date.now(),
-        ).toLocaleString()}
-      </p>
+      <p className="text-xs text-gray-300 mt-1">Starts: {displayStart}</p>
       <p className="text-xs text-gray-400">
         Registrations: {test.registrationCount || 0} • {countdown}
       </p>

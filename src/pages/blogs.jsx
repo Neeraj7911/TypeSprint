@@ -52,7 +52,7 @@ const Blogs = () => {
 
     const observer = new IntersectionObserver(
       observerCallback,
-      observerOptions
+      observerOptions,
     );
 
     Object.entries(sectionRefs).forEach(([key, ref]) => {
@@ -68,6 +68,33 @@ const Blogs = () => {
 
   // Sample blog data
   const blogPosts = [
+    {
+      slug: "mp-cpct-typing-exam-2026",
+      title:
+        "MP CPCT Typing Exam 2026: Expected April/May Dates & Practice Blueprint",
+      excerpt:
+        "Track the upcoming MP CPCT typing schedule, admit card timeline, and follow a TypeSprint plan to hit 30+ net WPM before the exam window opens.",
+      image: "https://typesprint.live/images/mp-cpct-typing-exam-2026.webp",
+      date: "February 16, 2026",
+    },
+    {
+      slug: "top-10-typing-mistakes-ssc-rrb",
+      title:
+        "Top 10 Typing Mistakes in SSC/RRB Exams & Fixes (with TypeSprint Simulations)",
+      excerpt:
+        "Stop the accuracy leaks that fail SSC and RRB candidates. Learn the ten critical mistakes and fix them with TypeSprint.live practice routines.",
+      image: "https://typesprint.live/images/top-typing-mistakes-ssc-rrb.webp",
+      date: "February 15, 2026",
+    },
+    {
+      slug: "kannada-typing-guide-2025",
+      title:
+        "Kannada Typing Guide 2025: Roadmap for KPSC Typist & Karnataka Clerk Exams",
+      excerpt:
+        "Master Kannada typing with TypeSprint drills, Nudi font practice, and exam-focused study plans to hit 30 WPM for KPSC, District Court, and Karnataka High Court roles.",
+      image: "https://typesprint.live/images/kannada-typing-hero.webp",
+      date: "August 1, 2025",
+    },
     {
       slug: "boost-typing-speed-competitive-exams",
       title: "How to Boost Your Typing Speed for Competitive Exams",
@@ -108,7 +135,7 @@ const Blogs = () => {
   const filteredPosts = blogPosts.filter(
     (post) =>
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -137,10 +164,11 @@ const Blogs = () => {
           />
           <meta
             property="og:image"
-            content="https://typesprint.com/images/blog-hero.jpg"
+            content="https://typesprint.live/images/blog-hero.jpg"
           />
-          <meta property="og:url" content="https://typesprint.com/blogs" />
+          <meta property="og:url" content="https://typesprint.live/blogs" />
           <meta name="twitter:card" content="summary_large_image" />
+          <link rel="canonical" href="https://typesprint.live/blogs" />
         </Helmet>
 
         {/* Hero Section */}

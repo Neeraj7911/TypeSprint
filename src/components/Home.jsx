@@ -7,6 +7,7 @@ import React, {
   Suspense,
   lazy,
 } from "react";
+import { Helmet } from "react-helmet-async";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -222,6 +223,35 @@ function Home() {
           : "bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100"
       }`}
     >
+      <Helmet>
+        <title>
+          TypeSprint: Free Online Typing Tests for Government Exams | SSC CGL,
+          CSIR, UPPSC
+        </title>
+        <meta
+          name="description"
+          content="Master government exam typing tests with TypeSprint. Practice SSC CGL, CHSL, RRB, CSIR and more with real exam simulators, accuracy analytics, and free certificates."
+        />
+        <meta
+          name="keywords"
+          content="typing test online free, SSC typing practice, government exam typing test, CSIR JSA typing speed, Hindi typing test, English typing speed test"
+        />
+        <link rel="canonical" href="https://typesprint.live/" />
+        <meta
+          property="og:title"
+          content="TypeSprint | Free Government Exam Typing Practice"
+        />
+        <meta
+          property="og:description"
+          content="Adaptive typing mock tests, live analytics, and exam-style simulations to help you qualify SSC, RRB, CSIR, UPPSC typing rounds."
+        />
+        <meta property="og:url" content="https://typesprint.live/" />
+        <meta
+          property="og:image"
+          content="https://typesprint.live/og-banner.jpg"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
       {/* banner removed — moved into a dedicated Home section below FeatureCards to avoid navbar overlap */}
       <Suspense fallback={null}>
         <CustomCursor />

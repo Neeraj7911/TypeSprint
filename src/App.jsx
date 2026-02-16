@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./components/Home";
@@ -54,6 +55,8 @@ import CsirDate from "./pages/contents/CsirDate.jsx"; // Assuming this is CsirDa
 import Blog9 from "./pages/blogs/Blog9.jsx"; // Assuming this is Blog9.jsx
 import CbseTest from "./pages/contents/CbseTest.jsx"; // Assuming this is CbseJsa.jsx
 import Blog10 from "./pages/blogs/Blog10.jsx"; // Assuming this is Blog10.jsx
+import Blog11 from "./pages/blogs/Blog11.jsx";
+import Blog12 from "./pages/blogs/Blog12.jsx";
 import SscCglTyping from "./pages/contents/SscCglTyping.jsx"; // Assuming this is SscCglTyping.jsx
 import LiveTestResults from "./pages/LiveTestResults";
 import NotFound from "./pages/NotFound.jsx";
@@ -125,12 +128,30 @@ const AppContent = () => {
               element={<CbseBlog />}
             />
             <Route
-              path="/ssc-cgl-typing-test-2025"
+              path="/ssc-cgl-typing-test-practice"
               element={<SscCglTyping />}
             />
             <Route
-              path="/blogs/kannada-typing-test-guide"
+              path="/ssc-cgl-typing-test-2025"
+              element={<Navigate to="/ssc-cgl-typing-test-practice" replace />}
+            />
+            <Route
+              path="/blogs/kannada-typing-guide-2025"
               element={<Blog8 />}
+            />
+            <Route
+              path="/blogs/kannada-typing-test-guide"
+              element={
+                <Navigate to="/blogs/kannada-typing-guide-2025" replace />
+              }
+            />
+            <Route
+              path="/blogs/top-10-typing-mistakes-ssc-rrb"
+              element={<Blog11 />}
+            />
+            <Route
+              path="/blogs/mp-cpct-typing-exam-2026"
+              element={<Blog12 />}
             />
             <Route path="/ssc-cgl-typing-test" element={<SscCgl />} />
             <Route
@@ -138,8 +159,12 @@ const AppContent = () => {
               element={<Min />}
             />
             <Route
-              path="/kannada-typing-test"
+              path="/kannada-typing-test-practice"
               element={<KannadaTypingTest />}
+            />
+            <Route
+              path="/kannada-typing-test"
+              element={<Navigate to="/kannada-typing-test-practice" replace />}
             />
             <Route
               path="/csir-jsa-typing-stenography-test-rules"
