@@ -30,6 +30,7 @@ import {
   TwitterShareButton,
   LinkedinShareButton,
 } from "react-share";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 // Register ChartJS components
 ChartJS.register(
@@ -512,7 +513,7 @@ const CBSE2025TypingBlog = () => {
                       in Delhi (Computer-Based Test).
                     </li>
                     <li>
-                      <strong>Junior Assistant Typing Test</strong>: July 3–5,
+                      <strong>Junior Assistant Typing Test</strong>: July 3-5,
                       2025, in Delhi (check candidate login for exact date).
                     </li>
                     <li>
@@ -1312,6 +1313,7 @@ const CBSE2025TypingBlog = () => {
             </button>
           </div>
         </div>
+        <BlogInterlink currentSlug="cbse-recruitment-2025-tier2-typing-test-guide" />
       </div>
     </ErrorBoundary>
   );

@@ -76,6 +76,7 @@ const Blogs = () => {
         "Track the upcoming MP CPCT typing schedule, admit card timeline, and follow a TypeSprint plan to hit 30+ net WPM before the exam window opens.",
       image: "https://typesprint.live/images/mp-cpct-typing-exam-2026.webp",
       date: "February 16, 2026",
+      published: "2026-02-16",
     },
     {
       slug: "top-10-typing-mistakes-ssc-rrb",
@@ -85,6 +86,17 @@ const Blogs = () => {
         "Stop the accuracy leaks that fail SSC and RRB candidates. Learn the ten critical mistakes and fix them with TypeSprint.live practice routines.",
       image: "https://typesprint.live/images/top-typing-mistakes-ssc-rrb.webp",
       date: "February 15, 2026",
+      published: "2026-02-15",
+    },
+    {
+      slug: "the-ultimate-guide-to-typing-tests-2025",
+      title:
+        "The Ultimate Guide to Typing Tests: Speed, WPM, Exam Prep & Free Online Practice",
+      excerpt:
+        "Comprehensive 2025 playbook covering WPM benchmarks, exam formats, five-minute drills, and how to train for free on TypeSprint.live.",
+      image: "https://typesprint.live/images/typing-tests-ultimate-guide-2025.webp",
+      date: "Updated February 18, 2026",
+      published: "2026-02-18",
     },
     {
       slug: "kannada-typing-guide-2025",
@@ -94,40 +106,92 @@ const Blogs = () => {
         "Master Kannada typing with TypeSprint drills, Nudi font practice, and exam-focused study plans to hit 30 WPM for KPSC, District Court, and Karnataka High Court roles.",
       image: "https://typesprint.live/images/kannada-typing-hero.webp",
       date: "August 1, 2025",
+      published: "2025-08-01",
+    },
+    {
+      slug: "cbse-recruitment-2025-tier2-typing-test-guide",
+      title: "CBSE Recruitment 2025 Tier-II Typing Test Guide",
+      excerpt:
+        "Use TypeSprint simulations to stay ahead of CBSE Tier-II typing requirements, benchmarks, and desk ready accuracy goals.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "July 2, 2025",
+      published: "2025-07-02",
+    },
+    {
+      slug: "csir-jsa-typing-stenography-test-2025",
+      title: "CSIR JSA Typing and Stenography Test 2025 Playbook",
+      excerpt:
+        "Understand CSIR JSA typing and stenography evaluation parameters, scoring matrix, and the drills that keep your accuracy on target.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "June 20, 2025",
+      published: "2025-06-20",
+    },
+    {
+      slug: "csir-jsa-typing-stenography-test-date-2025",
+      title: "CSIR JSA Typing Test Date 2025: Timeline & Preparation Checklist",
+      excerpt:
+        "Stay aligned with the official CSIR calendar, document upload deadlines, and the week-by-week preparation cadence to stay exam ready.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "June 22, 2025",
+      published: "2025-06-22",
     },
     {
       slug: "boost-typing-speed-competitive-exams",
       title: "How to Boost Your Typing Speed for Competitive Exams",
       excerpt:
         "Learn expert tips to improve your typing speed and accuracy for SSC, NTPC, and other competitive exams with TypeSprint.",
-      image: "https://typesprint.com/images/typing-blog-hero.jpg",
+      image: "https://typesprint.live/og-banner.jpg",
       date: "May 23, 2025",
+      published: "2025-05-23",
     },
     {
       slug: "prepare-csir-jsa-typing-test",
       title: "Prepare for CSIR JSA Typing Test with TypeSprint",
       excerpt:
         "Get ready for the CSIR JSA typing test with our comprehensive guide. Master the skills you need to succeed.",
-      image: "https://typesprint.com/images/typing-blog-hero.jpg",
+      image: "https://typesprint.live/og-banner.jpg",
       date: "May 24, 2025",
+      published: "2025-05-24",
     },
     {
       slug: "csir-jsa-eligiblity-and-typing-speed-criteria",
-      title: "Master the CSIR JSA Typing Test with TypeSprint’s Free Practice",
+      title: "Master the CSIR JSA Typing Test with TypeSprint's Free Practice",
       excerpt:
-        "Prepare for the CSIR JSA typing test with TypeSprint’s expert guide. Achieve 35 WPM in English or 30 WPM in Hindi with 80%+ accuracy.",
-      image: "https://typesprint.com/images/csir-jsa-typing-blog-hero.jpg",
-      date: "2025-05-27",
+        "Prepare for the CSIR JSA typing test with TypeSprint's expert guide. Achieve 35 WPM in English or 30 WPM in Hindi with 80% accuracy.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "May 27, 2025",
+      published: "2025-05-27",
+    },
+    {
+      slug: "full-paragraph-typing-tests-ssc-chsl",
+      title: "Full Paragraph Typing Tests for SSC CHSL",
+      excerpt:
+        "Practice long-form SSC CHSL typing passages, boost endurance, and understand evaluation rubrics using TypeSprint drills.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "May 26, 2025",
+      published: "2025-05-26",
     },
     {
       slug: "dgafms-group-c-typing-test-2025",
       title:
-        "Master DGAFMS GROUP C (ALL POSTS) Typing Test with TypeSprint’s Free Practice",
+        "Master DGAFMS Group C Typing Test with TypeSprint's Free Practice",
       excerpt:
-        "Prepare for the DGAFMS GROUP C typing test with TypeSprint’s expert guide. Achieve 35 WPM in English or 30 WPM in Hindi with 80%+ accuracy.",
-      image:
-        "https://blogger.googleusercontent.com/img/a/AVvXsEhl5CL4QKsrTAv_CVvSdb0ZoLu9T3AEaOPoV2heu7foelX2VPgPEHnv4UFq-cxG8fxJjeIb5lQXa1ciDFxRr7PMHr-8tOAtYMwqZRo37_uIinTze7u530gzQvC5cNvNZuus2I_5u3Krca7FZXAEEdCClp9DPGn6Oms09DXaWLz5eviHi2pBwdjDqphhEfM",
-      date: "2025-06-11",
+        "Prepare for the DGAFMS Group C typing test with TypeSprint drills to maintain 35 WPM English or 30 WPM Hindi accuracy.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "June 11, 2025",
+      published: "2025-06-11",
+    },
+    {
+      slug: "cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules",
+      title:
+        "CBSE Superintendent Typing Rules 2025: English and Hindi Speed Targets",
+      excerpt:
+        "Decode the CBSE superintendent and junior assistant typing rules, official nuances, and how to pace bilingual practice.",
+      image: "https://typesprint.live/og-banner.jpg",
+      date: "July 15, 2025",
+      published: "2025-07-15",
+      href:
+        "/blog/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules",
     },
   ];
 
@@ -137,6 +201,35 @@ const Blogs = () => {
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const canonicalBase = "https://typesprint.live";
+  const blogListSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${canonicalBase}/blogs#collection`,
+    url: `${canonicalBase}/blogs`,
+    name: "TypeSprint Blog",
+    description:
+      "Actionable strategies, exam calendars, and accuracy drills for government typing test aspirants.",
+    inLanguage: "en",
+    isPartOf: {
+      "@id": `${canonicalBase}/#website`,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      numberOfItems: blogPosts.length,
+      itemListElement: blogPosts.map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `${canonicalBase}${post.href ?? `/blogs/${post.slug}`}`,
+        name: post.title,
+        description: post.excerpt,
+        image: post.image,
+        datePublished: post.published,
+      })),
+    },
+  };
 
   return (
     <ErrorBoundary>
@@ -169,6 +262,9 @@ const Blogs = () => {
           <meta property="og:url" content="https://typesprint.live/blogs" />
           <meta name="twitter:card" content="summary_large_image" />
           <link rel="canonical" href="https://typesprint.live/blogs" />
+          <script type="application/ld+json">
+            {JSON.stringify(blogListSchema)}
+          </script>
         </Helmet>
 
         {/* Hero Section */}
@@ -243,7 +339,7 @@ const Blogs = () => {
                   {filteredPosts.map((post, index) => (
                     <Link
                       key={index}
-                      to={`/blogs/${post.slug}`}
+                      to={post.href ?? `/blogs/${post.slug}`}
                       className="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700 hover:border-cyan-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl"
                     >
                       <img

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaKeyboard, FaTrophy, FaChartLine, FaLock } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -364,7 +365,7 @@ const BlogCSIRJSATypingTest = () => {
                       Log in to TypeSprint to access the complete guide,
                       including all five strategies and exclusive tips for the
                       CSIR JSA typing test. No subscription or payment
-                      required—just sign in!
+                      required-just sign in!
                     </p>
                     <button
                       onClick={handleLogin}
@@ -450,6 +451,7 @@ const BlogCSIRJSATypingTest = () => {
             </div>
           </section>
         )}
+        <BlogInterlink currentSlug="prepare-csir-jsa-typing-test" />
       </div>
     </ErrorBoundary>
   );

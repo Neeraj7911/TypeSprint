@@ -57,6 +57,7 @@ import CbseTest from "./pages/contents/CbseTest.jsx"; // Assuming this is CbseJs
 import Blog10 from "./pages/blogs/Blog10.jsx"; // Assuming this is Blog10.jsx
 import Blog11 from "./pages/blogs/Blog11.jsx";
 import Blog12 from "./pages/blogs/Blog12.jsx";
+import Blog13 from "./pages/blogs/Blog13.jsx";
 import SscCglTyping from "./pages/contents/SscCglTyping.jsx"; // Assuming this is SscCglTyping.jsx
 import LiveTestResults from "./pages/LiveTestResults";
 import NotFound from "./pages/NotFound.jsx";
@@ -152,6 +153,10 @@ const AppContent = () => {
             <Route
               path="/blogs/mp-cpct-typing-exam-2026"
               element={<Blog12 />}
+            />
+            <Route
+              path="/blogs/the-ultimate-guide-to-typing-tests-2025"
+              element={<Blog13 />}
             />
             <Route path="/ssc-cgl-typing-test" element={<SscCgl />} />
             <Route

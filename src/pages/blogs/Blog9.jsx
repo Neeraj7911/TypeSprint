@@ -30,6 +30,7 @@ import {
   TwitterShareButton,
   LinkedinShareButton,
 } from "react-share";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 // Register ChartJS components
 ChartJS.register(
@@ -1336,6 +1337,7 @@ const CSIRJSATypingBlog = () => {
             </button>
           </div>
         </div>
+        <BlogInterlink currentSlug="csir-jsa-typing-stenography-test-date-2025" />
       </div>
     </ErrorBoundary>
   );

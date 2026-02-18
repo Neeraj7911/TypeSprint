@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaKeyboard, FaTrophy, FaChartLine, FaLock } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -363,7 +364,7 @@ const Blog3 = () => {
                     <p className="text-lg text-gray-300 mb-6">
                       Sign in to TypeSprint to access the complete guide,
                       including all five strategies, exclusive tips, and a
-                      sample SSC CHSL paragraph. No subscription required—just
+                      sample SSC CHSL paragraph. No subscription required-just
                       sign in!
                     </p>
                     <button
@@ -540,6 +541,7 @@ const Blog3 = () => {
             </ul>
           </div>
         </section>
+        <BlogInterlink currentSlug="full-paragraph-typing-tests-ssc-chsl" />
       </div>
     </ErrorBoundary>
   );

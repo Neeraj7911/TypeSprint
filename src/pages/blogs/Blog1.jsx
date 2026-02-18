@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaKeyboard, FaTrophy, FaChartLine, FaLock } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -353,7 +354,7 @@ const BlogBoostTypingSpeed = () => {
                     <p className="text-lg text-gray-300 mb-6">
                       Log in to TypeSprint to access the complete guide,
                       including all five strategies and exclusive tips. No
-                      subscription or payment required—just sign in!
+                      subscription or payment required-just sign in!
                     </p>
                     <button
                       onClick={handleLogin}
@@ -438,6 +439,7 @@ const BlogBoostTypingSpeed = () => {
             </div>
           </section>
         )}
+        <BlogInterlink currentSlug="boost-typing-speed-competitive-exams" />
       </div>
     </ErrorBoundary>
   );

@@ -30,6 +30,7 @@ import {
   TwitterShareButton,
   LinkedinShareButton,
 } from "react-share";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 // Lazy load Chart.js components
 const Bar = lazy(() =>
@@ -871,7 +872,7 @@ const KannadaTypingBlog2025 = () => {
                   </div>
                   <p className="text-gray-300 text-center mt-6">
                     Attaining a proficient level of 30 WPM in Kannada along with
-                    precision using TypeSprint’s AI feedback is possible –
+                    precision using TypeSprint’s AI feedback is possible -
                     achieve it!
                   </p>
                   <button
@@ -1548,6 +1549,7 @@ const KannadaTypingBlog2025 = () => {
             </button>
           </div>
         </div>
+        <BlogInterlink currentSlug="kannada-typing-guide-2025" />
       </div>
     </ErrorBoundary>
   );

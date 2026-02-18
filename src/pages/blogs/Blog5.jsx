@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -167,7 +168,7 @@ const DGAFMSGroupCTypingBlog = () => {
                     name: "What is the DGAFMS Group C LDC typing exam pattern?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "The LDC typing test involves typing a full paragraph on a computer, typically 350–400 words, within a set time to achieve 35 WPM (English) or 30 WPM (Hindi).",
+                      text: "The LDC typing test involves typing a full paragraph on a computer, typically 350-400 words, within a set time to achieve 35 WPM (English) or 30 WPM (Hindi).",
                     },
                   },
                 ],
@@ -268,7 +269,7 @@ const DGAFMSGroupCTypingBlog = () => {
                           1. Practice Real Exam Paragraphs
                         </h3>
                         <p className="text-gray-400">
-                          DGAFMS LDC typing tests involve 350–400-word
+                          DGAFMS LDC typing tests involve 350-400-word
                           paragraphs. TypeSprint’s tests replicate this format,
                           including punctuation and formatting challenges.
                         </p>
@@ -362,7 +363,7 @@ const DGAFMSGroupCTypingBlog = () => {
                           7. Practice Daily for Success
                         </h3>
                         <p className="text-gray-400">
-                          Dedicate 15–30 minutes daily on TypeSprint to reach 35
+                          Dedicate 15-30 minutes daily on TypeSprint to reach 35
                           WPM for LDC or 30 WPM for Store Keeper in weeks.
                         </p>
                       </div>
@@ -599,7 +600,7 @@ const DGAFMSGroupCTypingBlog = () => {
                   <ul className="list-disc list-inside text-gray-400">
                     <li>
                       <strong>LDC</strong>: 35 WPM (English) or 30 WPM (Hindi),
-                      ~350–400 words, 90%+ accuracy.
+                      ~350-400 words, 90%+ accuracy.
                     </li>
                     <li>
                       <strong>Store Keeper</strong>: 30 WPM (English) or 25 WPM
@@ -607,7 +608,7 @@ const DGAFMSGroupCTypingBlog = () => {
                     </li>
                     <li>
                       <strong>Stenographer Grade-II</strong>: Dictation at 80
-                      WPM, transcription in 50–75 mins.
+                      WPM, transcription in 50-75 mins.
                     </li>
                   </ul>
                   <button
@@ -711,7 +712,7 @@ const DGAFMSGroupCTypingBlog = () => {
                       question:
                         "What is the DGAFMS Group C LDC typing exam pattern?",
                       answer:
-                        "The LDC typing test requires typing a 350–400-word paragraph on a computer within a set time, achieving 35 WPM (English) or 30 WPM (Hindi) with high accuracy.",
+                        "The LDC typing test requires typing a 350-400-word paragraph on a computer within a set time, achieving 35 WPM (English) or 30 WPM (Hindi) with high accuracy.",
                     },
                     {
                       question:
@@ -728,7 +729,7 @@ const DGAFMSGroupCTypingBlog = () => {
                     {
                       question: "What is a good typing speed for DGAFMS LDC?",
                       answer:
-                        "Aim for 40–45 WPM with 90%+ accuracy to comfortably clear the test and stand out.",
+                        "Aim for 40-45 WPM with 90%+ accuracy to comfortably clear the test and stand out.",
                     },
                     {
                       question:
@@ -740,7 +741,7 @@ const DGAFMSGroupCTypingBlog = () => {
                       question:
                         "How long should I practice daily for DGAFMS LDC?",
                       answer:
-                        "Practice 15–30 minutes daily on TypeSprint to reach 35 WPM in 2–4 weeks.",
+                        "Practice 15-30 minutes daily on TypeSprint to reach 35 WPM in 2-4 weeks.",
                     },
                   ].map((faq, index) => (
                     <div
@@ -848,6 +849,7 @@ const DGAFMSGroupCTypingBlog = () => {
             </button>
           </div>
         </div>
+        <BlogInterlink currentSlug="dgafms-group-c-typing-test-2025" />
       </div>
     </ErrorBoundary>
   );

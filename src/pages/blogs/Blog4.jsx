@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -217,7 +218,7 @@ const Blog4 = () => {
                 free, exam-like full-paragraph tests and AI-powered feedback.
               </p>
               <p className="text-lg text-gray-300 mb-8">
-                Whether you’re starting from scratch or aiming for 40–50 WPM,
+                Whether you’re starting from scratch or aiming for 40-50 WPM,
                 our platform is designed to make your preparation engaging and
                 effective. Below, we share seven proven strategies, common
                 mistakes to avoid, and inspiring stories from our community to
@@ -336,7 +337,7 @@ const Blog4 = () => {
                           7. Commit to Daily Practice
                         </h3>
                         <p className="text-gray-400">
-                          Spend 15–30 minutes daily on TypeSprint to steadily
+                          Spend 15-30 minutes daily on TypeSprint to steadily
                           improve your speed and accuracy, ensuring you’re
                           exam-ready in weeks.
                         </p>
@@ -541,7 +542,7 @@ const Blog4 = () => {
                   {
                     question: "What is a good typing speed for CSIR JSA?",
                     answer:
-                      "Aiming for 40–50 WPM with 80%+ accuracy ensures you complete the test comfortably and stand out.",
+                      "Aiming for 40-50 WPM with 80%+ accuracy ensures you complete the test comfortably and stand out.",
                   },
                   {
                     question:
@@ -552,7 +553,7 @@ const Blog4 = () => {
                   {
                     question: "How long should I practice daily for CSIR JSA?",
                     answer:
-                      "Practice 15–30 minutes daily on TypeSprint to improve your speed and accuracy within 2–4 weeks.",
+                      "Practice 15-30 minutes daily on TypeSprint to improve your speed and accuracy within 2-4 weeks.",
                   },
                   {
                     question:
@@ -631,7 +632,7 @@ const Blog4 = () => {
                 </h3>
                 <p className="text-lg text-gray-300 mb-6">
                   As part of the TypeSprint family, you’re closer to acing the
-                  CSIR JSA typing test. Keep practicing to hit 40–50 WPM and
+                  CSIR JSA typing test. Keep practicing to hit 40-50 WPM and
                   secure your dream role!
                 </p>
                 <button
@@ -661,6 +662,7 @@ const Blog4 = () => {
             )}
           </div>
         </section>
+        <BlogInterlink currentSlug="csir-jsa-eligiblity-and-typing-speed-criteria" />
       </div>
     </ErrorBoundary>
   );

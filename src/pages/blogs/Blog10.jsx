@@ -30,6 +30,7 @@ import {
   TwitterShareButton,
   LinkedinShareButton,
 } from "react-share";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 // Register ChartJS components
 ChartJS.register(
@@ -1348,6 +1349,7 @@ const CBSEJuniorAssistantTypingBlog = () => {
             </button>
           </div>
         </div>
+        <BlogInterlink currentSlug="cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules" />
       </div>
     </ErrorBoundary>
   );

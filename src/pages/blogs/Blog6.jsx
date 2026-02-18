@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 import {
   WhatsappShareButton,
   TwitterShareButton,
@@ -439,7 +440,7 @@ const CSIRJSATypingBlog = () => {
                           7. Practice Daily for Success
                         </h3>
                         <p className="text-gray-400">
-                          Dedicate 15–30 minutes daily on TypeSprint to reach 35
+                          Dedicate 15-30 minutes daily on TypeSprint to reach 35
                           WPM (English) or 30 WPM (Hindi) in 2-4 weeks.
                         </p>
                       </div>
@@ -1157,6 +1158,7 @@ const CSIRJSATypingBlog = () => {
             </button>
           </div>
         </div>
+        <BlogInterlink currentSlug="csir-jsa-typing-stenography-test-2025" />
       </div>
     </ErrorBoundary>
   );

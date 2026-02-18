@@ -7,6 +7,7 @@ import {
   FaClipboardCheck,
 } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -76,7 +77,7 @@ const typingTargets = [
     title: "Integrated Session",
     points: [
       "75-minute computer knowledge MCQ paper immediately precedes typing component",
-      "No break between MCQ completion and typing segment—plan hydration and stamina",
+      "No break between MCQ completion and typing segment-plan hydration and stamina",
       "You must qualify both MCQ and typing to receive the CPCT certificate",
     ],
   },
@@ -91,7 +92,7 @@ const practicePlan = [
   {
     label: "Week 2: Accuracy First",
     detail:
-      "Switch to TypeSprint’s CPCT mock set—target 92%+ accuracy before pushing speed; enable real-time error overlays.",
+      "Switch to TypeSprint’s CPCT mock set-target 92%+ accuracy before pushing speed; enable real-time error overlays.",
   },
   {
     label: "Week 3: Exam Simulation",
@@ -108,7 +109,7 @@ const practicePlan = [
 const faqs = [
   {
     q: "Is there a separate prelim for the CPCT typing module?",
-    a: "No. CPCT is a single sitting—75-minute MCQ exam followed instantly by the typing test. Failing either section requires a full retake.",
+    a: "No. CPCT is a single sitting-75-minute MCQ exam followed instantly by the typing test. Failing either section requires a full retake.",
   },
   {
     q: "When will the April/May 2026 admit card be available?",
@@ -248,8 +249,8 @@ const BlogMpCpct2026 = () => {
               The typing module is a 15-minute, passage-based assessment in
               English, Hindi, or both, where net speed matters more than flashy
               gross WPM because each error shaves marks from your final score.
-              Exam software remains straightforward—no auto-complete or
-              predictive text—so consistent practice with standard keyboards is
+              Exam software remains straightforward-no auto-complete or
+              predictive text-so consistent practice with standard keyboards is
               the fastest way to qualify.
             </p>
             <div className="mt-6 grid gap-6 md:grid-cols-3">
@@ -446,6 +447,7 @@ const BlogMpCpct2026 = () => {
             </div>
           </section>
         </main>
+        <BlogInterlink currentSlug="mp-cpct-typing-exam-2026" />
       </div>
     </ErrorBoundary>
   );

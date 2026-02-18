@@ -2,6 +2,7 @@ import React from "react";
 import { Helmet } from "react-helmet-async";
 import { FaArrowRight, FaBookOpen, FaLock } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
+import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -1012,7 +1013,7 @@ const BlogTopTypingMistakes = () => {
                       Follow pacing checkpoints and respect the backspace limit.
                     </li>
                     <li>
-                      Trust trained reflexes—accuracy comes from discipline, not
+                      Trust trained reflexes-accuracy comes from discipline, not
                       panic.
                     </li>
                   </ul>
@@ -1102,6 +1103,7 @@ const BlogTopTypingMistakes = () => {
             </div>
           </div>
         </footer>
+        <BlogInterlink currentSlug="top-10-typing-mistakes-ssc-rrb" />
       </div>
     </ErrorBoundary>
   );

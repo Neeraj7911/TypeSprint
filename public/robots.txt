@@ -18,10 +18,16 @@ Allow: /blogs/dgafms-group-c-typing-test-2025
 Allow: /blogs/csir-jsa-typing-stenography-test-2025
 Allow: /blogs/csir-jsa-typing-stenography-test-date-2025
 Allow: /blogs/cbse-recruitment-2025-tier2-typing-test-guide
-Allow: /blogs/kannada-typing-test-guide
+Allow: /blogs/kannada-typing-guide-2025
 Allow: /blogs/top-10-typing-mistakes-ssc-rrb
 Allow: /blogs/mp-cpct-typing-exam-2026
+Allow: /blogs/the-ultimate-guide-to-typing-tests-2025
 Allow: /blog/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules
+Allow: /kannada-typing-test-practice
+Allow: /cbse-recruitment-2025-tier2-typing-test
+Allow: /cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules
+Allow: /csir-jsa-typing-stenography-test-rules
+Allow: /csir-jsa-typing-test-2025
 
 # Disallow sensitive areas
 Disallow: /login
