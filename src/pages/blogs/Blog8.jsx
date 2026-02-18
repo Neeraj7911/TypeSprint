@@ -34,7 +34,7 @@ import BlogInterlink from "../../components/BlogInterlink.jsx";
 
 // Lazy load Chart.js components
 const Bar = lazy(() =>
-  import("react-chartjs-2").then((module) => ({ default: module.Bar }))
+  import("react-chartjs-2").then((module) => ({ default: module.Bar })),
 );
 
 // Register ChartJS components
@@ -44,7 +44,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 // Lazy load html2pdf
@@ -109,7 +109,7 @@ const KannadaTypingBlog2025 = () => {
     };
     const observer = new IntersectionObserver(
       observerCallback,
-      observerOptions
+      observerOptions,
     );
     Object.entries(sectionRefs).forEach(([key, ref]) => {
       if (ref.current) observer.observe(ref.current);
@@ -140,7 +140,7 @@ const KannadaTypingBlog2025 = () => {
       if (diff > 0) {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor(
-          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
         );
         setTimeLeft({ days, hours });
       } else {
@@ -330,7 +330,7 @@ const KannadaTypingBlog2025 = () => {
         },
       ],
     }),
-    []
+    [],
   );
 
   // Memoized Chart Options
@@ -353,7 +353,7 @@ const KannadaTypingBlog2025 = () => {
       responsive: true,
       maintainAspectRatio: false,
     }),
-    []
+    [],
   );
 
   return (

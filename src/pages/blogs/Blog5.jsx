@@ -62,7 +62,7 @@ const DGAFMSGroupCTypingBlog = () => {
 
     const observer = new IntersectionObserver(
       observerCallback,
-      observerOptions
+      observerOptions,
     );
 
     Object.entries(sectionRefs).forEach(([key, ref]) => {

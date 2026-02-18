@@ -94,7 +94,8 @@ const Blogs = () => {
         "The Ultimate Guide to Typing Tests: Speed, WPM, Exam Prep & Free Online Practice",
       excerpt:
         "Comprehensive 2025 playbook covering WPM benchmarks, exam formats, five-minute drills, and how to train for free on TypeSprint.live.",
-      image: "https://typesprint.live/images/typing-tests-ultimate-guide-2025.webp",
+      image:
+        "https://typesprint.live/images/typing-tests-ultimate-guide-2025.webp",
       date: "Updated February 18, 2026",
       published: "2026-02-18",
     },
@@ -190,8 +191,7 @@ const Blogs = () => {
       image: "https://typesprint.live/og-banner.jpg",
       date: "July 15, 2025",
       published: "2025-07-15",
-      href:
-        "/blog/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules",
+      href: "/blog/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules",
     },
   ];
 

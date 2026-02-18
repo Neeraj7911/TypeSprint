@@ -52,7 +52,7 @@ const Blog3 = () => {
 
     const observer = new IntersectionObserver(
       observerCallback,
-      observerOptions
+      observerOptions,
     );
 
     Object.entries(sectionRefs).forEach(([key, ref]) => {

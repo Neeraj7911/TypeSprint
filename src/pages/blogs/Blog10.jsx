@@ -39,7 +39,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 // Lazy load html2pdf
@@ -101,7 +101,7 @@ const CBSEJuniorAssistantTypingBlog = () => {
     };
     const observer = new IntersectionObserver(
       observerCallback,
-      observerOptions
+      observerOptions,
     );
     Object.entries(sectionRefs).forEach(([key, ref]) => {
       if (ref.current) observer.observe(ref.current);
@@ -132,7 +132,7 @@ const CBSEJuniorAssistantTypingBlog = () => {
       if (diff > 0) {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor(
-          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
         );
         setTimeLeft({ days, hours });
       } else {

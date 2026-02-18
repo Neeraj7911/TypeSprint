@@ -80,7 +80,8 @@ export default function BlogInterlink({ currentSlug }) {
         Explore More Typing Guides
       </h2>
       <p className="text-gray-300 mb-6">
-        Keep your preparation fresh with more detailed walk throughs from the TypeSprint team.
+        Keep your preparation fresh with more detailed walk throughs from the
+        TypeSprint team.
       </p>
       <div className="grid gap-4 md:grid-cols-2">
         {related.map((item) => (
