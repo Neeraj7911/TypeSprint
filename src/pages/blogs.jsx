@@ -69,6 +69,16 @@ const Blogs = () => {
   // Sample blog data
   const blogPosts = [
     {
+      slug: "surabhi-kannada-typing-practice-online-high-court-typist-2026",
+      title:
+        "Free Surabhi Kannada Typing Practice Online | High Court Typist 2026",
+      excerpt:
+        "Practice Surabhi Kannada typing with legal-style passages, instant WPM, accuracy tracking, and 100+ tests for Karnataka High Court Typist 2026.",
+      image: "https://typesprint.live/images/surabhi-kannada-typing-2026.webp",
+      date: "February 19, 2026",
+      published: "2026-02-19",
+    },
+    {
       slug: "mp-cpct-typing-exam-2026",
       title:
         "MP CPCT Typing Exam 2026: Expected April/May Dates & Practice Blueprint",

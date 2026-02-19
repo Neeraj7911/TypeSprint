@@ -22,6 +22,7 @@ Allow: /blogs/kannada-typing-guide-2025
 Allow: /blogs/top-10-typing-mistakes-ssc-rrb
 Allow: /blogs/mp-cpct-typing-exam-2026
 Allow: /blogs/the-ultimate-guide-to-typing-tests-2025
+Allow: /blogs/surabhi-kannada-typing-practice-online-high-court-typist-2026
 Allow: /blog/cbse-superintendent-junior-assistant-recruitment-2025-english-typing-hindi-typing-rules
 Allow: /kannada-typing-test-practice
 Allow: /cbse-recruitment-2025-tier2-typing-test

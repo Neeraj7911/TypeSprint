@@ -8,6 +8,15 @@ const ExamPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialSearch = queryParams.get("search") || "";
+  const langParam = (queryParams.get("lang") || "").toLowerCase();
+  const initialLanguage =
+    langParam === "kn" || langParam === "kannada"
+      ? "Kannada"
+      : langParam === "en" || langParam === "english"
+        ? "English"
+        : langParam === "hi" || langParam === "hindi"
+          ? "Hindi"
+          : "All";
 
   const nationalExams = [
     {
@@ -1272,7 +1281,7 @@ const ExamPage = () => {
   ];
 
   const [searchTerm, setSearchTerm] = useState(initialSearch);
-  const [languageFilter, setLanguageFilter] = useState("All");
+  const [languageFilter, setLanguageFilter] = useState(initialLanguage);
   const [fontFilter, setFontFilter] = useState("All");
 
   // Debug: Log initial search and filtered results
@@ -1329,7 +1338,7 @@ const ExamPage = () => {
     if (exam.konkaniWPM) availableLanguages.push("konkani");
 
     const defaultLanguage = availableLanguages.includes(
-      languageFilter.toLowerCase()
+      languageFilter.toLowerCase(),
     )
       ? languageFilter.toLowerCase()
       : availableLanguages[0] || "english";
@@ -1337,36 +1346,36 @@ const ExamPage = () => {
       defaultLanguage === "english"
         ? exam.englishWPM
         : defaultLanguage === "hindi"
-        ? exam.hindiWPM
-        : defaultLanguage === "punjabi"
-        ? exam.punjabiWPM
-        : defaultLanguage === "odia"
-        ? exam.odiaWPM
-        : defaultLanguage === "bengali"
-        ? exam.bengaliWPM
-        : defaultLanguage === "telugu"
-        ? exam.teluguWPM
-        : defaultLanguage === "kannada"
-        ? exam.kannadaWPM
-        : defaultLanguage === "tamil"
-        ? exam.tamilWPM
-        : defaultLanguage === "malayalam"
-        ? exam.malayalamWPM
-        : defaultLanguage === "marathi"
-        ? exam.marathiWPM
-        : defaultLanguage === "gujarati"
-        ? exam.gujaratiWPM
-        : defaultLanguage === "assamese"
-        ? exam.assameseWPM
-        : defaultLanguage === "manipuri"
-        ? exam.manipuriWPM
-        : defaultLanguage === "khasi"
-        ? exam.khasiWPM
-        : defaultLanguage === "urdu"
-        ? exam.urduWPM
-        : defaultLanguage === "konkani"
-        ? exam.konkaniWPM
-        : 35;
+          ? exam.hindiWPM
+          : defaultLanguage === "punjabi"
+            ? exam.punjabiWPM
+            : defaultLanguage === "odia"
+              ? exam.odiaWPM
+              : defaultLanguage === "bengali"
+                ? exam.bengaliWPM
+                : defaultLanguage === "telugu"
+                  ? exam.teluguWPM
+                  : defaultLanguage === "kannada"
+                    ? exam.kannadaWPM
+                    : defaultLanguage === "tamil"
+                      ? exam.tamilWPM
+                      : defaultLanguage === "malayalam"
+                        ? exam.malayalamWPM
+                        : defaultLanguage === "marathi"
+                          ? exam.marathiWPM
+                          : defaultLanguage === "gujarati"
+                            ? exam.gujaratiWPM
+                            : defaultLanguage === "assamese"
+                              ? exam.assameseWPM
+                              : defaultLanguage === "manipuri"
+                                ? exam.manipuriWPM
+                                : defaultLanguage === "khasi"
+                                  ? exam.khasiWPM
+                                  : defaultLanguage === "urdu"
+                                    ? exam.urduWPM
+                                    : defaultLanguage === "konkani"
+                                      ? exam.konkaniWPM
+                                      : 35;
     const font =
       fontFilter === "All" && exam.fonts.length > 0
         ? exam.fonts[0]
@@ -1376,8 +1385,8 @@ const ExamPage = () => {
       `/select-language?exam=${exam.name
         .toLowerCase()
         .replace(/\s+/g, "-")}&availableLanguages=${availableLanguages.join(
-        ","
-      )}&wpm=${wpm}&font=${font}`
+        ",",
+      )}&wpm=${wpm}&font=${font}`,
     );
   };
 
